@@ -1,0 +1,88 @@
+﻿<Window x:Class="Revelator.io24.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Revelator.io24.Wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="830">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="313*"/>
+            <ColumnDefinition Width="87*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
+            <GroupBox Header="Microphone L" Width="90" Background="LightGray">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <ProgressBar x:Name="microphoneL" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="gainReductionMeterL" Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue" Value="100" />
+                    <Slider Orientation="Vertical" Margin="10" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Microphone R" Width="90" Background="LightGray">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <ProgressBar x:Name="microphoneR" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="gainReductionMeterR" Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue" Value="100" />
+                    <Slider Orientation="Vertical" Margin="10" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Playback L/R" Width="90">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="20" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <ProgressBar x:Name="playback_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                        <ProgressBar  x:Name="playback_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                        <Slider Orientation="Vertical" Margin="10" />
+                    </StackPanel>
+                    <Button Grid.Row="1" x:Name="playbackMute" Click="playbackMute_Click">Mute</Button>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="Virtual A L/R" Width="90">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <ProgressBar x:Name="virtualOutputA_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="virtualOutputA_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <Slider Orientation="Vertical" Margin="10" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Virtual B L/R" Width="90">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <ProgressBar x:Name="virtualOutputB_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="virtualOutputB_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <Slider Orientation="Vertical" Margin="10" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Reverb" Width="90">
+            </GroupBox>
+
+            <GroupBox Header="Main" Width="90" Background="LightGray">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Slider Orientation="Vertical" Margin="10" />
+                    <ProgressBar x:Name="main_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="main_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Stream Mix 1" Width="90" Background="LightGray">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Slider Orientation="Vertical" Margin="10" />
+                    <ProgressBar x:Name="streamMix1_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="streamMix1_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Stream Mix 2" Width="90" Background="LightGray">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Slider Orientation="Vertical" Margin="10" />
+                    <ProgressBar x:Name="streamMix2_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                    <ProgressBar x:Name="streamMix2_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10" />
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</Window>
