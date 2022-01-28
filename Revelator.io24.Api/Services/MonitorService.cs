@@ -1,7 +1,6 @@
 ﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Models;
 using Serilog;
-using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -12,14 +11,10 @@ namespace Revelator.io24.Api.Services
     /// This service is used to receive UDP packages containing monitorin data.
     /// Examples of this is the mic/volume meters, and FX meters.
     /// </summary>
-    public class MonitorService : IDisposable, INotifyPropertyChanged
+    public class MonitorService : IDisposable
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void OnPropertyChanged(string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        public event EventHandler? FatChannelUpdated;
+        public event EventHandler? ValuesUpdated;
 
         public FatChannelMonitorModel FatChannel { get; set; } = new FatChannelMonitorModel();
         public ValuesMonitorModel Values { get; set; } = new ValuesMonitorModel();
@@ -129,8 +124,8 @@ namespace Revelator.io24.Api.Services
                 //Gain Reduction Meter (0xFF, 0xFF is highest = no blue line):
                 var gainReductionMeterL = BitConverter.ToUInt16(data[44..46]);
                 var gainReductionMeterR = BitConverter.ToUInt16(data[46..48]);
-                FatChannel.GainReductionMeterL = gainReductionMeterL;
-                FatChannel.GainReductionMeterR = gainReductionMeterR;
+                FatChannel.GainReductionMeter_L = gainReductionMeterL;
+                FatChannel.GainReductionMeter_R = gainReductionMeterR;
 
                 var unknown4 = data[48..101];
                 var unknown4Val = BitConverter.ToString(unknown4).Replace("-", "");
@@ -140,12 +135,13 @@ namespace Revelator.io24.Api.Services
                 //FFFFFFFFF9FFF9FFF9FFF9FFF9FFF9FF0600010000040000020400040000040800040000000C000400040010000400070014000200
                 var prevValues = new[] {
                     "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200",
-                    "FFFFFFFFF9FFF9FFF9FFF9FFF9FFF9FF0600010000040000020400040000040800040000000C000400040010000400070014000200"
+                    "FFFFFFFFF9FFF9FFF9FFF9FFF9FFF9FF0600010000040000020400040000040800040000000C000400040010000400070014000200",
+                    "FFFFFFFFF9FFF9FFFFFFFFFFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200"
                 };
                 if (!prevValues.Contains(unknown4Val))
                     Log.Information("Something 3: {val1}", unknown4Val);
 
-                OnPropertyChanged(nameof(FatChannel));
+                FatChannelUpdated?.Invoke(this, EventArgs.Empty);
             }
             else if (data.Length == 81)
             {
@@ -205,7 +201,7 @@ namespace Revelator.io24.Api.Services
                 if (unknown2Val != "0400000000060001000600060004000C000400070010000200")
                     Log.Information("Unknown 2: {val1}", unknown2Val);
 
-                OnPropertyChanged("Values");
+                ValuesUpdated?.Invoke(this, EventArgs.Empty);
             }
             else if (data.Length == 85)
             {
@@ -258,6 +254,8 @@ namespace Revelator.io24.Api.Services
                 var unknown2Val = BitConverter.ToString(unknown2).Replace("-", "");
                 if (unknown2Val != "0400000000080001000800060004000E000400070012000200")
                     Log.Information("Unknown 2: {val1}", unknown2Val);
+
+                ValuesUpdated?.Invoke(this, EventArgs.Empty);
             }
             else
             {

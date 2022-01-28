@@ -1,13 +1,24 @@
-﻿using Revelator.io24.Api.Helpers;
+﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages.Writers;
+using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Models.Json;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
 
 namespace Revelator.io24.Api.Services
 {
     public class CommunicationService : IDisposable
     {
+        public delegate void RouteUpdated(string route, ushort state);
+        public delegate void SynchronizeEvent(SynchronizeModel synchronizeModel);
+
+        public event RouteUpdated? RouteChange;
+        public event SynchronizeEvent? Synchronize;
+
         private readonly TcpClient _tcpClient;
 
         private Thread? _listeningThread;
@@ -114,12 +125,15 @@ namespace Revelator.io24.Api.Services
                     {
                         case "PV":
                             //PV Settings packet
+                            PV(data);
                             Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
                             break;
                         case "ZM": //ZLib Message
+                            ZM(data);
                             Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
                             break;
-                        case "PS": //Ex. Channel name change, Profile change
+                        case "PS":
+                            PS(data);
                             Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
                             break;
                         default:
@@ -137,23 +151,57 @@ namespace Revelator.io24.Api.Services
         /// <summary>
         /// Happens ex. on turning thing on and of, ex. EQ
         /// </summary>
-        private static void PV(byte[] data)
+        private void PV(byte[] data)
         {
-            //
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = data[6..8];
+            var customBytes = data[8..12];
+
+            var route = Encoding.ASCII.GetString(data[12..^7]);
+            var emptyBytes = data[^7..^2];
+            var state = BitConverter.ToUInt16(data[^2..^0]);
+
+            RouteChange?.Invoke(route, state);
         }
 
         /// <summary>
         /// ZLib compressed message
         /// </summary>
-        private static void ZM(byte[] data)
+        private void ZM(byte[] data)
         {
-            //
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = data[6..8];
+            var customBytes = data[8..12];
+
+            var size = BitConverter.ToInt32(data[12..16]);
+
+            using var compressedStream = new MemoryStream(data[16..]);
+            using var inputStream = new InflaterInputStream(compressedStream);
+            using var outputStream = new MemoryStream();
+
+            inputStream.CopyTo(outputStream);
+            outputStream.Position = 0;
+
+            var json = Encoding.ASCII.GetString(outputStream.ToArray());
+
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var synchronize = JsonSerializer.Deserialize<Synchronize>(json, options);
+            //TODO: Check for unmapped members, can do with reflection, as all models should inherit from Extension class.
+
+            //Line: Mute, volume etc.
+            //Return: Mute, volume etc.
+            //Main: Mute, volume etc.
+            //Aux: Mute, volume etc.
+            var model = new SynchronizeModel(synchronize);
+            Synchronize?.Invoke(model);
         }
 
         /// <summary>
         /// Changing profile, changing names... Updates of strings?
         /// </summary>
-        private static void PS(byte[] data)
+        private void PS(byte[] data)
         {
             //
         }

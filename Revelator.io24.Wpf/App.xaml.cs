@@ -1,6 +1,8 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Revelator.io24.Api.Services;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using System;
 using System.Windows;
 
 namespace Revelator.io24.Wpf
@@ -10,14 +12,25 @@ namespace Revelator.io24.Wpf
     /// </summary>
     public partial class App : Application
     {
+        //TODO: Move out:
         public static BroadcastService? BroadcastService;
         public static MonitorService? MonitorService;
         public static CommunicationService? CommunicationService;
         public static UpdateService? UpdateService;
 
+        private IServiceProvider _serviceProvider;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+#if DEBUG
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console(theme: ConsoleTheme.None)
+                .CreateLogger();
+
+            AllocConsole();
+#endif
 
             BroadcastService = new BroadcastService();
             var deviceTcpPort = BroadcastService.WaitForFirstBroadcast();
@@ -28,22 +41,19 @@ namespace Revelator.io24.Wpf
             CommunicationService = new CommunicationService();
             CommunicationService.Init(deviceTcpPort, monitorPort);
             UpdateService = new UpdateService(CommunicationService);
-#if DEBUG
-            //Log.Logger = new LoggerConfiguration()
-            //    .WriteTo.Console(theme: ConsoleTheme.None)
-            //    .CreateLogger();
 
-            //AllocConsole();
-#endif
-        }
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton(typeof(MainWindow));
+            serviceCollection.AddSingleton(typeof(MainViewModel));
+            serviceCollection.AddSingleton(BroadcastService);
+            serviceCollection.AddSingleton(MonitorService);
+            serviceCollection.AddSingleton(UpdateService);
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            BroadcastService?.Dispose();
-            MonitorService?.Dispose();
-            CommunicationService?.Dispose();
+            _serviceProvider = serviceCollection.BuildServiceProvider();
 
-            base.OnExit(e);
+            //Run application:
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Show();
         }
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]

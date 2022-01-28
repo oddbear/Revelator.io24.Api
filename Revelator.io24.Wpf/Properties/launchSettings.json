@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Revelator.io24.Wpf": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
