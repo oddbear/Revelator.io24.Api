@@ -13,6 +13,7 @@ namespace Revelator.io24.Wpf
         public static BroadcastService? BroadcastService;
         public static MonitorService? MonitorService;
         public static CommunicationService? CommunicationService;
+        public static UpdateService? UpdateService;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -26,6 +27,7 @@ namespace Revelator.io24.Wpf
 
             CommunicationService = new CommunicationService();
             CommunicationService.Init(deviceTcpPort, monitorPort);
+            UpdateService = new UpdateService(CommunicationService);
 #if DEBUG
             //Log.Logger = new LoggerConfiguration()
             //    .WriteTo.Console(theme: ConsoleTheme.None)

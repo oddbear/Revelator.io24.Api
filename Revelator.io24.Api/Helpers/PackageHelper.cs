@@ -30,5 +30,14 @@ namespace Revelator.io24.Api.Helpers
         {
             return Encoding.ASCII.GetString(data[6..8]);
         }
+
+        public static void ApplyBytes(byte[] message, byte[] data, int index, int? length = null)
+        {
+            var len = length ?? data.Length;
+            for (int i = 0; i < len; i++)
+            {
+                message[index + i] = data[i];
+            }
+        }
     }
 }

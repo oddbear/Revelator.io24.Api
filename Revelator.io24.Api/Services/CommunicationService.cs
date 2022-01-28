@@ -73,6 +73,22 @@ namespace Revelator.io24.Api.Services
             }
         }
 
+        public bool SendMessage(byte[] message)
+        {
+            if (_networkStream is null)
+                return false;
+
+            try
+            {
+                _networkStream.Write(message);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void Listener()
         {
             var receiveBytes = new byte[65536];
