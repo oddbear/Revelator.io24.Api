@@ -116,29 +116,33 @@ namespace Revelator.io24.Api.Services
                     var bytesReceived = _networkStream.Read(receiveBytes);
                     var data = receiveBytes[0..bytesReceived];
 
-                    var isUcNetPackage = PackageHelper.IsUcNetPackage(data);
-                    if (!isUcNetPackage)
-                        continue;
-
-                    var messageType = PackageHelper.GetMessageType(data);
-                    switch (messageType)
+                    //Multiple messages can be in one package:
+                    var chunks = PackageHelper.ChuncksByIndicator(data).ToArray();
+                    foreach (var chunck in chunks)
                     {
-                        case "PV":
-                            //PV Settings packet
-                            PV(data);
-                            Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
-                            break;
-                        case "ZM": //ZLib Message
-                            ZM(data);
-                            Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
-                            break;
-                        case "PS":
-                            PS(data);
-                            Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
-                            break;
-                        default:
-                            Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
-                            break;
+                        var messageType = PackageHelper.GetMessageType(chunck);
+                        switch (messageType)
+                        {
+                            case "PV":
+                                //PV Settings packet
+                                PV(data);
+                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                break;
+                            case "JM": //?
+                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                break;
+                            case "ZM": //ZLib Message
+                                ZM(data);
+                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                break;
+                            case "PS":
+                                PS(data);
+                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                break;
+                            default:
+                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                break;
+                        }
                     }
                 }
                 catch (Exception exception)
@@ -147,6 +151,7 @@ namespace Revelator.io24.Api.Services
                 }
             }
         }
+
 
         /// <summary>
         /// Happens ex. on turning thing on and of, ex. EQ
