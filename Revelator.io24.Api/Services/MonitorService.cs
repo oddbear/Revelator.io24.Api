@@ -37,7 +37,7 @@ namespace Revelator.io24.Api.Services
             {
                 try
                 {
-                    IPEndPoint endPoint = null;
+                    IPEndPoint? endPoint = null;
                     var data = _udpClient.Receive(ref endPoint);
 
                     var isUcNetPackage = PackageHelper.IsUcNetPackage(data);
@@ -62,7 +62,7 @@ namespace Revelator.io24.Api.Services
             }
         }
 
-        private Dictionary<string, int> _count = new ();
+        private Dictionary<string, int> _count = new();
 
         /// <summary>
         /// This Package type is used for real time monitoring.
@@ -87,8 +87,9 @@ namespace Revelator.io24.Api.Services
             //85:  6c:65:76:6c:00:00:14:00
             //                       22
             //101: 72:65:64:75:00:00:16:00
-            var unknownHeader = BitConverter.ToString(data[12..20]).Replace("-", ":"); //Always the same (but there is two of them).
+            var unknownHeader = BitConverter.ToString(data[12..20]).Replace("-", ":"); //Always the same (but there is tree of them, 81, 85, 101).
 
+            //FatChannel, gain reduction etc.:
             if (data.Length == 101)
             {
                 //Gate meter:
@@ -122,10 +123,8 @@ namespace Revelator.io24.Api.Services
 
                 //One of the gain reduction meters are probarbly the Gate meter
                 //Gain Reduction Meter (0xFF, 0xFF is highest = no blue line):
-                var gainReductionMeterL = BitConverter.ToUInt16(data[44..46]);
-                var gainReductionMeterR = BitConverter.ToUInt16(data[46..48]);
-                FatChannel.GainReductionMeter_L = gainReductionMeterL;
-                FatChannel.GainReductionMeter_R = gainReductionMeterR;
+                FatChannel.GainReductionMeter_L = BitConverter.ToUInt16(data[44..46]);
+                FatChannel.GainReductionMeter_R = BitConverter.ToUInt16(data[46..48]);
 
                 var unknown4 = data[48..101];
                 var unknown4Val = BitConverter.ToString(unknown4).Replace("-", "");
@@ -143,13 +142,12 @@ namespace Revelator.io24.Api.Services
 
                 FatChannelUpdated?.Invoke(this, EventArgs.Empty);
             }
+            //Audio monitoring (mic channels unlinked):
             else if (data.Length == 81)
             {
                 //Microphone:
-                var microphoneL = BitConverter.ToUInt16(data[20..22]); //XLR Input left
-                var microphoneR = BitConverter.ToUInt16(data[22..24]); //XLR Input Right
-                Values.Microphone_L = microphoneL;
-                Values.Microphone_R = microphoneR;
+                Values.Microphone_L = BitConverter.ToUInt16(data[20..22]); //XLR Input left
+                Values.Microphone_R = BitConverter.ToUInt16(data[22..24]); //XLR Input Right
 
                 //Unknown 1:
                 var unknown1 = data[24..32];
@@ -159,41 +157,29 @@ namespace Revelator.io24.Api.Services
 
                 //Outputs:
                 //Palyback L/R:
-                var playback_l = BitConverter.ToUInt16(data[32..34]);
-                var playback_r = BitConverter.ToUInt16(data[34..36]);
-                Values.Playback_L = playback_l;
-                Values.Playback_R = playback_r;
+                Values.Playback_L = BitConverter.ToUInt16(data[32..34]);
+                Values.Playback_R = BitConverter.ToUInt16(data[34..36]);
 
                 //Virtual Output A L/R:
-                var virtualOutputA_L = BitConverter.ToUInt16(data[36..38]);
-                var virtualOutputA_R = BitConverter.ToUInt16(data[38..40]);
-                Values.VirtualOutputA_L = virtualOutputA_L;
-                Values.VirtualOutputA_R = virtualOutputA_R;
+                Values.VirtualOutputA_L = BitConverter.ToUInt16(data[36..38]);
+                Values.VirtualOutputA_R = BitConverter.ToUInt16(data[38..40]);
 
                 //Virtual Output B L/R:
-                var virtualOutputB_L = BitConverter.ToUInt16(data[40..42]);
-                var virtualOutputB_R = BitConverter.ToUInt16(data[42..44]);
-                Values.VirtualOutputB_L = virtualOutputB_L;
-                Values.VirtualOutputB_R = virtualOutputB_R;
+                Values.VirtualOutputB_L = BitConverter.ToUInt16(data[40..42]);
+                Values.VirtualOutputB_R = BitConverter.ToUInt16(data[42..44]);
 
                 //Mixes:
                 //Stream Mix 1:
-                var streamMix1_l = BitConverter.ToUInt16(data[44..46]);
-                var streamMix1_r = BitConverter.ToUInt16(data[46..48]);
-                Values.StreamMix1_L = streamMix1_l;
-                Values.StreamMix1_R = streamMix1_r;
+                Values.StreamMix1_L = BitConverter.ToUInt16(data[44..46]);
+                Values.StreamMix1_R = BitConverter.ToUInt16(data[46..48]);
 
                 //Stream Mix 2:
-                var streamMix2_l = BitConverter.ToUInt16(data[48..50]);
-                var streamMix2_r = BitConverter.ToUInt16(data[50..52]);
-                Values.StreamMix2_L = streamMix2_l;
-                Values.StreamMix2_R = streamMix2_r;
+                Values.StreamMix2_L = BitConverter.ToUInt16(data[48..50]);
+                Values.StreamMix2_R = BitConverter.ToUInt16(data[50..52]);
 
                 //Main monitor:
-                var main_l = BitConverter.ToUInt16(data[52..54]);
-                var main_r = BitConverter.ToUInt16(data[54..56]);
-                Values.Main_L = main_l;
-                Values.Main_R = main_r;
+                Values.Main_L = BitConverter.ToUInt16(data[52..54]);
+                Values.Main_R = BitConverter.ToUInt16(data[54..56]);
 
                 //Unknown 2:
                 var unknown2 = data[56..];
@@ -203,19 +189,20 @@ namespace Revelator.io24.Api.Services
 
                 ValuesUpdated?.Invoke(this, EventArgs.Empty);
             }
+            //Audio monitoring (mic channels linked):
             else if (data.Length == 85)
             {
                 //Microphone L/R:
-                var microphoneL = BitConverter.ToUInt16(data[20..22]); //XLR Input left
-                var microphoneR = BitConverter.ToUInt16(data[22..24]); //XLR Input Right
+                Values.Microphone_L = BitConverter.ToUInt16(data[20..22]); //XLR Input left
+                Values.Microphone_R = BitConverter.ToUInt16(data[22..24]); //XLR Input Right
 
                 //Microphone L/R again?:
                 var somethingL = BitConverter.ToUInt16(data[24..26]); //Same as Microphone L
                 var somethingR = BitConverter.ToUInt16(data[26..28]); //Same as Microphone R
-                if (microphoneL != somethingL)
-                    Log.Information("Mic L != Something L: {val1} {val2}", microphoneL, somethingL);
-                if (microphoneR != somethingR)
-                    Log.Information("Mic R != Something R: {val1} {val2}", microphoneR, somethingR);
+                if (Values.Microphone_L != somethingL)
+                    Log.Information("Mic L != Something L: {val1} {val2}", Values.Microphone_L, somethingL);
+                if (Values.Microphone_R != somethingR)
+                    Log.Information("Mic R != Something R: {val1} {val2}", Values.Microphone_R, somethingR);
 
                 //Unknown 1:
                 var unknown1 = data[32..36];
@@ -225,29 +212,29 @@ namespace Revelator.io24.Api.Services
 
                 //Outputs:
                 //Playback:
-                var playback_l = BitConverter.ToString(data[36..38]).Replace("-", "");
-                var playback_r = BitConverter.ToString(data[38..40]).Replace("-", "");
+                Values.Playback_L = BitConverter.ToUInt16(data[36..38]);
+                Values.Playback_R = BitConverter.ToUInt16(data[38..40]);
 
                 //Virtual Output A L/R:
-                var virtualOutputA_L = BitConverter.ToUInt16(data[40..42]);
-                var virtualOutputA_R = BitConverter.ToUInt16(data[42..44]);
+                Values.VirtualOutputA_L = BitConverter.ToUInt16(data[40..42]);
+                Values.VirtualOutputA_R = BitConverter.ToUInt16(data[42..44]);
 
                 //Virtual Output B L/R:
-                var virtualOutputB_L = BitConverter.ToUInt16(data[44..46]);
-                var virtualOutputB_R = BitConverter.ToUInt16(data[46..48]);
+                Values.VirtualOutputB_L = BitConverter.ToUInt16(data[44..46]);
+                Values.VirtualOutputB_R = BitConverter.ToUInt16(data[46..48]);
 
                 //Mixes:
                 //Stream Mix 1:
-                var streamMix1_l = BitConverter.ToString(data[48..50]).Replace("-", "");
-                var streamMix1_2 = BitConverter.ToString(data[50..52]).Replace("-", "");
+                Values.StreamMix1_L = BitConverter.ToUInt16(data[48..50]);
+                Values.StreamMix1_R = BitConverter.ToUInt16(data[50..52]);
 
                 //Stream Mix 2:
-                var streamMix2_l = BitConverter.ToString(data[52..54]).Replace("-", "");
-                var streamMix2_r = BitConverter.ToString(data[54..56]).Replace("-", "");
+                Values.StreamMix2_L = BitConverter.ToUInt16(data[52..54]);
+                Values.StreamMix2_R = BitConverter.ToUInt16(data[54..56]);
 
                 //Main monitor:
-                var main_l = BitConverter.ToUInt16(data[56..58]);
-                var main_r = BitConverter.ToUInt16(data[58..60]);
+                Values.Main_L = BitConverter.ToUInt16(data[56..58]);
+                Values.Main_R = BitConverter.ToUInt16(data[58..60]);
 
                 //Unknown 2:
                 var unknown2 = data[60..];
@@ -259,17 +246,8 @@ namespace Revelator.io24.Api.Services
             }
             else
             {
-                //TODO: Happens if I combine the two XLR monitors to one.
-                Log.Information("Unknown data length: {val1}", data.Length);
+                Log.Warning("Unknown data length: {val1}", data.Length);
             }
-            //var unknown_20 = BitConverter.ToString(d).Replace("-", ":");
-
-            //if (!_count.ContainsKey(unknown_20))
-            //    _count[unknown_20] = 0;
-            //_count[unknown_20]++;
-
-            //if (_count[unknown_20] > 100)
-            //    Log.Information("[{className}] {len} {count}", nameof(BroadcastService), d.Length, _count[unknown_20]);
         }
 
         public void Dispose()

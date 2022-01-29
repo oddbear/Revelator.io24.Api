@@ -39,7 +39,7 @@ namespace Revelator.io24.Api.Services
 
         private void Listener()
         {
-            while(true)
+            while (true)
             {
                 try
                 {

@@ -12,12 +12,6 @@ namespace Revelator.io24.Wpf
     /// </summary>
     public partial class App : Application
     {
-        //TODO: Move out:
-        public static BroadcastService? BroadcastService;
-        public static MonitorService? MonitorService;
-        public static CommunicationService? CommunicationService;
-        public static UpdateService? UpdateService;
-
         private IServiceProvider _serviceProvider;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -32,28 +26,29 @@ namespace Revelator.io24.Wpf
             AllocConsole();
 #endif
 
-            BroadcastService = new BroadcastService();
-            var deviceTcpPort = BroadcastService.WaitForFirstBroadcast();
+            var broadcastService = new BroadcastService();
+            var deviceTcpPort = broadcastService.WaitForFirstBroadcast();
 
-            MonitorService = new MonitorService();
-            var monitorPort = MonitorService.Port;
+            var monitorService = new MonitorService();
+            var monitorPort = monitorService.Port;
 
-            CommunicationService = new CommunicationService();
-            CommunicationService.Init(deviceTcpPort, monitorPort);
-            UpdateService = new UpdateService(CommunicationService);
+            var communicationService = new CommunicationService();
+            communicationService.Init(deviceTcpPort, monitorPort);
+            var updateService = new UpdateService(communicationService);
 
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(typeof(MainWindow));
             serviceCollection.AddSingleton(typeof(MainViewModel));
-            serviceCollection.AddSingleton(BroadcastService);
-            serviceCollection.AddSingleton(MonitorService);
-            serviceCollection.AddSingleton(UpdateService);
+            serviceCollection.AddSingleton(broadcastService);
+            serviceCollection.AddSingleton(monitorService);
+            serviceCollection.AddSingleton(updateService);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
 
             //Run application:
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
+            Log.Information("Application ready.");
         }
 
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]

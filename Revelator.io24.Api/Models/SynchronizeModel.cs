@@ -25,64 +25,61 @@ namespace Revelator.io24.Api.Models
 
         public SynchronizeModel(Synchronize model)
         {
-            Mic_L = new SynchronizeState {
-                //0.0 or 1.0
-                Main_Assigned = model.Children.Line.Children.Ch1.Values.Mute == 0,
-                MixA_Assigned = model.Children.Line.Children.Ch1.Values.AssignAux1 == 1,
-                MixB_Assigned = model.Children.Line.Children.Ch1.Values.AssignAux2 == 1
+            var children = model.Children;
+            var globalV = children.Global.Values;
+            var lineC = children.Line.Children;
+            var returnC = children.Return.Children;
+            var mainC = children.Main.Children;
+            var auxC = children.Aux.Children;
+
+            Mic_L = new SynchronizeState
+            {
+                Main_Assigned = lineC.Ch1.Values.Mute == 0,
+                MixA_Assigned = lineC.Ch1.Values.AssignAux1 == 1,
+                MixB_Assigned = lineC.Ch1.Values.AssignAux2 == 1
             };
 
             Mic_R = new SynchronizeState
             {
-                Main_Assigned = model.Children.Line.Children.Ch2.Values.Mute == 0,
-                MixA_Assigned = model.Children.Line.Children.Ch2.Values.AssignAux1 == 1,
-                MixB_Assigned = model.Children.Line.Children.Ch2.Values.AssignAux2 == 1
+                Main_Assigned = lineC.Ch2.Values.Mute == 0,
+                MixA_Assigned = lineC.Ch2.Values.AssignAux1 == 1,
+                MixB_Assigned = lineC.Ch2.Values.AssignAux2 == 1
             };
 
-            //Høyre horisontalt : stemmer
-            //Ve
             Playback = new SynchronizeState
             {
-                Main_Assigned = model.Children.Return.Children.Ch1.Values.Mute == 0,
-                MixA_Assigned = model.Children.Return.Children.Ch1.Values.AssignAux1 == 1,
-                MixB_Assigned = model.Children.Return.Children.Ch1.Values.AssignAux2 == 1
+                Main_Assigned = returnC.Ch1.Values.Mute == 0,
+                MixA_Assigned = returnC.Ch1.Values.AssignAux1 == 1,
+                MixB_Assigned = returnC.Ch1.Values.AssignAux2 == 1
             };
-            
+
             VirtualA = new SynchronizeState
             {
-                Main_Assigned = model.Children.Return.Children.Ch2.Values.Mute == 0,
-                MixA_Assigned = model.Children.Return.Children.Ch2.Values.AssignAux1 == 1,
-                MixB_Assigned = model.Children.Return.Children.Ch2.Values.AssignAux2 == 1
+                Main_Assigned = returnC.Ch2.Values.Mute == 0,
+                MixA_Assigned = returnC.Ch2.Values.AssignAux1 == 1,
+                MixB_Assigned = returnC.Ch2.Values.AssignAux2 == 1
             };
-            
+
             VirtualB = new SynchronizeState
             {
-                Main_Assigned = model.Children.Return.Children.Ch3.Values.Mute == 0,
-                MixA_Assigned = model.Children.Return.Children.Ch3.Values.AssignAux1 == 1,
-                MixB_Assigned = model.Children.Return.Children.Ch3.Values.AssignAux2 == 1
+                Main_Assigned = returnC.Ch3.Values.Mute == 0,
+                MixA_Assigned = returnC.Ch3.Values.AssignAux1 == 1,
+                MixB_Assigned = returnC.Ch3.Values.AssignAux2 == 1
             };
 
             Mix = new SynchronizeState
             {
-                Main_Assigned = model.Children.Main.Children.Ch1.Values.Mute == 0,
-                MixA_Assigned = model.Children.Aux.Children.Ch1.Values.Mute == 0,
-                MixB_Assigned= model.Children.Aux.Children.Ch2.Values.Mute == 0
+                Main_Assigned = mainC.Ch1.Values.Mute == 0,
+                MixA_Assigned = auxC.Ch1.Values.Mute == 0,
+                MixB_Assigned = auxC.Ch2.Values.Mute == 0
             };
 
-            var phoneSource = model.Children.Global.Values;
-            if (phoneSource?.PhonesSrc is null)
-                return;
-
-            if (phoneSource.PhonesSrc.Value == 0) //0
+            if (globalV.PhonesSrc == 0) //0
                 HeadphonesSource = Headphones.Main;
-            if (phoneSource.PhonesSrc.Value == 0.5) //16128
+            if (globalV.PhonesSrc == 0.5) //16128
                 HeadphonesSource = Headphones.MixA;
-            if (phoneSource.PhonesSrc.Value == 1) //16256
+            if (globalV.PhonesSrc == 1) //16256
                 HeadphonesSource = Headphones.MixB;
-
-
-            //Return: ch1 - ch3
-            //Inputs: Main, Aux ch1 / ch2
         }
     }
 }

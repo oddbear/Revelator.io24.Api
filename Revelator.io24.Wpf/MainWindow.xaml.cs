@@ -1,19 +1,7 @@
-﻿using Revelator.io24.Api.Models;
-using Revelator.io24.Api.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Revelator.io24.Wpf
 {
@@ -38,8 +26,10 @@ namespace Revelator.io24.Wpf
             var route = NameToRoute(button.Name);
 
             //Name:
-            App.UpdateService.ToggleMute(route, (route, state) => {
-                Dispatcher.Invoke(() => {
+            App.UpdateService.ToggleMute(route, (route, state) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
                     var name = RouteToName(route);
                     var button = this.FindName(name) as Button;
                     if (button is null)

@@ -1,8 +1,7 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Revelator.io24.Api.Helpers;
+﻿using Revelator.io24.Api.Helpers;
+using Revelator.io24.Api.Messages.Readers;
 using Revelator.io24.Api.Messages.Writers;
 using Revelator.io24.Api.Models;
-using Revelator.io24.Api.Models.Json;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -63,7 +62,7 @@ namespace Revelator.io24.Api.Services
 
         private void KeepAlive()
         {
-            while(true)
+            while (true)
             {
                 if (_networkStream is null)
                 {
@@ -125,22 +124,25 @@ namespace Revelator.io24.Api.Services
                         {
                             case "PV":
                                 //PV Settings packet
-                                PV(data);
-                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                PV(chunck);
+                                Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
-                            case "JM": //?
-                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                            case "JM":
+                                var jm = JM.GetJsonMessage(chunck);
+                                Json(jm);
+                                Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
-                            case "ZM": //ZLib Message
-                                ZM(data);
-                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                            case "ZM":
+                                var zm = ZM.GetJsonMessage(chunck);
+                                Json(zm);
+                                Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
                             case "PS":
-                                PS(data);
-                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                PS(chunck);
+                                Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
                             default:
-                                Log.Information("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                Log.Warning("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
                         }
                     }
@@ -152,6 +154,28 @@ namespace Revelator.io24.Api.Services
             }
         }
 
+        private void Json(string json)
+        {
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
+            if (!jsonElement.TryGetProperty("id", out var idProperty))
+                return;
+
+            var id = idProperty.GetString();
+
+            switch (id)
+            {
+                case "Synchronize":
+                    var model = ZM.GetSynchronizeModel(json);
+                    if (model is not null)
+                        Synchronize?.Invoke(model);
+                    return;
+                case "SubscriptionReply":
+                    return;
+                default:
+                    Log.Warning("[{className}] Unknown json id {messageType}", nameof(CommunicationService), id);
+                    return;
+            }
+        }
 
         /// <summary>
         /// Happens ex. on turning thing on and of, ex. EQ
@@ -171,44 +195,11 @@ namespace Revelator.io24.Api.Services
         }
 
         /// <summary>
-        /// ZLib compressed message
-        /// </summary>
-        private void ZM(byte[] data)
-        {
-            var header = data[0..4];
-            var messageLength = data[4..6];
-            var messageType = data[6..8];
-            var customBytes = data[8..12];
-
-            var size = BitConverter.ToInt32(data[12..16]);
-
-            using var compressedStream = new MemoryStream(data[16..]);
-            using var inputStream = new InflaterInputStream(compressedStream);
-            using var outputStream = new MemoryStream();
-
-            inputStream.CopyTo(outputStream);
-            outputStream.Position = 0;
-
-            var json = Encoding.ASCII.GetString(outputStream.ToArray());
-
-            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            var synchronize = JsonSerializer.Deserialize<Synchronize>(json, options);
-            //TODO: Check for unmapped members, can do with reflection, as all models should inherit from Extension class.
-
-            //Line: Mute, volume etc.
-            //Return: Mute, volume etc.
-            //Main: Mute, volume etc.
-            //Aux: Mute, volume etc.
-            var model = new SynchronizeModel(synchronize);
-            Synchronize?.Invoke(model);
-        }
-
-        /// <summary>
         /// Changing profile, changing names... Updates of strings?
         /// </summary>
         private void PS(byte[] data)
         {
-            //
+            //TODO: ...
         }
 
         public void Dispose()
