@@ -1,5 +1,5 @@
-﻿using Revelator.io24.Api.Models.Json;
-using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models.Json;
 
 namespace Revelator.io24.Api.Models
 {

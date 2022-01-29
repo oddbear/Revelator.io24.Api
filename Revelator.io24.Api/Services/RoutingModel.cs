@@ -1,4 +1,7 @@
-﻿namespace Revelator.io24.Api.Services
+﻿using Revelator.io24.Api.Attributes;
+using Revelator.io24.Api.Enums;
+
+namespace Revelator.io24.Api.Services
 {
     public class RoutingModel
     {

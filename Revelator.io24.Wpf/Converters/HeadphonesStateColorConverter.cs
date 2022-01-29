@@ -1,4 +1,4 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Enums;
 using System;
 using System.Globalization;
 using System.Windows.Data;
