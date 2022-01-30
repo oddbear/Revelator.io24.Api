@@ -1,5 +1,6 @@
 ﻿using Revelator.io24.Api.Attributes;
 using Revelator.io24.Api.Enums;
+using System.Reflection;
 
 namespace Revelator.io24.Api.Services
 {
@@ -45,5 +46,21 @@ namespace Revelator.io24.Api.Services
         public bool MixB_Mix { get; set; }
 
         public Headphones HeadphonesSource { get; set; } = Headphones.Unknown;
+
+        public bool GetValueByRoute(string route)
+        {
+            var properties = typeof(RoutingModel).GetProperties();
+            var routeProperty = properties
+                .Select(property => new { property, attribute = property.GetCustomAttribute<RouteNameAttribute>() })
+                .FirstOrDefault(obj => obj.attribute?.RouteName == route);
+
+            if (routeProperty is null)
+                return false;
+
+            var property = routeProperty.property;
+            var attribute = routeProperty.attribute;
+
+            return (bool)property.GetValue(this);
+        }
     }
 }

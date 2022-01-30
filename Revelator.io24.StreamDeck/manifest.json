@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/GeekyEggo/SharpDeck/master/src/SharpDeck.PropertyInspector/manifest-schema.json",
   "Name": "Revelator io24",
   "Version": "0.0.1",
   "Author": "oddbear",
@@ -6,22 +7,24 @@
     {
       "Name": "Route Change",
       "UUID": "com.oddbear.revelator.io24.routechange",
-      "Icon": "Images/Counter/Icon",
-      "Tooltip": "A counter action",
+      "Icon": "Images/Icons/Icon",
+      "Tooltip": "A route changing action",
+      "PropertyInspectorPath": "PropertyInspector/RouteChangeAction.html",
       "States": [
         {
-          "Image": "Images/Counter/Image"
+          "Image": "Images/Icons/Image"
         }
       ]
     },
     {
       "Name": "Headphone source",
       "UUID": "com.oddbear.revelator.io24.headphonesource",
-      "Icon": "Images/Counter/Icon",
-      "Tooltip": "A counter action",
+      "Icon": "Images/Icons/Icon",
+      "Tooltip": "A headphones source set action",
+      "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceAction.html",
       "States": [
         {
-          "Image": "Images/Counter/Image"
+          "Image": "Images/Icons/Image"
         }
       ]
     }
@@ -29,7 +32,7 @@
   "Category": "Revelator io24",
   "CategoryIcon": "Images/Plugin/CategoryIcon",
   "CodePath": "Revelator.io24.StreamDeck.exe",
-  "Description": "A shared counter plugin example",
+  "Description": "A Revelator io24 plugin for the Stream Deck",
   "Icon": "Images/Plugin/Icon",
   "SDKVersion": 2,
   "Software": {

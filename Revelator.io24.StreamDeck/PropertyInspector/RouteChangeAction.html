@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Route Change Action</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+</head>
+<body>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Input</div>
+        <select id="inputValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Input')">
+            <option value="Mic L">Mic L</option>
+            <option value="Mic R">Mic R</option>
+            <option value="Playback">Playback</option>
+            <option value="Virual A">Virual A</option>
+            <option value="Virual B">Virual B</option>
+            <option value="Mute All">Mute All</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Output</div>
+        <select id="outputValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Output')">
+            <option value="Main">Main</option>
+            <option value="Stream Mix A">Stream Mix A</option>
+            <option value="Stream Mix B">Stream Mix B</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Routing</div>
+        <select id="actionValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Action')">
+            <option value="Toggle">Toggle</option>
+            <option value="On">On</option>
+            <option value="Off">Off</option>
+        </select>
+    </div>
+    <script src="RouteChangeAction.js"></script>
+</body>
+</html>
