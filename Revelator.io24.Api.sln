@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revelator.io24.Wpf", "Revel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revelator.io24.StreamDeck", "Revelator.io24.StreamDeck\Revelator.io24.StreamDeck.csproj", "{7A007F8C-9A3E-45B4-AF55-EA402E697AE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revelator.io24.TouchPortal", "Revelator.io24.TouchPortal\Revelator.io24.TouchPortal.csproj", "{79E8A413-5AA5-42C9-B714-59E2447B0293}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revelator.io24.TouchPortal", "Revelator.io24.TouchPortal\Revelator.io24.TouchPortal.csproj", "{79E8A413-5AA5-42C9-B714-59E2447B0293}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{DC8F4AF6-492A-4325-94D7-B97655A15BC3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{668A904C-D35F-45C7-A172-17699E8722DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +46,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{323CDB13-42C8-423B-8E7C-7D75B21E5A06} = {668A904C-D35F-45C7-A172-17699E8722DF}
+		{31DB1381-319F-461D-A84C-0274AC276F23} = {668A904C-D35F-45C7-A172-17699E8722DF}
+		{7A007F8C-9A3E-45B4-AF55-EA402E697AE6} = {DC8F4AF6-492A-4325-94D7-B97655A15BC3}
+		{79E8A413-5AA5-42C9-B714-59E2447B0293} = {DC8F4AF6-492A-4325-94D7-B97655A15BC3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ACF277BA-B3A2-4BC6-85C1-F452B0C26BB5}
