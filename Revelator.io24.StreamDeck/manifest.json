@@ -1,0 +1,44 @@
+{
+  "Name": "Revelator io24",
+  "Version": "0.0.1",
+  "Author": "oddbear",
+  "Actions": [
+    {
+      "Name": "Route Change",
+      "UUID": "com.oddbear.revelator.io24.routechange",
+      "Icon": "Images/Counter/Icon",
+      "Tooltip": "A counter action",
+      "States": [
+        {
+          "Image": "Images/Counter/Image"
+        }
+      ]
+    },
+    {
+      "Name": "Headphone source",
+      "UUID": "com.oddbear.revelator.io24.headphonesource",
+      "Icon": "Images/Counter/Icon",
+      "Tooltip": "A counter action",
+      "States": [
+        {
+          "Image": "Images/Counter/Image"
+        }
+      ]
+    }
+  ],
+  "Category": "Revelator io24",
+  "CategoryIcon": "Images/Plugin/CategoryIcon",
+  "CodePath": "Revelator.io24.StreamDeck.exe",
+  "Description": "A shared counter plugin example",
+  "Icon": "Images/Plugin/Icon",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "4.1"
+  },
+  "OS": [
+    {
+      "MinimumVersion": "10",
+      "Platform": "windows"
+    }
+  ]
+}
