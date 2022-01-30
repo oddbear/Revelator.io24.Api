@@ -32,9 +32,29 @@ namespace Revelator.io24.TouchPortal
         private void RoutingUpdated(object? sender, EventArgs e)
         {
             var routing = _updateService.Routing;
-            var headponeSource = routing.HeadphonesSource.ToString();
 
-            _client.StateUpdate(PluginId + ".states.headphonessource", headponeSource.ToString());
+            _client.StateUpdate(PluginId + ".states.headphonessource", routing.HeadphonesSource.ToString());
+
+            _client.StateUpdate(PluginId + ".states.line/ch1/mute", routing.Main_MicL ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.line/ch2/mute", routing.Main_MicR ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch1/mute", routing.Main_Playback ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch2/mute", routing.Main_VirtualA ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch3/mute", routing.Main_VirtualB ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.main/ch1/mute", routing.Main_Mix ? "On" : "Off");
+
+            _client.StateUpdate(PluginId + ".states.line/ch1/assign_aux1", routing.MixA_MicL ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.line/ch2/assign_aux1", routing.MixA_MicR ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch1/assign_aux1", routing.MixA_Playback ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch2/assign_aux1", routing.MixA_VirtualA ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch3/assign_aux1", routing.MixA_VirtualB ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.aux/ch1/mute", routing.MixA_Mix ? "On" : "Off");
+
+            _client.StateUpdate(PluginId + ".states.line/ch1/assign_aux2", routing.MixB_MicL ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.line/ch2/assign_aux2", routing.MixB_MicR ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch1/assign_aux2", routing.MixB_Playback ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch2/assign_aux2", routing.MixB_VirtualA ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.return/ch3/assign_aux2", routing.MixB_VirtualB ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.aux/ch2/mute", routing.MixB_Mix ? "On" : "Off");
         }
 
         public void Init()
