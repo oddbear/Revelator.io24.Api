@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Headphones Source Action</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+</head>
+<body>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Headphone Source</div>
+        <select id="micValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Microphone')">
+            <option value="Main">Main</option>
+            <option value="MixA">Mix A</option>
+            <option value="MixB">Mix B</option>
+        </select>
+    </div>
+    <script src="HeadphonesSourceAction.js"></script>
+</body>
+</html>
