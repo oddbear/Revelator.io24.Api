@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revelator.io24.Console", "R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revelator.io24.Wpf", "Revelator.io24.Wpf\Revelator.io24.Wpf.csproj", "{31DB1381-319F-461D-A84C-0274AC276F23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revelator.io24.StreamDeck", "Revelator.io24.StreamDeck\Revelator.io24.StreamDeck.csproj", "{7A007F8C-9A3E-45B4-AF55-EA402E697AE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Revelator.io24.StreamDeck", "Revelator.io24.StreamDeck\Revelator.io24.StreamDeck.csproj", "{7A007F8C-9A3E-45B4-AF55-EA402E697AE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Revelator.io24.TouchPortal", "Revelator.io24.TouchPortal\Revelator.io24.TouchPortal.csproj", "{79E8A413-5AA5-42C9-B714-59E2447B0293}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7A007F8C-9A3E-45B4-AF55-EA402E697AE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A007F8C-9A3E-45B4-AF55-EA402E697AE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A007F8C-9A3E-45B4-AF55-EA402E697AE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79E8A413-5AA5-42C9-B714-59E2447B0293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79E8A413-5AA5-42C9-B714-59E2447B0293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79E8A413-5AA5-42C9-B714-59E2447B0293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79E8A413-5AA5-42C9-B714-59E2447B0293}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

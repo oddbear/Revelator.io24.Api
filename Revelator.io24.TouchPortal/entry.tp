@@ -1,0 +1,96 @@
+{
+  "sdk": 4,
+  "version": 1,
+  "name": "Revelator io24 TouchPortal Plugin",
+  "id": "oddbear.touchportal.revelator.io24",
+  "configuration": {
+    "colorDark": "#59B1B6",
+    "colorLight": "#59B1B6"
+  },
+  "plugin_start_cmd": "\"%TP_PLUGIN_FOLDER%Revelator.io24.TouchPortal\\Revelator.io24.TouchPortal.exe\"",
+  "categories": [
+    {
+      "id": "oddbear.touchportal.revelator.io24",
+      "name": "io24",
+      "actions": [
+        {
+          "id": "oddbear.touchportal.revelator.io24.routingtable.action.change",
+          "prefix": "io24:",
+          "name": "io24 Routing Table Change",
+          "type": "communicate",
+          "tryInline": true,
+          "format": "Input {$oddbear.touchportal.revelator.io24.routingtable.action.change.data.inputs$} Output {$oddbear.touchportal.revelator.io24.routingtable.action.change.data.outputs$} Action {$oddbear.touchportal.revelator.io24.routingtable.action.change.data.actions$}",
+          "description": "The routing table change on the io24 device.",
+          "data": [
+            {
+              "id": "oddbear.touchportal.revelator.io24.routingtable.action.change.data.inputs",
+              "type": "choice",
+              "label": "Input",
+              "default": "Mic L",
+              "valueChoices": [
+                "Mic L",
+                "Mic R",
+                "Playback",
+                "Virual A",
+                "Virual B",
+                "Mute All"
+              ]
+            },
+            {
+              "id": "oddbear.touchportal.revelator.io24.routingtable.action.change.data.outputs",
+              "type": "choice",
+              "label": "Output",
+              "default": "Main",
+              "valueChoices": [
+                "Main",
+                "Stream Mix A",
+                "Stream Mix B"
+              ]
+            },
+            {
+              "id": "oddbear.touchportal.revelator.io24.routingtable.action.change.data.actions",
+              "type": "choice",
+              "label": "Action",
+              "default": "Toggle",
+              "valueChoices": [
+                "Toggle",
+                "Turn On",
+                "Turn Off"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "oddbear.touchportal.revelator.io24.headphones.action.change",
+          "prefix": "io24:",
+          "name": "io24 Headphones source Select",
+          "type": "communicate",
+          "tryInline": true,
+          "format": "Profile {$oddbear.touchportal.revelator.io24.headphones.action.change.data.headphones$}",
+          "description": "The profile to select on the io24 device.",
+          "data": [
+            {
+              "id": "oddbear.touchportal.revelator.io24.headphones.action.change.data.headphones",
+              "type": "choice",
+              "label": "Profile",
+              "default": "Main",
+              "valueChoices": [
+                "Main",
+                "Stream Mix A",
+                "Stream Mix B"
+              ]
+            }
+          ]
+        }
+      ],
+      "states": [
+        {
+          "id": "oddbear.touchportal.revelator.io24.states.headphonessource",
+          "type": "text",
+          "desc": "io24: Headphone source",
+          "default": "Main"
+        }],
+      "events": []
+    }
+  ]
+}
