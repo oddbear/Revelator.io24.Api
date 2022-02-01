@@ -67,6 +67,12 @@ namespace Revelator.io24.Api.Services
                     }
 
                     DeviceTcpPort = BitConverter.ToUInt16(data[4..6]);
+
+                    //1.19 -> 281:
+                    //1.21 -> 281: 
+                    //Revelator IO 24/281 AUD <serialnr>
+                    //Revelator IO 24/289 AUD <serialnr>
+
                     _infoWaitHandle.Set();
                 }
                 catch (Exception exception)
