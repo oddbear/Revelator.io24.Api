@@ -12,10 +12,13 @@ namespace Revelator.io24.Api.Services
     /// </summary>
     public class BroadcastService : IDisposable
     {
+        public static BroadcastService? Current;
+
         private readonly UdpClient _udpClient;
         private readonly Thread _thread;
 
         public ushort DeviceTcpPort { get; private set; }
+        public ushort DeviceId { get; private set; }
 
         private readonly ManualResetEvent _infoWaitHandle;
 
@@ -29,6 +32,8 @@ namespace Revelator.io24.Api.Services
             _thread.Start();
 
             _infoWaitHandle = new ManualResetEvent(false);
+
+            Current = this;
         }
 
         public ushort WaitForFirstBroadcast()
@@ -66,7 +71,9 @@ namespace Revelator.io24.Api.Services
                         continue;
                     }
 
+                    //TODO: What if... multiple devices?
                     DeviceTcpPort = BitConverter.ToUInt16(data[4..6]);
+                    DeviceId = BitConverter.ToUInt16(data[8..10]);
 
                     //1.19 -> 281:
                     //1.21 -> 281: 

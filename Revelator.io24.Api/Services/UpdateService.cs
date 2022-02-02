@@ -86,7 +86,7 @@ namespace Revelator.io24.Api.Services
             }
         }
 
-        public void SetRouteValue(string route, ushort value)
+        public void SetRouteValue(string route, uint value)
         {
             var message = new List<byte>();
 
@@ -104,7 +104,7 @@ namespace Revelator.io24.Api.Services
             length += messageType.Length;
 
             //CustomBytes [8..10]:
-            var customBytes = PackageHelper.GetDeviceCustomBytes();
+            var customBytes = PackageHelper.GetFromToBytes();
             message.AddRange(customBytes);
             length += customBytes.Length;
 
@@ -113,13 +113,13 @@ namespace Revelator.io24.Api.Services
             message.AddRange(text);
             length += text.Length;
 
-            //Empty [x..x+5]:
-            var empty = Enumerable.Repeat<byte>(0x00, 5).ToArray();
+            //Empty [x..x+3]:
+            var empty = Enumerable.Repeat<byte>(0x00, 3).ToArray();
             message.AddRange(empty);
             length += empty.Length;
 
-            //State [x+5..x+7]:
-            var state = BitConverter.GetBytes(value); //Float, but on two bytes (ints are AA,BB,00,00 this is 00,00,AA,BB
+            //State [x+3..x+7]:
+            var state = BitConverter.GetBytes(value); //Float: ON / OFF -> 0.0 / 1.0 -> { 0x00, 0x00, 0x00, 0x00 } / { 0x00, 0x00, 0x80, 0x3F }
             message.AddRange(state);
             length += state.Length;
 

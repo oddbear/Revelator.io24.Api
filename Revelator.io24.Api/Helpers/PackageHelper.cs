@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Revelator.io24.Api.Services;
+using System.Text;
 
 namespace Revelator.io24.Api.Helpers
 {
@@ -9,13 +10,30 @@ namespace Revelator.io24.Api.Helpers
             return new byte[] { 0x55, 0x43, 0x00, 0x01 };
         }
 
-        public static byte[] GetDeviceCustomBytes()
+        public static byte[] GetFromToBytes()
         {
             //Seems to always be this from the device (and inversed pair from service).
             //Not sure what this is.
             //66:00:68:00 -> Incomming from service
             //68:00:66:00 -> Outgoing to service
-            return new byte[] { 0x68, 0x00, 0x66, 0x00 };
+
+            //Did change from: 0x68, 0x00, 0x66, 0x00
+            //             to: 0x68, 0x00, 0x6b, 0x00
+            // from firmware 1.19 to 1.21... interesting.
+            //6b is a part of the broadcast message, and needs to be the same... the 0x68 can be changed.
+
+            var deviceId = BroadcastService.Current?.DeviceId ?? throw new InvalidOperationException("DeviceId not received yet.");
+
+            var clientIdBytes = BitConverter.GetBytes(104);
+            var deviceIdBytes = BitConverter.GetBytes(deviceId);
+
+            var fromTo = new byte[4];
+            fromTo[0] = clientIdBytes[0];
+            fromTo[1] = clientIdBytes[1];
+            fromTo[2] = deviceIdBytes[0];
+            fromTo[3] = deviceIdBytes[1];
+
+            return fromTo;
         }
 
         public static bool IsUcNetPackage(byte[] data, int index = 0)

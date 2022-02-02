@@ -96,30 +96,30 @@ namespace Revelator.io24.TouchPortal
             _updateService.SetRouteValue(route, value);
         }
 
-        private ushort ActionToValue(string route, string action)
+        private uint ActionToValue(string route, string action)
         {
             if (action == "Turn On")
             {
                 var value = route.EndsWith("mute")
-                    ? 0
-                    : 16256;
+                    ? 0u
+                    : 16256u;
 
-                return (ushort)value;
+                return value;
             }
 
             if (action == "Turn Off")
             {
                 var value = route.EndsWith("mute")
-                    ? 16256
-                    : 0;
+                    ? 16256u
+                    : 0u;
 
-                return (ushort)value;
+                return value;
             }
 
             var hasRoute = _updateService.Routing.GetValueByRoute(route);
             return route.EndsWith("mute")
-                ? (ushort)(hasRoute ? 16256 : 0)
-                : (ushort)(hasRoute ? 0 : 16256);
+                ? (hasRoute ? 16256u : 0u)
+                : (hasRoute ? 0u : 16256u);
         }
 
         private string InputToPart(string input)

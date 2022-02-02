@@ -27,7 +27,7 @@ namespace Revelator.io24.Api.Messages.Writers
             message[7] = messageType[1];
 
             //CustomBytes (this is one of the few messages that works without the CustomBytes):
-            var customBytes = PackageHelper.GetDeviceCustomBytes();
+            var customBytes = PackageHelper.GetFromToBytes();
             message[8] = customBytes[0];
             message[9] = customBytes[1];
             message[10] = customBytes[2];
