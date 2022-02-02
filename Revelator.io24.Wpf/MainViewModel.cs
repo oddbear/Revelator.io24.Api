@@ -25,6 +25,9 @@ namespace Revelator.io24.Wpf
         private readonly DelegateCommand _routeChangeCommand;
         public ICommand RouteChangeCommand => _routeChangeCommand;
 
+        private readonly DelegateCommand _toggleFatChannelCommand;
+        public ICommand ToggleFatChannelCommand => _toggleFatChannelCommand;
+
         public MainViewModel(MonitorService monitorService, UpdateService updateService)
         {
             _monitorService = monitorService ?? throw new ArgumentNullException(nameof(monitorService));
@@ -36,6 +39,15 @@ namespace Revelator.io24.Wpf
             _updateService.RoutingUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingValues));
 
             _routeChangeCommand = new DelegateCommand(OnRouteChangeRequest);
+            _toggleFatChannelCommand = new DelegateCommand(OnFatchannelToggleRequest);
+        }
+
+        private void OnFatchannelToggleRequest(object commandParameter)
+        {
+            if (commandParameter is not string commandParameterString)
+                return;
+
+            _updateService.ToggleFatChannel(commandParameterString);
         }
 
         private void OnRouteChangeRequest(object commandParameter)

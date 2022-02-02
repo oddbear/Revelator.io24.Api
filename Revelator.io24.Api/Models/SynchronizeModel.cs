@@ -23,6 +23,9 @@ namespace Revelator.io24.Api.Models
 
         public Headphones HeadphonesSource { get; set; }
 
+        public bool ByPassDsp_MicL { get; set; }
+        public bool ByPassDsp_MicR { get; set; }
+
         public SynchronizeModel(Synchronize model)
         {
             var children = model.Children;
@@ -80,6 +83,9 @@ namespace Revelator.io24.Api.Models
                 HeadphonesSource = Headphones.MixA;
             if (globalV.PhonesSrc == 1) //16256
                 HeadphonesSource = Headphones.MixB;
+
+            ByPassDsp_MicL = lineC.Ch1.Values.BypassDSP > 0;
+            ByPassDsp_MicR = lineC.Ch2.Values.BypassDSP > 0;
         }
     }
 }
