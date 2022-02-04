@@ -17,8 +17,15 @@
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <StackPanel Orientation="Horizontal">
+            <Button
+                Command="{Binding Path=ToggleFatChannelCommand}" CommandParameter="ch1">Toggle Fatchannel Mic L</Button>
+            <Button
+                Command="{Binding Path=ToggleFatChannelCommand}" CommandParameter="ch2">Toggle Fatchannel Mic 3</Button>
+        </StackPanel>
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="313*"/>
                 <ColumnDefinition Width="87*"/>
@@ -106,7 +113,7 @@
                 </GroupBox>
             </StackPanel>
         </Grid>
-        <GroupBox Grid.Row="1" Header="Routing">
+        <GroupBox Grid.Row="2" Header="Routing">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />

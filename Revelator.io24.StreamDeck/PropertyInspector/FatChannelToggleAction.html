@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Fat Channel Toggle Action</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+</head>
+<body>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Headphone Source</div>
+        <select id="routeValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Route')">
+            <option value="line/ch1/bypassDSP">Mic L</option>
+            <option value="line/ch2/bypassDSP">Mic R</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">State</div>
+        <select id="actionValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Action')">
+            <option value="Toggle">Toggle</option>
+            <option value="On">On</option>
+            <option value="Off">Off</option>
+        </select>
+    </div>
+    <script src="FatChannelToggleAction.js"></script>
+</body>
+</html>

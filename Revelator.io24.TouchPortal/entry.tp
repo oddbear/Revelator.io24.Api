@@ -1,6 +1,6 @@
 {
   "sdk": 4,
-  "version": 1,
+  "version": 2,
   "name": "Revelator io24 TouchPortal Plugin",
   "id": "oddbear.touchportal.revelator.io24",
   "configuration": {
@@ -66,7 +66,7 @@
           "name": "io24 Headphones source Select",
           "type": "communicate",
           "tryInline": true,
-          "format": "Profile {$oddbear.touchportal.revelator.io24.headphones.action.change.data.headphones$}",
+          "format": "Headphone Source {$oddbear.touchportal.revelator.io24.headphones.action.change.data.headphones$}",
           "description": "The profile to select on the io24 device.",
           "data": [
             {
@@ -78,6 +78,38 @@
                 "Main",
                 "Stream Mix A",
                 "Stream Mix B"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "oddbear.touchportal.revelator.io24.fatchanneltoggle.action.change",
+          "prefix": "io24:",
+          "name": "io24 Fat Channel Toggle",
+          "type": "communicate",
+          "tryInline": true,
+          "format": "Microphone {$oddbear.touchportal.revelator.io24.fatchanneltoggle.action.change.data.microphone$} Action {$oddbear.touchportal.revelator.io24.fatchanneltoggle.action.change.data.actions$}",
+          "description": "The Fat Channel to toggle on the io24 device.",
+          "data": [
+            {
+              "id": "oddbear.touchportal.revelator.io24.fatchanneltoggle.action.change.data.microphone",
+              "type": "choice",
+              "label": "Microphone",
+              "default": "Mic L",
+              "valueChoices": [
+                "Mic L",
+                "Mic R"
+              ]
+            },
+            {
+              "id": "oddbear.touchportal.revelator.io24.fatchanneltoggle.action.change.data.actions",
+              "type": "choice",
+              "label": "Action",
+              "default": "Toggle",
+              "valueChoices": [
+                "Toggle",
+                "Turn On",
+                "Turn Off"
               ]
             }
           ]
@@ -199,6 +231,19 @@
           "id": "oddbear.touchportal.revelator.io24.states.aux/ch2/mute",
           "type": "text",
           "desc": "io24: Mute All / Stream Mix B",
+          "default": ""
+        },
+
+        {
+          "id": "oddbear.touchportal.revelator.io24.states.line/ch1/bypassDSP",
+          "type": "text",
+          "desc": "io24: Fat Channel Left",
+          "default": ""
+        },
+        {
+          "id": "oddbear.touchportal.revelator.io24.states.line/ch2/bypassDSP",
+          "type": "text",
+          "desc": "io24: Fat Channel Right",
           "default": ""
         }
       ],

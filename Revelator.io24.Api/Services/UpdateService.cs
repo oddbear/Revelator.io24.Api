@@ -18,11 +18,11 @@ namespace Revelator.io24.Api.Services
         public UpdateService(CommunicationService communicationService)
         {
             _communicationService = communicationService;
-            _communicationService.RouteChange += _communicationService_RouteChange;
-            _communicationService.Synchronize += _communicationService_Synchronize;
+            _communicationService.RouteChange += RouteChange;
+            _communicationService.Synchronize += Synchronize;
         }
 
-        private void _communicationService_Synchronize(SynchronizeModel synchronizeModel)
+        private void Synchronize(SynchronizeModel synchronizeModel)
         {
             Routing.Main_MicL = synchronizeModel.Mic_L.Main_Assigned;
             Routing.MixA_MicL = synchronizeModel.Mic_L.MixA_Assigned;
@@ -50,14 +50,35 @@ namespace Revelator.io24.Api.Services
 
             Routing.HeadphonesSource = synchronizeModel.HeadphonesSource;
 
+            Routing.FatChannel_MicL = !synchronizeModel.ByPassDsp_MicL;
+            Routing.FatChannel_MicR = !synchronizeModel.ByPassDsp_MicR;
+
             RoutingUpdated?.Invoke(this, EventArgs.Empty);
         }
 
-        private void _communicationService_RouteChange(string route, ushort state)
+        private void RouteChange(string route, ushort state)
         {
             if (route == "global/phonesSrc")
             {
                 Routing.HeadphonesSource = (Headphones)state;
+
+                RoutingUpdated?.Invoke(this, EventArgs.Empty);
+
+                return;
+            }
+
+            if (route == "line/ch1/bypassDSP")
+            {
+                Routing.FatChannel_MicL = state == 0;
+
+                RoutingUpdated?.Invoke(this, EventArgs.Empty);
+
+                return;
+            }
+
+            if (route == "line/ch2/bypassDSP")
+            {
+                Routing.FatChannel_MicR = state == 0;
 
                 RoutingUpdated?.Invoke(this, EventArgs.Empty);
 
@@ -86,7 +107,7 @@ namespace Revelator.io24.Api.Services
             }
         }
 
-        public void SetRouteValue(string route, uint value)
+        public void SetRouteValue(string route, float value)
         {
             var message = new List<byte>();
 

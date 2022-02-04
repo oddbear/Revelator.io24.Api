@@ -47,6 +47,9 @@ namespace Revelator.io24.Api.Services
 
         public Headphones HeadphonesSource { get; set; } = Headphones.Unknown;
 
+        public bool FatChannel_MicL { get; set; }
+        public bool FatChannel_MicR { get; set; }
+
         public bool GetValueByRoute(string route)
         {
             var properties = typeof(RoutingModel).GetProperties();

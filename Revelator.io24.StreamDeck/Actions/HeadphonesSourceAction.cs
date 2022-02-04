@@ -1,4 +1,5 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
@@ -53,7 +54,18 @@ namespace Revelator.io24.StreamDeck.Actions
                 return;
 
             var setting = _settings.Microphone;
-            _updateService.SetRouteValue("global/phonesSrc", (ushort)setting);
+            switch(setting)
+            {
+                case Headphones.Main:
+                    _updateService.SetRouteValue("global/phonesSrc", 0.0f);
+                    break;
+                case Headphones.MixA:
+                    _updateService.SetRouteValue("global/phonesSrc", 0.5f);
+                    break;
+                case Headphones.MixB:
+                    _updateService.SetRouteValue("global/phonesSrc", 1.0f);
+                    break;
+            }
         }
 
         private async void RoutingUpdated(object? sender, EventArgs e)

@@ -12,7 +12,10 @@
       "PropertyInspectorPath": "PropertyInspector/RouteChangeAction.html",
       "States": [
         {
-          "Image": "Images/Icons/Image"
+          "Image": "Images/Plugin/On"
+        },
+        {
+          "Image": "Images/Plugin/Off"
         }
       ]
     },
@@ -25,6 +28,21 @@
       "States": [
         {
           "Image": "Images/Icons/Image"
+        }
+      ]
+    },
+    {
+      "Name": "Fat Channel Toggle",
+      "UUID": "com.oddbear.revelator.io24.fatchanneltoggle",
+      "Icon": "Images/Icons/Icon",
+      "Tooltip": "A Fat Channel toggle action",
+      "PropertyInspectorPath": "PropertyInspector/FatChannelToggleAction.html",
+      "States": [
+        {
+          "Image": "Images/Plugin/On"
+        },
+        {
+          "Image": "Images/Plugin/Off"
         }
       ]
     }

@@ -1,7 +1,9 @@
 ﻿using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
+using Serilog;
 using SharpDeck;
 using SharpDeck.Events.Received;
+using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
@@ -14,8 +16,9 @@ namespace Revelator.io24.StreamDeck.Actions
         public RouteChangeAction(UpdateService updateService)
         {
             _updateService = updateService;
-            _updateService.RoutingUpdated += RoutingUpdated;
         }
+
+        private int _count;
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
@@ -28,7 +31,18 @@ namespace Revelator.io24.StreamDeck.Actions
         {
             await base.OnWillAppear(args);
 
+            _count++;
+            _updateService.RoutingUpdated += RoutingUpdated;
+
             await UpdateSettings(args.Payload);
+        }
+
+        protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
+        {
+            await base.OnWillDisappear(args);
+
+            _count--;
+            _updateService.RoutingUpdated -= RoutingUpdated;
         }
 
         private async Task UpdateSettings(ActionPayload payload)
@@ -37,12 +51,7 @@ namespace Revelator.io24.StreamDeck.Actions
                 .Settings["settingsModel"]
                 ?.ToObject<RouteChangeSettings>() ?? new RouteChangeSettings();
 
-            await UpdateTitle();
-        }
-
-        protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
-        {
-            await base.OnWillDisappear(args);
+            await StateUpdated();
         }
 
         protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
@@ -55,30 +64,26 @@ namespace Revelator.io24.StreamDeck.Actions
             _updateService.SetRouteValue(route, value);
         }
 
-        private ushort ActionToValue(string route, string action)
+        private float ActionToValue(string route, string action)
         {
             if (action == "On")
             {
-                var value = route.EndsWith("mute")
-                    ? 0
-                    : 16256;
-
-                return (ushort)value;
+                return route.EndsWith("mute")
+                    ? 0.0f
+                    : 1.0f;
             }
 
             if (action == "Off")
             {
-                var value = route.EndsWith("mute")
-                    ? 16256
-                    : 0;
-
-                return (ushort)value;
+                return route.EndsWith("mute")
+                    ? 1.0f
+                    : 0.0f;
             }
 
             var hasRoute = _updateService.Routing.GetValueByRoute(route);
             return route.EndsWith("mute")
-                ? (ushort)(hasRoute ? 16256 : 0)
-                : (ushort)(hasRoute ? 0 : 16256);
+                ? (hasRoute ? 1.0f : 0.0f)
+                : (hasRoute ? 0.0f : 1.0f);
         }
 
         private string RouteFromSettings()
@@ -118,11 +123,17 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
+        private bool GetCurrentState()
+        {
+            var route = RouteFromSettings();
+            return _updateService.Routing.GetValueByRoute(route);
+        }
+
         private async void RoutingUpdated(object? sender, EventArgs e)
         {
             try
             {
-                await UpdateTitle();
+                await StateUpdated();
             }
             catch (Exception)
             {
@@ -130,14 +141,17 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        private async Task UpdateTitle()
+        private int? _lastState = null;
+
+        private async Task StateUpdated()
         {
-                var route = RouteFromSettings();
-                var hasRoute = _updateService.Routing.GetValueByRoute(route);
+            var state = GetCurrentState() ? 0 : 1;
+            if (state == _lastState)
+                return;
 
-                var title = hasRoute ? "On" : "Off";
-
-                await SetTitleAsync(title);
+            Trace.WriteLine($"Route state: {state}, count: {_count}, context: {base.Context}");
+            await SetStateAsync(state);
+            _lastState = state;
         }
     }
 }
