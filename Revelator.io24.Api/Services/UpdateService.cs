@@ -67,6 +67,24 @@ namespace Revelator.io24.Api.Services
                 return;
             }
 
+            if (route == "line/ch1/bypassDSP")
+            {
+                Routing.FatChannel_MicL = state == 0;
+
+                RoutingUpdated?.Invoke(this, EventArgs.Empty);
+
+                return;
+            }
+
+            if (route == "line/ch2/bypassDSP")
+            {
+                Routing.FatChannel_MicR = state == 0;
+
+                RoutingUpdated?.Invoke(this, EventArgs.Empty);
+
+                return;
+            }
+
             var properties = typeof(RoutingModel).GetProperties();
             foreach (var property in properties)
             {
@@ -87,70 +105,6 @@ namespace Revelator.io24.Api.Services
                     break;
                 }
             }
-        }
-
-        public void ToggleFatChannel(string line)
-        {
-            var route = $"line/{line}/bypassDSP";
-
-            var message = new byte[37];
-
-            //Header [0..4]:
-            var header = PackageHelper.GetHeader();
-            PackageHelper.ApplyBytes(message, header, 0);
-
-            //Length [4..6]:
-            var length = BitConverter.GetBytes((ushort)31);
-            PackageHelper.ApplyBytes(message, length, 4);
-
-            //MessageType [6..8]:
-            var messageType = Encoding.ASCII.GetBytes("PV");
-            PackageHelper.ApplyBytes(message, messageType, 6);
-
-            //CustomBytes [8..12]:
-            var customBytes = PackageHelper.GetFromToBytes();
-            PackageHelper.ApplyBytes(message, customBytes, 8);
-
-            //Text [12..30]:
-            var text = Encoding.ASCII.GetBytes(route);
-            PackageHelper.ApplyBytes(message, text, 12);
-
-            //Empty +3 [30..33]:
-            message[30] = 0x00;
-            message[31] = 0x00;
-            message[32] = 0x00;
-
-            var oldValue = line == "ch1"
-                ? Routing.FatChannel_MicL
-                : Routing.FatChannel_MicR;
-
-            //New value [33..37]:
-            if (oldValue)
-            {
-                message[33] = 0x00;
-                message[34] = 0x00;
-                message[35] = 0x80; //Bypass 1.0 means FatChannel Off
-                message[36] = 0x3F;
-
-                if (line == "ch1")
-                    Routing.FatChannel_MicL = false;
-                else
-                    Routing.FatChannel_MicR = false;
-            }
-            else
-            {
-                message[33] = 0x00;
-                message[34] = 0x00;
-                message[35] = 0x00; //Bypass 0.0 means FatChannel On
-                message[36] = 0x00;
-
-                if (line == "ch1")
-                    Routing.FatChannel_MicL = true;
-                else
-                    Routing.FatChannel_MicR = true;
-            }
-
-            _communicationService.SendMessage(message.ToArray());
         }
 
         public void SetRouteValue(string route, float value)

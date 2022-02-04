@@ -47,7 +47,12 @@ namespace Revelator.io24.Wpf
             if (commandParameter is not string commandParameterString)
                 return;
 
-            _updateService.ToggleFatChannel(commandParameterString);
+            var route = $"line/{commandParameterString}/bypassDSP";
+            var value = "ch1" == commandParameterString
+                ? RoutingValues.FatChannel_MicL
+                : RoutingValues.FatChannel_MicR;
+
+            _updateService.SetRouteValue(route, value ? 1.0f : 0.0f);
         }
 
         private void OnRouteChangeRequest(object commandParameter)
