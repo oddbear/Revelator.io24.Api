@@ -23,6 +23,7 @@ namespace Revelator.io24.Api.Services
         private Thread? _listeningThread;
         private Thread? _writingThread;
         private NetworkStream? _networkStream;
+        private ushort _monitorPort;
 
         public CommunicationService()
         {
@@ -34,11 +35,12 @@ namespace Revelator.io24.Api.Services
             if (_networkStream is not null)
                 return;
 
+            _monitorPort = monitorPort;
+
             _tcpClient.Connect(IPAddress.Loopback, tcpPort);
             _networkStream = _tcpClient.GetStream();
 
-            var welcomeMessage = CreateWelcomeMessage(monitorPort);
-            _networkStream.Write(welcomeMessage);
+            RequestCommunicationMessage();
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -47,11 +49,20 @@ namespace Revelator.io24.Api.Services
             _writingThread.Start();
         }
 
-        private byte[] CreateWelcomeMessage(ushort monitorPort)
+        private void RequestCommunicationMessage()
+        {
+            if (_networkStream is null)
+                return;
+
+            var welcomeMessage = CreateWelcomeMessage();
+            _networkStream.Write(welcomeMessage);
+        }
+
+        private byte[] CreateWelcomeMessage()
         {
             var list = new List<byte>();
 
-            var welcomeMessage = WelcomeMessage.Create(monitorPort);
+            var welcomeMessage = WelcomeMessage.Create(_monitorPort);
             list.AddRange(welcomeMessage);
 
             var jsonMessage = ClientInfoMessage.Create();
@@ -170,6 +181,9 @@ namespace Revelator.io24.Api.Services
                         Synchronize?.Invoke(model);
                     return;
                 case "SubscriptionReply":
+                    return;
+                case "SubscriptionLost":
+                    RequestCommunicationMessage();
                     return;
                 default:
                     Log.Warning("[{className}] Unknown json id {messageType}", nameof(CommunicationService), id);

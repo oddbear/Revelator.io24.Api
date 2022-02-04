@@ -59,8 +59,20 @@ namespace Revelator.io24.Wpf
             var route = split[0];
             if (route == "global/phonesSrc")
             {
-                var value = ushort.Parse(split[1]);
-                _updateService.SetRouteValue(route, value);
+                var headphone = (Headphones)ushort.Parse(split[1]);
+
+                switch (headphone)
+                {
+                    case Headphones.Main:
+                        _updateService.SetRouteValue("global/phonesSrc", 0.0f);
+                        break;
+                    case Headphones.MixA:
+                        _updateService.SetRouteValue("global/phonesSrc", 0.5f);
+                        break;
+                    case Headphones.MixB:
+                        _updateService.SetRouteValue("global/phonesSrc", 1.0f);
+                        break;
+                }
             }
             else
             {
@@ -78,12 +90,12 @@ namespace Revelator.io24.Wpf
                 var value = (bool)property.GetValue(RoutingValues);
                 if (attribute.RouteType == RouteType.Mute)
                 {
-                    ushort v = (ushort)(value ? 16256 : 0);
+                    var v = (value ? 1.0f : 0.0f);
                     _updateService.SetRouteValue(route, v);
                 }
                 else
                 {
-                    ushort v = (ushort)(value ? 0 : 16256);
+                    var v = (value ? 0.0f : 1.0f);
                     _updateService.SetRouteValue(route, v);
                 }
             }

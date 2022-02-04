@@ -18,11 +18,11 @@ namespace Revelator.io24.Api.Services
         public UpdateService(CommunicationService communicationService)
         {
             _communicationService = communicationService;
-            _communicationService.RouteChange += _communicationService_RouteChange;
-            _communicationService.Synchronize += _communicationService_Synchronize;
+            _communicationService.RouteChange += RouteChange;
+            _communicationService.Synchronize += Synchronize;
         }
 
-        private void _communicationService_Synchronize(SynchronizeModel synchronizeModel)
+        private void Synchronize(SynchronizeModel synchronizeModel)
         {
             Routing.Main_MicL = synchronizeModel.Mic_L.Main_Assigned;
             Routing.MixA_MicL = synchronizeModel.Mic_L.MixA_Assigned;
@@ -56,7 +56,7 @@ namespace Revelator.io24.Api.Services
             RoutingUpdated?.Invoke(this, EventArgs.Empty);
         }
 
-        private void _communicationService_RouteChange(string route, ushort state)
+        private void RouteChange(string route, ushort state)
         {
             if (route == "global/phonesSrc")
             {
@@ -153,7 +153,7 @@ namespace Revelator.io24.Api.Services
             _communicationService.SendMessage(message.ToArray());
         }
 
-        public void SetRouteValue(string route, uint value)
+        public void SetRouteValue(string route, float value)
         {
             var message = new List<byte>();
 

@@ -55,30 +55,26 @@ namespace Revelator.io24.StreamDeck.Actions
             _updateService.SetRouteValue(route, value);
         }
 
-        private ushort ActionToValue(string route, string action)
+        private float ActionToValue(string route, string action)
         {
             if (action == "On")
             {
-                var value = route.EndsWith("mute")
-                    ? 0
-                    : 16256;
-
-                return (ushort)value;
+                return route.EndsWith("mute")
+                    ? 0.0f
+                    : 1.0f;
             }
 
             if (action == "Off")
             {
-                var value = route.EndsWith("mute")
-                    ? 16256
-                    : 0;
-
-                return (ushort)value;
+                return route.EndsWith("mute")
+                    ? 1.0f
+                    : 0.0f;
             }
 
             var hasRoute = _updateService.Routing.GetValueByRoute(route);
             return route.EndsWith("mute")
-                ? (ushort)(hasRoute ? 16256 : 0)
-                : (ushort)(hasRoute ? 0 : 16256);
+                ? (hasRoute ? 1.0f : 0.0f)
+                : (hasRoute ? 0.0f : 1.0f);
         }
 
         private string RouteFromSettings()

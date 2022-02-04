@@ -96,30 +96,26 @@ namespace Revelator.io24.TouchPortal
             _updateService.SetRouteValue(route, value);
         }
 
-        private uint ActionToValue(string route, string action)
+        private float ActionToValue(string route, string action)
         {
             if (action == "Turn On")
             {
-                var value = route.EndsWith("mute")
-                    ? 0u
-                    : 16256u;
-
-                return value;
+                return route.EndsWith("mute")
+                    ? 0.0f
+                    : 1.0f;
             }
 
             if (action == "Turn Off")
             {
-                var value = route.EndsWith("mute")
-                    ? 16256u
-                    : 0u;
-
-                return value;
+                return route.EndsWith("mute")
+                    ? 1.0f
+                    : 0.0f;
             }
 
             var hasRoute = _updateService.Routing.GetValueByRoute(route);
             return route.EndsWith("mute")
-                ? (hasRoute ? 16256u : 0u)
-                : (hasRoute ? 0u : 16256u);
+                ? (hasRoute ? 1.0f : 0.0f)
+                : (hasRoute ? 0.0f : 1.0f);
         }
 
         private string InputToPart(string input)
@@ -159,7 +155,18 @@ namespace Revelator.io24.TouchPortal
             var headphoneValue = dict[name + ".headphones"];
             var headphone = GetHeadphoneEnum(headphoneValue);
 
-            _updateService.SetRouteValue("global/phonesSrc", (ushort)headphone);
+            switch (headphone)
+            {
+                case Headphones.Main:
+                    _updateService.SetRouteValue("global/phonesSrc", 0.0f);
+                    break;
+                case Headphones.MixA:
+                    _updateService.SetRouteValue("global/phonesSrc", 0.5f);
+                    break;
+                case Headphones.MixB:
+                    _updateService.SetRouteValue("global/phonesSrc", 1.0f);
+                    break;
+            }
         }
 
         private Headphones GetHeadphoneEnum(string headphoneValue)
