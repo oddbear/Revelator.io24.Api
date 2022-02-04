@@ -1,7 +1,6 @@
 ﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages.Readers;
 using Revelator.io24.Api.Messages.Writers;
-using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -13,7 +12,6 @@ namespace Revelator.io24.Api.Services
     public class CommunicationService : IDisposable
     {
         public delegate void RouteUpdated(string route, ushort state);
-        public delegate void SynchronizeEvent(SynchronizeModel synchronizeModel);
 
         private readonly TcpClient _tcpClient;
         private readonly RoutingModel _routingModel;
