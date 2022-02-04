@@ -1,5 +1,4 @@
-﻿using Revelator.io24.Api.Enums;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -10,10 +9,13 @@ namespace Revelator.io24.Wpf.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Headphones state && parameter is string parameterString)
+            if (value is float state && parameter is string parameterString)
             {
-                var parmeterEnum = Enum.Parse<Headphones>(parameterString);
-                return state == parmeterEnum
+                var cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+                cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
+
+                var parmeterFloat = float.Parse(parameterString, NumberStyles.Any, cultureInfo);
+                return state == parmeterFloat
                     ? Brushes.Green
                     : Brushes.Red;
             }

@@ -32,7 +32,7 @@ namespace Revelator.io24.Api.Messages.Readers
             return Encoding.ASCII.GetString(outputStream.ToArray());
         }
 
-        public static SynchronizeModel? GetSynchronizeModel(string json)
+        public static Synchronize? GetSynchronizeModel(string json)
         {
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var synchronize = JsonSerializer.Deserialize<Synchronize>(json, options);
@@ -41,7 +41,7 @@ namespace Revelator.io24.Api.Messages.Readers
 
             TraverseExtensionData(synchronize);
 
-            return new SynchronizeModel(synchronize);
+            return synchronize;
         }
 
         private static void TraverseExtensionData(object obj)
