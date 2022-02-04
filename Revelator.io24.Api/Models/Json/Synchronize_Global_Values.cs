@@ -2,7 +2,7 @@
 {
     public class Synchronize_Global_Values : ExtensionBase
     {
-        public double? PhonesSrc { get; set; } //0,5
+        public float PhonesSrc { get; set; } //0,5
         public double? PhonesMute { get; set; } //0
         public double? MonitorBlend { get; set; } //0,5
         public double? Aux1_mirror_main { get; set; } //0

@@ -1,7 +1,6 @@
 ﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages.Readers;
 using Revelator.io24.Api.Messages.Writers;
-using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -13,21 +12,19 @@ namespace Revelator.io24.Api.Services
     public class CommunicationService : IDisposable
     {
         public delegate void RouteUpdated(string route, ushort state);
-        public delegate void SynchronizeEvent(SynchronizeModel synchronizeModel);
-
-        public event RouteUpdated? RouteChange;
-        public event SynchronizeEvent? Synchronize;
 
         private readonly TcpClient _tcpClient;
+        private readonly RoutingModel _routingModel;
 
         private Thread? _listeningThread;
         private Thread? _writingThread;
         private NetworkStream? _networkStream;
         private ushort _monitorPort;
 
-        public CommunicationService()
+        public CommunicationService(RoutingModel routingModel)
         {
             _tcpClient = new TcpClient();
+            _routingModel = routingModel;
         }
 
         public void Init(ushort tcpPort, ushort monitorPort)
@@ -178,9 +175,10 @@ namespace Revelator.io24.Api.Services
                 case "Synchronize":
                     var model = ZM.GetSynchronizeModel(json);
                     if (model is not null)
-                        Synchronize?.Invoke(model);
+                        _routingModel.Synchronize(model);
                     return;
                 case "SubscriptionReply":
+                    //We now have communication.
                     return;
                 case "SubscriptionLost":
                     RequestCommunicationMessage();
@@ -202,10 +200,10 @@ namespace Revelator.io24.Api.Services
             var customBytes = data[8..12];
 
             var route = Encoding.ASCII.GetString(data[12..^7]);
-            var emptyBytes = data[^7..^2];
-            var state = BitConverter.ToUInt16(data[^2..^0]);
+            var emptyBytes = data[^7..^4];
+            var state = BitConverter.ToSingle(data[^4..^0]);
 
-            RouteChange?.Invoke(route, state);
+            _routingModel.StateUpdated(route, state);
         }
 
         /// <summary>

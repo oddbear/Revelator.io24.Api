@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
@@ -29,10 +30,13 @@ namespace Revelator.io24.Wpf
             var broadcastService = new BroadcastService();
             var deviceTcpPort = broadcastService.WaitForFirstBroadcast();
 
-            var monitorService = new MonitorService();
+            var fatChannel = new FatChannelMonitorModel();
+            var values = new ValuesMonitorModel();
+            var monitorService = new MonitorService(fatChannel, values);
             var monitorPort = monitorService.Port;
 
-            var communicationService = new CommunicationService();
+            var routingModel = new RoutingModel();
+            var communicationService = new CommunicationService(routingModel);
             communicationService.Init(deviceTcpPort, monitorPort);
             var updateService = new UpdateService(communicationService);
 
@@ -42,6 +46,9 @@ namespace Revelator.io24.Wpf
             serviceCollection.AddSingleton(broadcastService);
             serviceCollection.AddSingleton(monitorService);
             serviceCollection.AddSingleton(updateService);
+            serviceCollection.AddSingleton(routingModel);
+            serviceCollection.AddSingleton(fatChannel);
+            serviceCollection.AddSingleton(values);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
 

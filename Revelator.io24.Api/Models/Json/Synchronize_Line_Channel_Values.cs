@@ -11,7 +11,7 @@ namespace Revelator.io24.Api.Models.Json
         [JsonPropertyName("FXA")]
         public double? FXA { get; set; }
         public double? Dawpostdsp { get; set; }
-        public double? BypassDSP { get; set; }
+        public float BypassDSP { get; set; }
         public double? ProcessingChannel { get; set; }
         public double? ActivePresetSlotIndex { get; set; }
         public double? PresetHotKey { get; set; }

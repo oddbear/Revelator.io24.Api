@@ -12,6 +12,7 @@
         <converter:DecibelConverter x:Key="decibelConverter" />
         <converter:HeadphonesStateColorConverter x:Key="headphonesStateColorConverter" />
         <converter:RoutingStateColorConverter x:Key="routingStateColorConverter" />
+        <converter:VolumeConverter x:Key="volumeConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -21,9 +22,9 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
             <Button
-                Command="{Binding Path=ToggleFatChannelCommand}" CommandParameter="ch1">Toggle Fatchannel Mic L</Button>
+                Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/bypassDSP">Toggle Fatchannel Mic L</Button>
             <Button
-                Command="{Binding Path=ToggleFatChannelCommand}" CommandParameter="ch2">Toggle Fatchannel Mic 3</Button>
+                Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/bypassDSP">Toggle Fatchannel Mic 3</Button>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -33,51 +34,76 @@
             <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
                 <GroupBox Header="Microphone L" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar x:Name="microphoneL" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Microphone_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="gainReductionMeterL" Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
+                        <ProgressBar Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_L, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Margin="10" />
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.Main_MicL, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixA_MicL, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixB_MicL, Converter={StaticResource volumeConverter}}"/>
                     </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Microphone R" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar x:Name="microphoneR" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Microphone_R, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="gainReductionMeterR" Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
+                        <ProgressBar Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Margin="10" />
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.Main_MicR, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixA_MicR, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixB_MicR, Converter={StaticResource volumeConverter}}"/>
                     </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Playback L/R" Width="90">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar x:Name="playback_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Playback_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar  x:Name="playback_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Playback_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Margin="10" />
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.Main_Playback, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixA_Playback, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixB_Playback, Converter={StaticResource volumeConverter}}"/>
                     </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Virtual A L/R" Width="90">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar x:Name="virtualOutputA_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="virtualOutputA_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Margin="10" />
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.Main_VirtualA, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixA_VirtualA, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixB_VirtualA, Converter={StaticResource volumeConverter}}"/>
                     </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Virtual B L/R" Width="90">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar x:Name="virtualOutputB_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="virtualOutputB_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Margin="10" />
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.Main_VirtualB, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixA_VirtualB, Converter={StaticResource volumeConverter}}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixB_VirtualB, Converter={StaticResource volumeConverter}}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -86,28 +112,31 @@
 
                 <GroupBox Header="Main" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Margin="10" />
-                        <ProgressBar x:Name="main_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <Slider Orientation="Vertical" Margin="10" Maximum="100"
+                                Value="{Binding Path=VolumeMap.Main_Mix, Converter={StaticResource volumeConverter}}"/>
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Main_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="main_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Main_R, Converter={StaticResource decibelConverter}}" />
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Stream Mix 1" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Margin="10" />
-                        <ProgressBar x:Name="streamMix1_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <Slider Orientation="Vertical" Margin="10" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixA_Mix, Converter={StaticResource volumeConverter}}"/>
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.StreamMix1_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="streamMix1_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.StreamMix1_R, Converter={StaticResource decibelConverter}}" />
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Stream Mix 2" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Margin="10" />
-                        <ProgressBar x:Name="streamMix2_L" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <Slider Orientation="Vertical" Margin="10" Maximum="100"
+                                Value="{Binding Path=VolumeMap.MixB_Mix, Converter={StaticResource volumeConverter}}"/>
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.StreamMix2_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar x:Name="streamMix2_R" Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.StreamMix2_R, Converter={StaticResource decibelConverter}}" />
                     </StackPanel>
                 </GroupBox>
@@ -150,71 +179,71 @@
                 <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalContentAlignment="Center">Stream Mix A</Label>
                 <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalContentAlignment="Center">Stream Mix B</Label>
 
-                <Button Grid.Row="1" Grid.Column="1" x:Name="line_ch1_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="line/ch1/mute"
-                        Background="{Binding Path=RoutingValues.Main_MicL, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="2" x:Name="line_ch2_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="line/ch2/mute"
-                        Background="{Binding Path=RoutingValues.Main_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="3" x:Name="return_ch1_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch1/mute"
-                        Background="{Binding Path=RoutingValues.Main_Playback, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="4" x:Name="return_ch2_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch2/mute"
-                        Background="{Binding Path=RoutingValues.Main_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="5" x:Name="return_ch3_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch3/mute"
-                        Background="{Binding Path=RoutingValues.Main_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="6" x:Name="main_ch1_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="main/ch1/mute"
-                        Background="{Binding Path=RoutingValues.Main_Mix, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="7" x:Name="main_phones"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="global/phonesSrc:0"
-                        Background="{Binding Path=RoutingValues.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0}"></Button>
+                <Button Grid.Row="1" Grid.Column="1"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/mute"
+                        Background="{Binding Path=RoutingMap.Main_MicR, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="1" Grid.Column="2"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/mute"
+                        Background="{Binding Path=RoutingMap.Main_MicR, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="1" Grid.Column="3"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch1/mute"
+                        Background="{Binding Path=RoutingMap.Main_Playback, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="1" Grid.Column="4"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch2/mute"
+                        Background="{Binding Path=RoutingMap.Main_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="1" Grid.Column="5"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch3/mute"
+                        Background="{Binding Path=RoutingMap.Main_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="1" Grid.Column="6"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="main/ch1/mute"
+                        Background="{Binding Path=RoutingMap.Main_Mix, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="1" Grid.Column="7"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="global/phonesSrc:0.0"
+                        Background="{Binding Path=RoutingMap.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0}"></Button>
 
-                <Button Grid.Row="2" Grid.Column="1" x:Name="line_ch1_assign_aux1"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="line/ch1/assign_aux1"
-                        Background="{Binding Path=RoutingValues.MixA_MicL, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="2" x:Name="line_ch2_assign_aux1"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="line/ch2/assign_aux1"
-                        Background="{Binding Path=RoutingValues.MixA_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="3" x:Name="return_ch1_assign_aux1"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch1/assign_aux1"
-                        Background="{Binding Path=RoutingValues.MixA_Playback, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="4" x:Name="return_ch2_assign_aux1"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch2/assign_aux1"
-                        Background="{Binding Path=RoutingValues.MixA_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="5" x:Name="return_ch3_assign_aux1"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch3/assign_aux1"
-                        Background="{Binding Path=RoutingValues.MixA_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="6" x:Name="aux_ch1_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="aux/ch1/mute"
-                        Background="{Binding Path=RoutingValues.MixA_Mix, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="7" x:Name="mixA_phones"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="global/phonesSrc:16128"
-                        Background="{Binding Path=RoutingValues.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=16128}"></Button>
+                <Button Grid.Row="2" Grid.Column="1"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/assign_aux1"
+                        Background="{Binding Path=RoutingMap.MixA_MicL, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="2" Grid.Column="2"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/assign_aux1"
+                        Background="{Binding Path=RoutingMap.MixA_MicR, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="2" Grid.Column="3"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch1/assign_aux1"
+                        Background="{Binding Path=RoutingMap.MixA_Playback, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="2" Grid.Column="4"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch2/assign_aux1"
+                        Background="{Binding Path=RoutingMap.MixA_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="2" Grid.Column="5"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch3/assign_aux1"
+                        Background="{Binding Path=RoutingMap.MixA_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="2" Grid.Column="6"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="aux/ch1/mute"
+                        Background="{Binding Path=RoutingMap.MixA_Mix, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="2" Grid.Column="7"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="global/phonesSrc:0.5"
+                        Background="{Binding Path=RoutingMap.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0.5}"></Button>
 
-                <Button Grid.Row="3" Grid.Column="1" x:Name="line_ch1_assign_aux2"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="line/ch1/assign_aux2"
-                        Background="{Binding Path=RoutingValues.MixB_MicL, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="2" x:Name="line_ch2_assign_aux2"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="line/ch2/assign_aux2"
-                        Background="{Binding Path=RoutingValues.MixB_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="3" x:Name="return_ch1_assign_aux2"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch1/assign_aux2"
-                        Background="{Binding Path=RoutingValues.MixB_Playback, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="4" x:Name="return_ch2_assign_aux2"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch2/assign_aux2"
-                        Background="{Binding Path=RoutingValues.MixB_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="5" x:Name="return_ch3_assign_aux2"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="return/ch3/assign_aux2"
-                        Background="{Binding Path=RoutingValues.MixB_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="6" x:Name="aux_ch2_mute"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="aux/ch2/mute"
-                        Background="{Binding Path=RoutingValues.MixB_Mix, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="7" x:Name="mixB_phones"
-                        Command="{Binding Path=RouteChangeCommand}" CommandParameter="global/phonesSrc:16256"
-                        Background="{Binding Path=RoutingValues.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=16256}" />
+                <Button Grid.Row="3" Grid.Column="1"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/assign_aux2"
+                        Background="{Binding Path=RoutingMap.MixB_MicL, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="3" Grid.Column="2"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/assign_aux2"
+                        Background="{Binding Path=RoutingMap.MixB_MicR, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="3" Grid.Column="3"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch1/assign_aux2"
+                        Background="{Binding Path=RoutingMap.MixB_Playback, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="3" Grid.Column="4"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch2/assign_aux2"
+                        Background="{Binding Path=RoutingMap.MixB_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="3" Grid.Column="5"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch3/assign_aux2"
+                        Background="{Binding Path=RoutingMap.MixB_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="3" Grid.Column="6"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="aux/ch2/mute"
+                        Background="{Binding Path=RoutingMap.MixB_Mix, Converter={StaticResource routingStateColorConverter}}" />
+                <Button Grid.Row="3" Grid.Column="7"
+                        Command="{Binding Path=ToggleCommand}" CommandParameter="global/phonesSrc:1.0"
+                        Background="{Binding Path=RoutingMap.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=1.0}" />
             </Grid>
         </GroupBox>
     </Grid>

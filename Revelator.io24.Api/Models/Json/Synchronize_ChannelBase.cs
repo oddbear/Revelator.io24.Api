@@ -8,9 +8,9 @@ namespace Revelator.io24.Api.Models.Json
         public string? Name { get; set; }
         public string? Username { get; set; }
         public double? Select { get; set; }
-        public double? Mute { get; set; }
+        public float Mute { get; set; }
         public double? HardwareMute { get; set; }
-        public double? Volume { get; set; }
+        public float Volume { get; set; }
         public double? MonitorBlend { get; set; }
         public double? Clip { get; set; }
         public double? Link { get; set; }

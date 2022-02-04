@@ -1,108 +1,76 @@
-﻿using Revelator.io24.Api.Attributes;
-using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Models;
+﻿using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 using Revelator.io24.Wpf.Commands;
+using Revelator.io24.Wpf.Models;
 using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
+using System.Globalization;
 using System.Windows.Input;
 
 namespace Revelator.io24.Wpf
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private readonly MonitorService _monitorService;
+        private readonly RoutingModel _routingModel;
         private readonly UpdateService _updateService;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public ValuesMonitorModel MonitorValues => _monitorService.Values;
-        public FatChannelMonitorModel FatChannelValues => _monitorService.FatChannel;
-        public RoutingModel RoutingValues => _updateService.Routing;
+        public ValuesMonitorModel MonitorValues { get; }
+        public FatChannelMonitorModel FatChannelValues { get; }
 
-        private readonly DelegateCommand _routeChangeCommand;
-        public ICommand RouteChangeCommand => _routeChangeCommand;
+        public RoutingMapper RoutingMap { get; set; }
+        public VolumeMapper VolumeMap { get; set; }
 
-        private readonly DelegateCommand _toggleFatChannelCommand;
-        public ICommand ToggleFatChannelCommand => _toggleFatChannelCommand;
+        private readonly DelegateCommand _toggleCommand;
+        public ICommand ToggleCommand => _toggleCommand;
 
-        public MainViewModel(MonitorService monitorService, UpdateService updateService)
+        public MainViewModel(RoutingModel routingModel,
+            ValuesMonitorModel valuesMonitorModel,
+            FatChannelMonitorModel fatChannelMonitorModel,
+            UpdateService updateService)
         {
-            _monitorService = monitorService ?? throw new ArgumentNullException(nameof(monitorService));
+            _routingModel = routingModel;
+            MonitorValues = valuesMonitorModel;
+            FatChannelValues = fatChannelMonitorModel;
+            RoutingMap = new RoutingMapper(routingModel);
+            VolumeMap = new VolumeMapper(routingModel, updateService);
+
             _updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
-            _monitorService.ValuesUpdated += (sender, args) => OnPropertyChanged(nameof(MonitorValues));
-            _monitorService.FatChannelUpdated += (sender, args) => OnPropertyChanged(nameof(FatChannelValues));
+            valuesMonitorModel.ValuesUpdated += (sender, args) => OnPropertyChanged(nameof(MonitorValues));
+            fatChannelMonitorModel.FatChannelUpdated += (sender, args) => OnPropertyChanged(nameof(FatChannelValues));
 
-            _updateService.RoutingUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingValues));
+            routingModel.RoutingUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingMap));
+            routingModel.RoutingUpdated += (sender, args) => OnPropertyChanged(nameof(VolumeMap));
 
-            _routeChangeCommand = new DelegateCommand(OnRouteChangeRequest);
-            _toggleFatChannelCommand = new DelegateCommand(OnFatchannelToggleRequest);
+            _toggleCommand = new DelegateCommand(OnToggleRequest);
         }
 
-        private void OnFatchannelToggleRequest(object commandParameter)
+        private void OnToggleRequest(object commandParameter)
         {
-            if (commandParameter is not string commandParameterString)
+            if (commandParameter is not string route)
                 return;
 
-            var route = $"line/{commandParameterString}/bypassDSP";
-            var value = "ch1" == commandParameterString
-                ? RoutingValues.FatChannel_MicL
-                : RoutingValues.FatChannel_MicR;
-
-            _updateService.SetRouteValue(route, value ? 1.0f : 0.0f);
-        }
-
-        private void OnRouteChangeRequest(object commandParameter)
-        {
-            if (commandParameter is not string commandParameterString)
-                return;
-
-            var split = commandParameterString.Split(':');
-            var route = split[0];
-            if (route == "global/phonesSrc")
+            var split = route.Split(':');
+            if (split.Length > 1)
             {
-                var headphone = (Headphones)ushort.Parse(split[1]);
+                route = split[0];
 
-                switch (headphone)
-                {
-                    case Headphones.Main:
-                        _updateService.SetRouteValue("global/phonesSrc", 0.0f);
-                        break;
-                    case Headphones.MixA:
-                        _updateService.SetRouteValue("global/phonesSrc", 0.5f);
-                        break;
-                    case Headphones.MixB:
-                        _updateService.SetRouteValue("global/phonesSrc", 1.0f);
-                        break;
-                }
+                var cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+                cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
+
+                var value = float.Parse(split[1], NumberStyles.Any, cultureInfo);
+
+                _updateService.SetRouteValue(route, value);
             }
             else
             {
-                var properties = typeof(RoutingModel).GetProperties();
-                var routeProperty = properties
-                    .Select(property => new { property, attribute = property.GetCustomAttribute<RouteNameAttribute>() })
-                    .FirstOrDefault(obj => obj.attribute?.RouteName == route);
+                var value = _routingModel.GetBooleanState(route)
+                    ? 0.0f
+                    : 1.0f;
 
-                if (routeProperty is null)
-                    return;
-
-                var property = routeProperty.property;
-                var attribute = routeProperty.attribute;
-
-                var value = (bool)property.GetValue(RoutingValues);
-                if (attribute.RouteType == RouteType.Mute)
-                {
-                    var v = (value ? 1.0f : 0.0f);
-                    _updateService.SetRouteValue(route, v);
-                }
-                else
-                {
-                    var v = (value ? 0.0f : 1.0f);
-                    _updateService.SetRouteValue(route, v);
-                }
+                _updateService.SetRouteValue(route, value);
             }
         }
 

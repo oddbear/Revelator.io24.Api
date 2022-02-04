@@ -32,7 +32,7 @@ namespace Revelator.io24.StreamDeck.Actions
             await base.OnWillAppear(args);
 
             _count++;
-            _updateService.RoutingUpdated += RoutingUpdated;
+            //_updateService.RoutingUpdated += RoutingUpdated;
 
             await UpdateSettings(args.Payload);
         }
@@ -42,7 +42,7 @@ namespace Revelator.io24.StreamDeck.Actions
             await base.OnWillDisappear(args);
 
             _count--;
-            _updateService.RoutingUpdated -= RoutingUpdated;
+            //_updateService.RoutingUpdated -= RoutingUpdated;
         }
 
         private async Task UpdateSettings(ActionPayload payload)
@@ -77,8 +77,8 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private bool GetCurrentState()
             => _settings.Route == "line/ch1/bypassDSP"
-                ? _updateService.Routing.FatChannel_MicL
-                : _updateService.Routing.FatChannel_MicR;
+                ? true //_updateService.Routing.FatChannel_MicL
+                : false; //_updateService.Routing.FatChannel_MicR;
 
         private async void RoutingUpdated(object? sender, EventArgs e)
         {
