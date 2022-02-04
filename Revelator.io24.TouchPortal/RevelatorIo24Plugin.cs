@@ -55,6 +55,9 @@ namespace Revelator.io24.TouchPortal
             _client.StateUpdate(PluginId + ".states.return/ch2/assign_aux2", routing.MixB_VirtualA ? "On" : "Off");
             _client.StateUpdate(PluginId + ".states.return/ch3/assign_aux2", routing.MixB_VirtualB ? "On" : "Off");
             _client.StateUpdate(PluginId + ".states.aux/ch2/mute", routing.MixB_Mix ? "On" : "Off");
+
+            _client.StateUpdate(PluginId + ".states.line/ch1/bypassDSP", routing.FatChannel_MicL ? "On" : "Off");
+            _client.StateUpdate(PluginId + ".states.line/ch2/bypassDSP", routing.FatChannel_MicR ? "On" : "Off");
         }
 
         public void Init()
@@ -75,6 +78,11 @@ namespace Revelator.io24.TouchPortal
             if (actionId.EndsWith(".headphones.action.change"))
             {
                 HeadphonesSourceChange(actionId + ".data", message.Data);
+            }
+
+            if (actionId.EndsWith(".fatchanneltoggle.action.change"))
+            {
+                FatChannelChange(actionId + ".data", message.Data);
             }
         }
 
@@ -168,6 +176,42 @@ namespace Revelator.io24.TouchPortal
                     break;
             }
         }
+
+        private void FatChannelChange(string name, IReadOnlyCollection<ActionDataSelected> datalist)
+        {
+            var dict = datalist
+                .ToDictionary(kv => kv.Id, kv => kv.Value);
+
+            var microphone = dict[name + ".microphone"];
+            var action = dict[name + ".actions"];
+
+            var route = GetFatChannelRoute(microphone);
+            var state = GetCurrentFatChannelState(route);
+            var value = GetFatChannelAction(action, route);
+
+            _updateService.SetRouteValue(route, value);
+        }
+
+        private string GetFatChannelRoute(string microphone)
+            => microphone switch
+            {
+                "Mic L" => "line/ch1/bypassDSP",
+                "Mic R" => "line/ch2/bypassDSP",
+                _ => throw new InvalidOperationException()
+            };
+
+        private bool GetCurrentFatChannelState(string route)
+            => route == "line/ch1/bypassDSP"
+                ? _updateService.Routing.FatChannel_MicL
+                : _updateService.Routing.FatChannel_MicR;
+
+        private float GetFatChannelAction(string action, string route)
+            => action switch
+            {
+                "Turn On" => 0.0f,
+                "Turn Off" => 1.0f,
+                _ => GetCurrentFatChannelState(route) ? 1.0f : 0.0f,
+            };
 
         private Headphones GetHeadphoneEnum(string headphoneValue)
         {
