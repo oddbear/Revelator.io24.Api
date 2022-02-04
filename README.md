@@ -6,14 +6,14 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
 ## Progress
 
 - API: A lot of bugs, and missing features, but monitoring and routing works.
-- Stream Deck plugin: Routing and headphone sources, with status.
-- Touch Portal plugin: Routing and headphone sources, with status.
+- Stream Deck plugin: Fat Channel Toggle, Routing and headphone sources, with status.
+- Touch Portal plugin: Fat Channel Toggle, Routing and headphone sources, with status.
 - Loupedeck plugin: not started.
 
 ## How to test
 
 - Read the text on this page.
-- Go to the [Releases](https://github.com/oddbear/Revelator.io24.Api/releases/tag/v0.0.1-pre) page, or click on `Releases` to the right of this page.
+- Go to the [Releases](https://github.com/oddbear/Revelator.io24.Api/releases/tag/v0.0.2-pre) page, or click on `Releases` to the right of this page.
 - Read the text on the releases page.
 - Windows App:
   - Download zip file under Assets on the Releases page
