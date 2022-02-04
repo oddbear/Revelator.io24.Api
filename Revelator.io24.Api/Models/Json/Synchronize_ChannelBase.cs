@@ -10,7 +10,7 @@ namespace Revelator.io24.Api.Models.Json
         public double? Select { get; set; }
         public float Mute { get; set; }
         public double? HardwareMute { get; set; }
-        public double? Volume { get; set; }
+        public float Volume { get; set; }
         public double? MonitorBlend { get; set; }
         public double? Clip { get; set; }
         public double? Link { get; set; }

@@ -16,7 +16,7 @@ namespace Revelator.io24.Api.Services
             return RouteValue[route] == 1.0f;
         }
 
-        public void UpdateState(string route, float value)
+        public void StateUpdated(string route, float value)
         {
             RouteValue[route] = value;
             RoutingUpdated?.Invoke(this, route);
@@ -60,6 +60,28 @@ namespace Revelator.io24.Api.Services
             //Fat Channel:
             RouteValue["line/ch1/bypassDSP"] = lineC.Ch1.Values.BypassDSP;
             RouteValue["line/ch2/bypassDSP"] = lineC.Ch2.Values.BypassDSP;
+
+            //Volume:
+            RouteValue["line/ch1/volume"] = lineC.Ch1.Values.Volume;
+            RouteValue["line/ch2/volume"] = lineC.Ch2.Values.Volume;
+            RouteValue["return/ch1/volume"] = returnC.Ch1.Values.Volume;
+            RouteValue["return/ch2/volume"] = returnC.Ch2.Values.Volume;
+            RouteValue["return/ch3/volume"] = returnC.Ch3.Values.Volume;
+            RouteValue["main/ch1/volume"] = mainC.Ch1.Values.Volume;
+
+            RouteValue["line/ch1/aux1"] = lineC.Ch1.Values.Aux1;
+            RouteValue["line/ch2/aux1"] = lineC.Ch2.Values.Aux1;
+            RouteValue["return/ch1/aux1"] = returnC.Ch1.Values.Aux1;
+            RouteValue["return/ch2/aux1"] = returnC.Ch2.Values.Aux1;
+            RouteValue["return/ch3/aux1"] = returnC.Ch3.Values.Aux1;
+            RouteValue["aux1/ch1/volume"] = auxC.Ch1.Values.Volume;
+
+            RouteValue["line/ch1/aux2"] = lineC.Ch1.Values.Aux2;
+            RouteValue["line/ch2/aux2"] = lineC.Ch2.Values.Aux2;
+            RouteValue["return/ch1/aux2"] = returnC.Ch1.Values.Aux2;
+            RouteValue["return/ch2/aux2"] = returnC.Ch2.Values.Aux2;
+            RouteValue["return/ch3/aux2"] = returnC.Ch3.Values.Aux2;
+            RouteValue["aux/ch2/volume"] = auxC.Ch2.Values.Volume;
 
             RoutingUpdated?.Invoke(this, "synchronize");
         }

@@ -10,7 +10,7 @@ namespace Revelator.io24.Api.Models.Json
         public float AssignAux1 { get; set; }
         [JsonPropertyName("assign_aux2")]
         public float AssignAux2 { get; set; }
-        public double? Aux1 { get; set; }
-        public double? Aux2 { get; set; }
+        public float Aux1 { get; set; }
+        public float Aux2 { get; set; }
     }
 }

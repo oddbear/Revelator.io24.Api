@@ -11,7 +11,7 @@ namespace Revelator.io24.Wpf.Converters
         {
             if (value is float state && parameter is string parameterString)
             {
-                var cultureInfo = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+                var cultureInfo = (CultureInfo)culture.Clone();
                 cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
 
                 var parmeterFloat = float.Parse(parameterString, NumberStyles.Any, cultureInfo);

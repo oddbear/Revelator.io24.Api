@@ -205,7 +205,7 @@ namespace Revelator.io24.Api.Services
             var emptyBytes = data[^7..^4];
             var state = BitConverter.ToSingle(data[^4..^0]);
 
-            _routingModel.UpdateState(route, state);
+            _routingModel.StateUpdated(route, state);
         }
 
         /// <summary>

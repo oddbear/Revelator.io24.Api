@@ -1,14 +1,10 @@
-﻿using Revelator.io24.Api.Attributes;
-using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Models;
+﻿using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 using Revelator.io24.Wpf.Commands;
 using Revelator.io24.Wpf.Models;
 using System;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Windows.Input;
 
 namespace Revelator.io24.Wpf
@@ -24,6 +20,7 @@ namespace Revelator.io24.Wpf
         public FatChannelMonitorModel FatChannelValues { get; }
 
         public RoutingMapper RoutingMap { get; set; }
+        public VolumeMapper VolumeMap { get; set; }
 
         private readonly DelegateCommand _toggleCommand;
         public ICommand ToggleCommand => _toggleCommand;
@@ -37,6 +34,7 @@ namespace Revelator.io24.Wpf
             MonitorValues = valuesMonitorModel;
             FatChannelValues = fatChannelMonitorModel;
             RoutingMap = new RoutingMapper(routingModel);
+            VolumeMap = new VolumeMapper(routingModel, updateService);
 
             _updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
 
@@ -44,6 +42,7 @@ namespace Revelator.io24.Wpf
             fatChannelMonitorModel.FatChannelUpdated += (sender, args) => OnPropertyChanged(nameof(FatChannelValues));
 
             routingModel.RoutingUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingMap));
+            routingModel.RoutingUpdated += (sender, args) => OnPropertyChanged(nameof(VolumeMap));
 
             _toggleCommand = new DelegateCommand(OnToggleRequest);
         }
