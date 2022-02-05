@@ -1,10 +1,5 @@
 ﻿using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TouchPortalSDK;
 using TouchPortalSDK.Interfaces;
 using TouchPortalSDK.Messages.Events;
@@ -18,46 +13,69 @@ namespace Revelator.io24.TouchPortal
 
         private readonly ITouchPortalClient _client;
         private readonly UpdateService _updateService;
+        private readonly RoutingModel _routingModel;
 
         public RevelatorIo24Plugin(ITouchPortalClientFactory clientFactory,
-            UpdateService updateService)
+            UpdateService updateService,
+            RoutingModel routingModel)
         {
             //Set the event handler for TouchPortal:
             _client = clientFactory.Create(this);
 
             _updateService = updateService;
-            _updateService.RoutingUpdated += RoutingUpdated;
+            _routingModel = routingModel;
+            routingModel.RoutingUpdated += RoutingUpdated;
         }
 
-        private void RoutingUpdated(object? sender, EventArgs e)
+        private void RoutingUpdated(object? sender, string route)
         {
-            var routing = _updateService.Routing;
+            var headphones = _routingModel.RouteValue["global/phonesSrc"];
+            switch (headphones)
+            {
+                case 0.0f:
+                    _client.StateUpdate(PluginId + ".states.headphonessource", "Main");
+                    break;
+                case 0.5f:
+                    _client.StateUpdate(PluginId + ".states.headphonessource", "Mix A");
+                    break;
+                case 1.0f:
+                    _client.StateUpdate(PluginId + ".states.headphonessource", "Mix B");
+                    break;
+            }
 
-            _client.StateUpdate(PluginId + ".states.headphonessource", routing.HeadphonesSource.ToString());
+            UpdateState("line/ch1/mute");
 
-            _client.StateUpdate(PluginId + ".states.line/ch1/mute", routing.Main_MicL ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.line/ch2/mute", routing.Main_MicR ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch1/mute", routing.Main_Playback ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch2/mute", routing.Main_VirtualA ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch3/mute", routing.Main_VirtualB ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.main/ch1/mute", routing.Main_Mix ? "On" : "Off");
+            UpdateState("line/ch2/mute");
+            UpdateState("return/ch1/mute");
+            UpdateState("return/ch2/mute");
+            UpdateState("return/ch3/mute");
+            UpdateState("main/ch1/mute");
 
-            _client.StateUpdate(PluginId + ".states.line/ch1/assign_aux1", routing.MixA_MicL ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.line/ch2/assign_aux1", routing.MixA_MicR ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch1/assign_aux1", routing.MixA_Playback ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch2/assign_aux1", routing.MixA_VirtualA ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch3/assign_aux1", routing.MixA_VirtualB ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.aux/ch1/mute", routing.MixA_Mix ? "On" : "Off");
+            UpdateState("line/ch1/assign_aux1");
+            UpdateState("line/ch2/assign_aux1");
+            UpdateState("return/ch1/assign_aux1");
+            UpdateState("return/ch2/assign_aux1");
+            UpdateState("return/ch3/assign_aux1");
+            UpdateState("aux/ch1/mute");
 
-            _client.StateUpdate(PluginId + ".states.line/ch1/assign_aux2", routing.MixB_MicL ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.line/ch2/assign_aux2", routing.MixB_MicR ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch1/assign_aux2", routing.MixB_Playback ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch2/assign_aux2", routing.MixB_VirtualA ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.return/ch3/assign_aux2", routing.MixB_VirtualB ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.aux/ch2/mute", routing.MixB_Mix ? "On" : "Off");
+            UpdateState("line/ch1/assign_aux2");
+            UpdateState("line/ch2/assign_aux2");
+            UpdateState("return/ch1/assign_aux2");
+            UpdateState("return/ch2/assign_aux2");
+            UpdateState("return/ch3/assign_aux2");
+            UpdateState("aux/ch2/mute");
 
-            _client.StateUpdate(PluginId + ".states.line/ch1/bypassDSP", routing.FatChannel_MicL ? "On" : "Off");
-            _client.StateUpdate(PluginId + ".states.line/ch2/bypassDSP", routing.FatChannel_MicR ? "On" : "Off");
+            UpdateState("line/ch1/bypassDSP");
+            UpdateState("line/ch2/bypassDSP");
+        }
+
+        private void UpdateState(string route)
+        {
+            var hasRoute = _routingModel.GetBooleanState(route);
+            if (route.EndsWith("mute") || route.EndsWith("/bypassDSP"))
+                hasRoute = !hasRoute;
+
+            _client.StateUpdate(PluginId + ".states." + route, hasRoute ? "On" : "Off");
         }
 
         public void Init()
@@ -120,7 +138,7 @@ namespace Revelator.io24.TouchPortal
                     : 0.0f;
             }
 
-            var hasRoute = _updateService.Routing.GetValueByRoute(route);
+            var hasRoute = _routingModel.GetBooleanState(route);
             return route.EndsWith("mute")
                 ? (hasRoute ? 1.0f : 0.0f)
                 : (hasRoute ? 0.0f : 1.0f);
@@ -201,16 +219,14 @@ namespace Revelator.io24.TouchPortal
             };
 
         private bool GetCurrentFatChannelState(string route)
-            => route == "line/ch1/bypassDSP"
-                ? _updateService.Routing.FatChannel_MicL
-                : _updateService.Routing.FatChannel_MicR;
+            => _routingModel.GetBooleanState(route);
 
         private float GetFatChannelAction(string action, string route)
             => action switch
             {
                 "Turn On" => 0.0f,
                 "Turn Off" => 1.0f,
-                _ => GetCurrentFatChannelState(route) ? 1.0f : 0.0f,
+                _ => GetCurrentFatChannelState(route) ? 0.0f : 1.0f,
             };
 
         private Headphones GetHeadphoneEnum(string headphoneValue)
