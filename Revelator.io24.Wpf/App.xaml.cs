@@ -13,8 +13,6 @@ namespace Revelator.io24.Wpf
     /// </summary>
     public partial class App : Application
     {
-        private IServiceProvider _serviceProvider;
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -27,33 +25,33 @@ namespace Revelator.io24.Wpf
             AllocConsole();
 #endif
 
-            var broadcastService = new BroadcastService();
-            var deviceTcpPort = broadcastService.WaitForFirstBroadcast();
-
-            var fatChannel = new FatChannelMonitorModel();
-            var values = new ValuesMonitorModel();
-            var monitorService = new MonitorService(fatChannel, values);
-            var monitorPort = monitorService.Port;
-
-            var routingModel = new RoutingModel();
-            var communicationService = new CommunicationService(routingModel);
-            communicationService.Init(deviceTcpPort, monitorPort);
-            var updateService = new UpdateService(communicationService);
-
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(typeof(MainWindow));
-            serviceCollection.AddSingleton(typeof(MainViewModel));
-            serviceCollection.AddSingleton(broadcastService);
-            serviceCollection.AddSingleton(monitorService);
-            serviceCollection.AddSingleton(updateService);
-            serviceCollection.AddSingleton(routingModel);
-            serviceCollection.AddSingleton(fatChannel);
-            serviceCollection.AddSingleton(values);
+            serviceCollection.AddSingleton<MainWindow>();
+            serviceCollection.AddSingleton<MainViewModel>();
+            serviceCollection.AddSingleton<BroadcastService>();
+            serviceCollection.AddSingleton<CommunicationService>();
+            serviceCollection.AddSingleton<MonitorService>();
+            serviceCollection.AddSingleton<UpdateService>();
+            serviceCollection.AddSingleton<RoutingModel>();
+            serviceCollection.AddSingleton<FatChannelMonitorModel>();
+            serviceCollection.AddSingleton<ValuesMonitorModel>();
 
-            _serviceProvider = serviceCollection.BuildServiceProvider();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            var deviceTcpPort = serviceProvider
+                .GetRequiredService<BroadcastService>()
+                .WaitForFirstBroadcast();
+
+            var monitorPort = serviceProvider
+                .GetRequiredService<MonitorService>()
+                .Port;
+
+            serviceProvider
+                .GetRequiredService<CommunicationService>()
+                .Init(deviceTcpPort, monitorPort);
 
             //Run application:
-            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            var mainWindow = serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
             Log.Information("Application ready.");
         }

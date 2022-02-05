@@ -9,7 +9,7 @@
 <body>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Input</div>
-        <select id="inputValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Input')">
+        <select id="inputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="Mic L">Mic L</option>
             <option value="Mic R">Mic R</option>
             <option value="Playback">Playback</option>
@@ -20,7 +20,7 @@
     </div>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Output</div>
-        <select id="outputValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Output')">
+        <select id="outputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="Main">Main</option>
             <option value="Stream Mix A">Stream Mix A</option>
             <option value="Stream Mix B">Stream Mix B</option>
@@ -28,12 +28,12 @@
     </div>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Routing</div>
-        <select id="actionValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Action')">
+        <select id="actionValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="Toggle">Toggle</option>
             <option value="On">On</option>
             <option value="Off">Off</option>
         </select>
     </div>
-    <script src="RouteChangeAction.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
 </body>
 </html>

@@ -1,5 +1,4 @@
-﻿using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
@@ -11,98 +10,88 @@ namespace Revelator.io24.StreamDeck.Actions
     public class FatChannelToggleAction : StreamDeckAction
     {
         private readonly UpdateService _updateService;
-        private FatChannelToggleSettings _settings;
+        private readonly RoutingModel _routingModel;
 
-        public FatChannelToggleAction(UpdateService updateService)
+        //We need some how to know the route when Events are received.
+        //In other situations, use GetSettings.
+        private string? _route;
+
+        public FatChannelToggleAction(
+            UpdateService updateService,
+            RoutingModel routingModel)
         {
             _updateService = updateService;
+            _routingModel = routingModel;
         }
-
-        private int _count;
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
             await base.OnDidReceiveSettings(args);
 
-            await UpdateSettings(args.Payload);
+            var settings = args.Payload
+                .GetSettings<FatChannelToggleSettings>();
+
+            _route = settings.Route;
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
+            _routingModel.RoutingUpdated += RoutingUpdated;
 
-            _count++;
-            //_updateService.RoutingUpdated += RoutingUpdated;
+            var settings = args.Payload
+                .GetSettings<FatChannelToggleSettings>();
 
-            await UpdateSettings(args.Payload);
+            _route = settings.Route;
+
+            await StateUpdated(settings.Route);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-
-            _count--;
-            //_updateService.RoutingUpdated -= RoutingUpdated;
+            _routingModel.RoutingUpdated -= RoutingUpdated;
         }
 
-        private async Task UpdateSettings(ActionPayload payload)
+        protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
         {
-            _settings = payload
-                .Settings["settingsModel"]
-                ?.ToObject<FatChannelToggleSettings>() ?? new FatChannelToggleSettings();
+            await base.OnKeyUp(args);
 
-            await StateUpdated();
+            var settings = args.Payload
+                .GetSettings<FatChannelToggleSettings>();
+
+            var action = Action(settings);
+            _updateService.SetRouteValue(settings.Route, action);
         }
 
-        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
-        {
-            await base.OnKeyDown(args);
-
-            if (_settings is null)
-                return;
-
-            var action = Action();
-            _updateService.SetRouteValue(_settings.Route, action);
-        }
-
-        private float Action()
-        {
-            return _settings.Action switch
+        private float Action(FatChannelToggleSettings settings)
+            => settings.Action switch
             {
                 "On" => 0.0f,
                 "Off" => 1.0f,
-                _ => GetCurrentState() ? 1.0f : 0.0f,
+                _ => _routingModel.GetBooleanState(settings.Route) ? 0.0f : 1.0f,
             };
-        }
 
-        private bool GetCurrentState()
-            => _settings.Route == "line/ch1/bypassDSP"
-                ? true //_updateService.Routing.FatChannel_MicL
-                : false; //_updateService.Routing.FatChannel_MicR;
-
-        private async void RoutingUpdated(object? sender, EventArgs e)
+        private async void RoutingUpdated(object? sender, string route)
         {
             try
             {
-                await StateUpdated();
+                if (route != _route && route != "synchronize")
+                    return;
+
+                await StateUpdated(route);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                //Event
+                Trace.TraceError(exception.ToString());
             }
         }
 
-        private int? _lastState = null;
-
-        private async Task StateUpdated()
+        private async Task StateUpdated(string route)
         {
-            var state = GetCurrentState() ? 0 : 1;
-            if (state == _lastState)
-                return;
+            var state = _routingModel.GetBooleanState(route) ? 1 : 0;
 
-            Trace.WriteLine($"Fat state: {state}, count: {_count}, context: {base.Context}");
             await SetStateAsync(state);
-            _lastState = state;
         }
     }
 }

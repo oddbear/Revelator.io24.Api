@@ -3,6 +3,7 @@ using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
+using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
@@ -10,51 +11,63 @@ namespace Revelator.io24.StreamDeck.Actions
     public class HeadphonesSourceAction : StreamDeckAction
     {
         private readonly UpdateService _updateService;
-        private HeadphonesSourceSettings _settings;
+        private readonly RoutingModel _routingModel;
 
-        public HeadphonesSourceAction(UpdateService updateService)
+        //We need some how to know the state when Events are received.
+        //In other situations, use GetSettings.
+        private Headphones _state;
+
+        public HeadphonesSourceAction(
+            UpdateService updateService,
+            RoutingModel routingModel)
         {
             _updateService = updateService;
-            _updateService.RoutingUpdated += RoutingUpdated;
+            _routingModel = routingModel;
         }
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
             await base.OnDidReceiveSettings(args);
 
-            await UpdateSettings(args.Payload);
+            var settings = args.Payload
+                .GetSettings<HeadphonesSourceSettings>();
+
+            var state = settings.Microphone;
+
+            _state = state;
+
+            await StateUpdated(state);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
+            _routingModel.RoutingUpdated += RoutingUpdated;
 
-            await UpdateSettings(args.Payload);
-        }
+            var settings = args.Payload
+                .GetSettings<HeadphonesSourceSettings>();
 
-        private async Task UpdateSettings(ActionPayload payload)
-        {
-            _settings = payload
-                .Settings["settingsModel"]
-                ?.ToObject<HeadphonesSourceSettings>() ?? new HeadphonesSourceSettings();
+            var state = settings.Microphone;
 
-            await UpdateTitle();
+            _state = state;
+
+            await StateUpdated(state);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
+            _routingModel.RoutingUpdated -= RoutingUpdated;
         }
 
-        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
+        protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
         {
-            await base.OnKeyDown(args);
+            await base.OnKeyUp(args);
 
-            if (_settings is null)
-                return;
+            var settings = args.Payload
+                .GetSettings<HeadphonesSourceSettings>();
 
-            var setting = _settings.Microphone;
-            switch(setting)
+            switch(settings.Microphone)
             {
                 case Headphones.Main:
                     _updateService.SetRouteValue("global/phonesSrc", 0.0f);
@@ -68,24 +81,45 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        private async void RoutingUpdated(object? sender, EventArgs e)
+        private async void RoutingUpdated(object? sender, string route)
         {
             try
             {
-                await UpdateTitle();
+                if (route != "global/phonesSrc" && route != "synchronize")
+                    return;
+
+                await StateUpdated(_state);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                //Event
+                Trace.TraceError(exception.ToString());
             }
         }
 
-        private async Task UpdateTitle()
+        private async Task StateUpdated(Headphones state)
         {
-            var routing = _updateService.Routing;
-            var headponeSource = routing.HeadphonesSource.ToString();
-
-            await SetTitleAsync(headponeSource);
+            var headphoneSource = _routingModel.RouteValue["global/phonesSrc"];
+            switch (state)
+            {
+                case Headphones.Main:
+                    if (headphoneSource == 0.0f)
+                        await SetStateAsync(0);
+                    else
+                        await SetStateAsync(1);
+                    break;
+                case Headphones.MixA:
+                    if (headphoneSource == 0.5f)
+                        await SetStateAsync(0);
+                    else
+                        await SetStateAsync(1);
+                    break;
+                case Headphones.MixB:
+                    if (headphoneSource == 1.0f)
+                        await SetStateAsync(0);
+                    else
+                        await SetStateAsync(1);
+                    break;
+            }
         }
     }
 }

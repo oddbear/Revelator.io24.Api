@@ -1,6 +1,7 @@
 ﻿// register actions and connect to the Stream Deck
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 using SharpDeck.Extensions.DependencyInjection;
 
@@ -14,23 +15,29 @@ while (!System.Diagnostics.Debugger.IsAttached)
 //System.Diagnostics.Debugger.Launch();
 #endif
 
-var broadcastService = new BroadcastService();
-var deviceTcpPort = broadcastService.WaitForFirstBroadcast();
-
-var monitorService = new MonitorService();
-var monitorPort = monitorService.Port;
-
-var communicationService = new CommunicationService();
-communicationService.Init(deviceTcpPort, monitorPort);
-var updateService = new UpdateService(communicationService);
-
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddStreamDeck();
-serviceCollection.AddSingleton(broadcastService);
-serviceCollection.AddSingleton(monitorService);
-serviceCollection.AddSingleton(updateService);
+serviceCollection.AddSingleton<BroadcastService>();
+serviceCollection.AddSingleton<MonitorService>();
+serviceCollection.AddSingleton<CommunicationService>();
+serviceCollection.AddSingleton<UpdateService>();
+serviceCollection.AddSingleton<ValuesMonitorModel>();
+serviceCollection.AddSingleton<RoutingModel>();
+serviceCollection.AddSingleton<FatChannelMonitorModel>();
 
 var serviceProvicer = serviceCollection.BuildServiceProvider();
+
+var deviceTcpPort = serviceProvicer
+    .GetRequiredService<BroadcastService>()
+    .WaitForFirstBroadcast();
+
+var monitorPort = serviceProvicer
+    .GetRequiredService<MonitorService>()
+    .Port;
+
+serviceProvicer
+    .GetRequiredService<CommunicationService>()
+    .Init(deviceTcpPort, monitorPort);
 
 var services = serviceProvicer.GetServices<IHostedService>();
 

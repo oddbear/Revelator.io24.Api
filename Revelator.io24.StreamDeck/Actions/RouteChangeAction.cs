@@ -1,6 +1,5 @@
 ﻿using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
-using Serilog;
 using SharpDeck;
 using SharpDeck.Events.Received;
 using System.Diagnostics;
@@ -11,55 +10,64 @@ namespace Revelator.io24.StreamDeck.Actions
     public class RouteChangeAction : StreamDeckAction
     {
         private readonly UpdateService _updateService;
-        private RouteChangeSettings _settings;
+        private readonly RoutingModel _routingModel;
 
-        public RouteChangeAction(UpdateService updateService)
+        //We need some how to know the route when Events are received.
+        //In other situations, use GetSettings.
+        private string? _route;
+
+        public RouteChangeAction(
+            UpdateService updateService,
+            RoutingModel routingModel)
         {
             _updateService = updateService;
+            _routingModel = routingModel;
         }
-
-        private int _count;
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
         {
             await base.OnDidReceiveSettings(args);
 
-            await UpdateSettings(args.Payload);
+            var settings = args.Payload
+                .GetSettings<RouteChangeSettings>();
+
+            var route = RouteFromSettings(settings);
+
+            _route = route;
+
+            await StateUpdated(route);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
+            _routingModel.RoutingUpdated += RoutingUpdated;
 
-            _count++;
-            _updateService.RoutingUpdated += RoutingUpdated;
+            var settings = args.Payload
+                .GetSettings<RouteChangeSettings>();
 
-            await UpdateSettings(args.Payload);
+            var route = RouteFromSettings(settings);
+
+            _route = route;
+
+            await StateUpdated(route);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-
-            _count--;
-            _updateService.RoutingUpdated -= RoutingUpdated;
+            _routingModel.RoutingUpdated -= RoutingUpdated;
         }
 
-        private async Task UpdateSettings(ActionPayload payload)
+        protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
         {
-            _settings = payload
-                .Settings["settingsModel"]
-                ?.ToObject<RouteChangeSettings>() ?? new RouteChangeSettings();
+            await base.OnKeyUp(args);
 
-            await StateUpdated();
-        }
+            var settings = args.Payload
+                .GetSettings<RouteChangeSettings>();
 
-        protected override async Task OnKeyDown(ActionEventArgs<KeyPayload> args)
-        {
-            await base.OnKeyDown(args);
-
-            var route = RouteFromSettings();
-            var value = ActionToValue(route, _settings.Action);
+            var route = RouteFromSettings(settings);
+            var value = ActionToValue(route, settings.Action);
 
             _updateService.SetRouteValue(route, value);
         }
@@ -80,78 +88,77 @@ namespace Revelator.io24.StreamDeck.Actions
                     : 0.0f;
             }
 
-            var hasRoute = _updateService.Routing.GetValueByRoute(route);
+            var hasRoute = _routingModel.GetBooleanState(route);
             return route.EndsWith("mute")
                 ? (hasRoute ? 1.0f : 0.0f)
                 : (hasRoute ? 0.0f : 1.0f);
         }
 
-        private string RouteFromSettings()
+        private string RouteFromSettings(RouteChangeSettings settings)
         {
-            var input = InputToPart(_settings.Input);
-            var output = OutputToPart(_settings.Output);
+            //Special case:
+            if (settings.Input == "Mute All")
+            {
+                switch (settings.Output)
+                {
+                    case "Main":
+                        return "main/ch1/mute";
+                    case "Stream Mix A":
+                        return "aux/ch1/mute";
+                    case "Stream Mix B":
+                        return "aux/ch2/mute";
+                }
+            }
+
+            var input = InputToPart(settings.Input);
+            var output = OutputToPart(settings.Output);
 
             return $"{input}/{output}";
         }
 
         private string InputToPart(string input)
-        {
-            return input switch
+            => input switch
             {
                 "Mic L" => "line/ch1",
                 "Mic R" => "line/ch2",
                 "Playback" => "return/ch1",
                 "Virual A" => "return/ch2",
                 "Virual B" => "return/ch3",
-                "Mute All" => "main/ch1",
                 _ => throw new InvalidOperationException(),
             };
-        }
 
         private string OutputToPart(string output)
-        {
-            switch (output)
+            => output switch
             {
-                case "Main":
-                    return "mute";
-                case "Stream Mix A":
-                    return "assign_aux1";
-                case "Stream Mix B":
-                    return "assign_aux2";
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
+                "Main" => "mute",
+                "Stream Mix A" => "assign_aux1",
+                "Stream Mix B" => "assign_aux2",
+                _ => throw new InvalidOperationException(),
+            };
 
-        private bool GetCurrentState()
-        {
-            var route = RouteFromSettings();
-            return _updateService.Routing.GetValueByRoute(route);
-        }
-
-        private async void RoutingUpdated(object? sender, EventArgs e)
+        private async void RoutingUpdated(object? sender, string route)
         {
             try
             {
-                await StateUpdated();
+                if (route != _route && route != "synchronize")
+                    return;
+
+                await StateUpdated(route);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                //Event
+                Trace.TraceError(exception.ToString());
             }
         }
 
-        private int? _lastState = null;
-
-        private async Task StateUpdated()
+        private async Task StateUpdated(string route)
         {
-            var state = GetCurrentState() ? 0 : 1;
-            if (state == _lastState)
-                return;
+            var hasRoute = _routingModel.GetBooleanState(route);
+            var state = route.EndsWith("mute")
+                ? (hasRoute ? 1 : 0)
+                : (hasRoute ? 0 : 1);
 
-            Trace.WriteLine($"Route state: {state}, count: {_count}, context: {base.Context}");
             await SetStateAsync(state);
-            _lastState = state;
         }
     }
 }

@@ -27,7 +27,10 @@
       "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceAction.html",
       "States": [
         {
-          "Image": "Images/Icons/Image"
+          "Image": "Images/Plugin/On"
+        },
+        {
+          "Image": "Images/Plugin/Off"
         }
       ]
     },

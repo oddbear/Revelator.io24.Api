@@ -117,7 +117,7 @@ namespace Revelator.io24.Wpf.Models
 
         public float HeadphonesSource
         {
-            get => _routingModel.RouteValue["global/phonesSrc"];
+            get => _routingModel.RouteValue.TryGetValue("global/phonesSrc", out var value) ? value : 0;
             set => _routingModel.RouteValue["global/phonesSrc"] = value;
         }
 

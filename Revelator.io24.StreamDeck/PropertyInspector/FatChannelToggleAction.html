@@ -9,19 +9,19 @@
 <body>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Headphone Source</div>
-        <select id="routeValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Route')">
+        <select id="routeValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="line/ch1/bypassDSP">Mic L</option>
             <option value="line/ch2/bypassDSP">Mic R</option>
         </select>
     </div>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">State</div>
-        <select id="actionValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Action')">
+        <select id="actionValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="Toggle">Toggle</option>
             <option value="On">On</option>
             <option value="Off">Off</option>
         </select>
     </div>
-    <script src="FatChannelToggleAction.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
 </body>
 </html>

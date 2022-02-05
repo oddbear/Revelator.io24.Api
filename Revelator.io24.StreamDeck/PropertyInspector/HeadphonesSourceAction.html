@@ -9,12 +9,12 @@
 <body>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Headphone Source</div>
-        <select id="micValue" class="sdpi-item-value select" onchange="setSettings(event.target.value, 'Microphone')">
+        <select id="micValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="Main">Main</option>
             <option value="MixA">Mix A</option>
             <option value="MixB">Mix B</option>
         </select>
     </div>
-    <script src="HeadphonesSourceAction.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
 </body>
 </html>

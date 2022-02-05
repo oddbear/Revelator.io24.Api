@@ -34,7 +34,6 @@ namespace Revelator.io24.Api.Services
             //Routing:
             RouteValue["line/ch1/mute"] = lineC.Ch1.Values.Mute;
             RouteValue["line/ch2/mute"] = lineC.Ch2.Values.Mute;
-
             RouteValue["return/ch1/mute"] = returnC.Ch1.Values.Mute;
             RouteValue["return/ch2/mute"] = returnC.Ch2.Values.Mute;
             RouteValue["return/ch3/mute"] = returnC.Ch1.Values.Mute;
