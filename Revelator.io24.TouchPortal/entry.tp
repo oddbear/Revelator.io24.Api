@@ -247,6 +247,13 @@
           "default": ""
         }
       ],
+      "connectors": [
+        {
+          "id": "tp_io24_line/ch1/volume",
+          "name": "Mic L Volume",
+          "format": "Mic L Volume"
+        }
+      ],
       "events": []
     }
   ]

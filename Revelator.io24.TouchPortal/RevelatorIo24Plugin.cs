@@ -44,7 +44,6 @@ namespace Revelator.io24.TouchPortal
             }
 
             UpdateState("line/ch1/mute");
-
             UpdateState("line/ch2/mute");
             UpdateState("return/ch1/mute");
             UpdateState("return/ch2/mute");
@@ -67,6 +66,15 @@ namespace Revelator.io24.TouchPortal
 
             UpdateState("line/ch1/bypassDSP");
             UpdateState("line/ch2/bypassDSP");
+
+            UpdateConnector("line/ch1/volume");
+        }
+
+        private void UpdateConnector(string route)
+        {
+            var volume = _routingModel.RouteValue[route];
+            var value = (int)Math.Round(volume * 100f);
+            _client.ConnectorUpdate($"tp_io24_{route}", value);
         }
 
         private void UpdateState(string route)
@@ -252,7 +260,9 @@ namespace Revelator.io24.TouchPortal
 
         public void OnConnecterChangeEvent(ConnectorChangeEvent message)
         {
-            //Ignore for now, can implement when I have volume set in the API.
+            var route = message.ConnectorId.Split('_').Last();
+            var value = message.Value / 100.0f;
+            _updateService.SetRouteValue(route, value);
         }
 
         public void OnInfoEvent(InfoEvent message)
