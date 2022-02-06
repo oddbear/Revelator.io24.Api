@@ -15,16 +15,20 @@ namespace Revelator.io24.Api.Services
 
         private readonly TcpClient _tcpClient;
         private readonly RoutingModel _routingModel;
+        private readonly VolumeModel _volumeModel;
 
         private Thread? _listeningThread;
         private Thread? _writingThread;
         private NetworkStream? _networkStream;
         private ushort _monitorPort;
 
-        public CommunicationService(RoutingModel routingModel)
+        public CommunicationService(
+            RoutingModel routingModel,
+            VolumeModel volumeModel)
         {
             _tcpClient = new TcpClient();
             _routingModel = routingModel;
+            _volumeModel = volumeModel;
         }
 
         public void Init(ushort tcpPort, ushort monitorPort)
@@ -175,7 +179,10 @@ namespace Revelator.io24.Api.Services
                 case "Synchronize":
                     var model = ZM.GetSynchronizeModel(json);
                     if (model is not null)
+                    {
                         _routingModel.Synchronize(model);
+                        _volumeModel.Synchronize(model);
+                    }
                     return;
                 case "SubscriptionReply":
                     //We now have communication.
@@ -204,6 +211,7 @@ namespace Revelator.io24.Api.Services
             var state = BitConverter.ToSingle(data[^4..^0]);
 
             _routingModel.StateUpdated(route, state);
+            _volumeModel.StateUpdated(route, state);
         }
 
         /// <summary>
