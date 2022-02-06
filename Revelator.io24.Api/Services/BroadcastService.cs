@@ -16,30 +16,28 @@ namespace Revelator.io24.Api.Services
 
         private readonly UdpClient _udpClient;
         private readonly Thread _thread;
+        private readonly CommunicationService _communicationService;
 
-        public ushort DeviceTcpPort { get; private set; }
         public ushort DeviceId { get; private set; }
 
-        private readonly ManualResetEvent _infoWaitHandle;
+        //private readonly ManualResetEvent _infoWaitHandle;
 
-        public BroadcastService()
+        public BroadcastService(CommunicationService communicationService)
         {
+            _communicationService = communicationService;
+
             _udpClient = new UdpClient();
             _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             _udpClient.Client.Bind(new IPEndPoint(IPAddress.Loopback, 47809)); //IPAddress.Any
 
             _thread = new Thread(Listener) { IsBackground = true };
-            _thread.Start();
-
-            _infoWaitHandle = new ManualResetEvent(false);
 
             Current = this;
         }
 
-        public ushort WaitForFirstBroadcast()
+        public void StartReceive()
         {
-            _infoWaitHandle.WaitOne();
-            return DeviceTcpPort;
+            _thread.Start();
         }
 
         private void Listener()
@@ -72,15 +70,19 @@ namespace Revelator.io24.Api.Services
                     }
 
                     //TODO: What if... multiple devices?
-                    DeviceTcpPort = BitConverter.ToUInt16(data[4..6]);
+
+                    //TODO: Fix PackageHelper.GetFromToBytes() to use DeviceId in a non global way.
                     DeviceId = BitConverter.ToUInt16(data[8..10]);
+                    if (!_communicationService.IsConnected)
+                    {
+                        var tcpPort = BitConverter.ToUInt16(data[4..6]);
+                        _communicationService.Connect(tcpPort);
+                    }
 
                     //1.19 -> 281:
                     //1.21 -> 281: 
                     //Revelator IO 24/281 AUD <serialnr>
                     //Revelator IO 24/289 AUD <serialnr>
-
-                    _infoWaitHandle.Set();
                 }
                 catch (Exception exception)
                 {

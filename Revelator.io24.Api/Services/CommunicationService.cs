@@ -13,35 +13,26 @@ namespace Revelator.io24.Api.Services
     {
         public delegate void RouteUpdated(string route, ushort state);
 
-        private readonly TcpClient _tcpClient;
+        private readonly BroadcastService _broadcastService;
+        private readonly MonitorService _monitorService;
+
         private readonly RoutingModel _routingModel;
         private readonly VolumeModel _volumeModel;
 
+        private TcpClient _tcpClient;
         private Thread? _listeningThread;
         private Thread? _writingThread;
-        private NetworkStream? _networkStream;
-        private ushort _monitorPort;
+
+        public bool IsConnected => _tcpClient?.Connected ?? false;
 
         public CommunicationService(
+            MonitorService monitorService,
             RoutingModel routingModel,
             VolumeModel volumeModel)
         {
-            _tcpClient = new TcpClient();
+            _monitorService = monitorService;
             _routingModel = routingModel;
             _volumeModel = volumeModel;
-        }
-
-        public void Init(ushort tcpPort, ushort monitorPort)
-        {
-            if (_networkStream is not null)
-                return;
-
-            _monitorPort = monitorPort;
-
-            _tcpClient.Connect(IPAddress.Loopback, tcpPort);
-            _networkStream = _tcpClient.GetStream();
-
-            RequestCommunicationMessage();
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -50,20 +41,39 @@ namespace Revelator.io24.Api.Services
             _writingThread.Start();
         }
 
+        public void Connect(int tcpPort)
+        {
+            _tcpClient?.Dispose();
+
+            _tcpClient = new TcpClient();
+            _tcpClient.Connect(IPAddress.Loopback, tcpPort);
+
+            RequestCommunicationMessage();
+        }
+
+        public NetworkStream? GetNetworkStream()
+        {
+            return _tcpClient?.Connected is true
+                ? _tcpClient.GetStream()
+                : null;
+        }
+
         private void RequestCommunicationMessage()
         {
-            if (_networkStream is null)
+            var networkStream = GetNetworkStream();
+            if (networkStream is null)
                 return;
 
             var welcomeMessage = CreateWelcomeMessage();
-            _networkStream.Write(welcomeMessage);
+            networkStream.Write(welcomeMessage);
         }
 
         private byte[] CreateWelcomeMessage()
         {
             var list = new List<byte>();
 
-            var welcomeMessage = WelcomeMessage.Create(_monitorPort);
+            var monitorPort = _monitorService.Port;
+            var welcomeMessage = WelcomeMessage.Create(monitorPort);
             list.AddRange(welcomeMessage);
 
             var jsonMessage = ClientInfoMessage.Create();
@@ -76,33 +86,35 @@ namespace Revelator.io24.Api.Services
         {
             while (true)
             {
-                if (_networkStream is null)
-                {
-                    Thread.Sleep(TimeSpan.FromMilliseconds(100));
-                    continue;
-                }
-
                 try
                 {
+                    var networkStream = GetNetworkStream();
+                    if (networkStream is null)
+                        continue;
+
                     var keepAliveMessage = KeepAliveMessage.Create();
-                    _networkStream.Write(keepAliveMessage);
+                    networkStream.Write(keepAliveMessage);
                 }
                 catch (Exception exception)
                 {
                     Log.Error("[{className}] {exception}", nameof(CommunicationService), exception);
                 }
-                Thread.Sleep(TimeSpan.FromSeconds(1));
+                finally
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                }
             }
         }
 
         public bool SendMessage(byte[] message)
         {
-            if (_networkStream is null)
-                return false;
-
             try
             {
-                _networkStream.Write(message);
+                var networkStream = GetNetworkStream();
+                if (networkStream is null)
+                    return false;
+
+                networkStream.Write(message);
                 return true;
             }
             catch
@@ -116,15 +128,16 @@ namespace Revelator.io24.Api.Services
             var receiveBytes = new byte[65536];
             while (true)
             {
-                if (_networkStream is null)
-                {
-                    Thread.Sleep(TimeSpan.FromMilliseconds(100));
-                    continue;
-                }
-
                 try
                 {
-                    var bytesReceived = _networkStream.Read(receiveBytes);
+                    var networkStream = GetNetworkStream();
+                    if (networkStream is null)
+                    {
+                        Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                        continue;
+                    }
+
+                    var bytesReceived = networkStream.Read(receiveBytes);
                     var data = receiveBytes[0..bytesReceived];
 
                     //Multiple messages can be in one package:

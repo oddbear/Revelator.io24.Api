@@ -27,17 +27,9 @@ serviceCollection.AddSingleton<FatChannelMonitorModel>();
 
 var serviceProvicer = serviceCollection.BuildServiceProvider();
 
-var deviceTcpPort = serviceProvicer
-    .GetRequiredService<BroadcastService>()
-    .WaitForFirstBroadcast();
-
-var monitorPort = serviceProvicer
-    .GetRequiredService<MonitorService>()
-    .Port;
-
 serviceProvicer
-    .GetRequiredService<CommunicationService>()
-    .Init(deviceTcpPort, monitorPort);
+    .GetRequiredService<BroadcastService>()
+    .StartReceive();
 
 var services = serviceProvicer.GetServices<IHostedService>();
 

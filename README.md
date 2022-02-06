@@ -31,6 +31,7 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
 
 - This API is **unofficial**, at any time, a update to the Revelator io24 **can break this API**. 
 - This project is in the **early stages**, and a **proof-of-concept only**, don't expect it to be stable at this point.
+- There will be **breaking changes** between updates.
 
 ## About the API
 

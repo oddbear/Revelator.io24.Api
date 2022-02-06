@@ -33,22 +33,13 @@ namespace Revelator.io24.Wpf
             serviceCollection.AddSingleton<MonitorService>();
             serviceCollection.AddSingleton<UpdateService>();
             serviceCollection.AddSingleton<RoutingModel>();
+            serviceCollection.AddSingleton<VolumeModel>();
             serviceCollection.AddSingleton<FatChannelMonitorModel>();
             serviceCollection.AddSingleton<ValuesMonitorModel>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-
-            var deviceTcpPort = serviceProvider
-                .GetRequiredService<BroadcastService>()
-                .WaitForFirstBroadcast();
-
-            var monitorPort = serviceProvider
-                .GetRequiredService<MonitorService>()
-                .Port;
-
-            serviceProvider
-                .GetRequiredService<CommunicationService>()
-                .Init(deviceTcpPort, monitorPort);
+            var broadcastService = serviceProvider.GetRequiredService<BroadcastService>();
+            broadcastService.StartReceive();
 
             //Run application:
             var mainWindow = serviceProvider.GetRequiredService<MainWindow>();

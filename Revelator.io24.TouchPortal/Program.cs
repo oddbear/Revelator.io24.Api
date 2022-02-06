@@ -27,17 +27,9 @@ serviceCollection.AddSingleton<ValuesMonitorModel>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-var deviceTcpPort = serviceProvider
-    .GetRequiredService<BroadcastService>()
-    .WaitForFirstBroadcast();
-
-var monitorPort = serviceProvider
-    .GetRequiredService<MonitorService>()
-    .Port;
-
 serviceProvider
-    .GetRequiredService<CommunicationService>()
-    .Init(deviceTcpPort, monitorPort);
+    .GetRequiredService<BroadcastService>()
+    .StartReceive();
 
 //Init TouchPortal:
 var touchPortalClient = serviceProvider.GetRequiredService<RevelatorIo24Plugin>();

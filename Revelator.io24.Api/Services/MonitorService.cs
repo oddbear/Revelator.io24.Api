@@ -18,14 +18,16 @@ namespace Revelator.io24.Api.Services
         private readonly FatChannelMonitorModel _fatChannel;
         private readonly ValuesMonitorModel _values;
 
-        public ushort Port => (ushort)((IPEndPoint)_udpClient.Client.LocalEndPoint).Port;
+        public ushort Port { get; }
 
         public MonitorService(
             FatChannelMonitorModel fatChannelMonitorModel,
             ValuesMonitorModel valuesMonitorModel)
         {
             _udpClient = new UdpClient(0);
-            
+            var ipEndpoint = (IPEndPoint)_udpClient.Client.LocalEndPoint;
+            Port = (ushort)ipEndpoint.Port;
+
             _thread = new Thread(Listener) { IsBackground = true };
             _thread.Start();
 
