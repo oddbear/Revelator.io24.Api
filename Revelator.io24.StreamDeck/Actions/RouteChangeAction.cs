@@ -1,4 +1,5 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;

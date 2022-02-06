@@ -1,6 +1,7 @@
 ﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages.Readers;
 using Revelator.io24.Api.Messages.Writers;
+using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -17,7 +18,7 @@ namespace Revelator.io24.Api.Services
         private readonly MonitorService _monitorService;
 
         private readonly RoutingModel _routingModel;
-        private readonly VolumeModel _volumeModel;
+        private readonly FatChannelModel _fatChannelModel;
 
         private TcpClient _tcpClient;
         private Thread? _listeningThread;
@@ -28,11 +29,11 @@ namespace Revelator.io24.Api.Services
         public CommunicationService(
             MonitorService monitorService,
             RoutingModel routingModel,
-            VolumeModel volumeModel)
+            FatChannelModel fatChannelModel)
         {
             _monitorService = monitorService;
             _routingModel = routingModel;
-            _volumeModel = volumeModel;
+            _fatChannelModel = fatChannelModel;
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -194,7 +195,7 @@ namespace Revelator.io24.Api.Services
                     if (model is not null)
                     {
                         _routingModel.Synchronize(model);
-                        _volumeModel.Synchronize(model);
+                        _fatChannelModel.Synchronize(model);
                     }
                     return;
                 case "SubscriptionReply":
@@ -224,7 +225,7 @@ namespace Revelator.io24.Api.Services
             var state = BitConverter.ToSingle(data[^4..^0]);
 
             _routingModel.StateUpdated(route, state);
-            _volumeModel.StateUpdated(route, state);
+            _fatChannelModel.StateUpdated(route, state);
         }
 
         /// <summary>

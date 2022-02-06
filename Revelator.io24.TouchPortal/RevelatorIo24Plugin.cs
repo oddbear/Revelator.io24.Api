@@ -1,5 +1,6 @@
 ﻿using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Extensions;
+using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 using System.Text.Json;
 using TouchPortalSDK;
@@ -16,27 +17,23 @@ namespace Revelator.io24.TouchPortal
         private readonly ITouchPortalClient _client;
         private readonly UpdateService _updateService;
         private readonly RoutingModel _routingModel;
-        private readonly VolumeModel _volumeModel;
 
         public RevelatorIo24Plugin(ITouchPortalClientFactory clientFactory,
             UpdateService updateService,
-            RoutingModel routingModel,
-            VolumeModel volumeModel)
+            RoutingModel routingModel)
         {
             //Set the event handler for TouchPortal:
             _client = clientFactory.Create(this);
 
             _updateService = updateService;
             _routingModel = routingModel;
-            _volumeModel = volumeModel;
 
             routingModel.RoutingUpdated += RoutingUpdated;
-            volumeModel.VolumeUpdated += VolumeUpdated;
         }
 
         private void RoutingUpdated(object? sender, string route)
         {
-            var headphones = _routingModel.RouteValue["global/phonesSrc"];
+            var headphones = _routingModel.RouteValues["global/phonesSrc"];
             switch (headphones)
             {
                 case 0.0f:
@@ -73,13 +70,10 @@ namespace Revelator.io24.TouchPortal
 
             UpdateState("line/ch1/bypassDSP");
             UpdateState("line/ch2/bypassDSP");
-        }
 
-        private void VolumeUpdated(object? sender, string route)
-        {
             if (route == "synchronize")
             {
-                foreach (var key in _volumeModel.VolumeValue.Keys)
+                foreach (var key in _routingModel.VolumeValues.Keys)
                 {
                     UpdateConnector(key);
                 }
@@ -92,10 +86,10 @@ namespace Revelator.io24.TouchPortal
 
         private void UpdateConnector(string route)
         {
-            var volume = _volumeModel.VolumeValue[route];
+            var volume = _routingModel.VolumeValues[route];
             var value = (int)Math.Round(volume * 100f);
 
-            var (input, output) = _volumeModel.GetInputOutput(route);
+            var (input, output) = _routingModel.GetVolumeInputOutput(route);
             
             var inputDesc = input.GetDescription();
             var outputDesc = output.GetDescription();
@@ -300,7 +294,7 @@ namespace Revelator.io24.TouchPortal
                 var input = EnumExtensions.ParseDescription<Input>(inputDesc);
                 var output = EnumExtensions.ParseDescription<Output>(outputDesc);
 
-                var route = _volumeModel.GetRoute(input, output);
+                var route = _routingModel.GetVolumeRoute(input, output);
 
                 var value = message.Value / 100.0f;
                 _updateService.SetRouteValue(route, value);

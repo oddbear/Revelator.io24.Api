@@ -1,4 +1,5 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Services;
 namespace Revelator.io24.Wpf.Models
 {
     public class VolumeMapper
@@ -132,10 +133,10 @@ namespace Revelator.io24.Wpf.Models
 
         private float GetValue(string route)
         {
-            if (!_routingModel.RouteValue.ContainsKey(route))
+            if (!_routingModel.RouteValues.ContainsKey(route))
                 return 0;
 
-            return _routingModel.RouteValue[route];
+            return _routingModel.RouteValues[route];
         }
     }
 }

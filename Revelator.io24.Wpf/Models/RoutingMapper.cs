@@ -1,5 +1,5 @@
 ﻿using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Services;
+using Revelator.io24.Api.Models;
 
 namespace Revelator.io24.Wpf.Models
 {
@@ -117,8 +117,8 @@ namespace Revelator.io24.Wpf.Models
 
         public float HeadphonesSource
         {
-            get => _routingModel.RouteValue.TryGetValue("global/phonesSrc", out var value) ? value : 0;
-            set => _routingModel.RouteValue["global/phonesSrc"] = value;
+            get => _routingModel.RouteValues.TryGetValue("global/phonesSrc", out var value) ? value : 0;
+            set => _routingModel.RouteValues["global/phonesSrc"] = value;
         }
 
         public RoutingMapper(RoutingModel routingModel)
@@ -132,17 +132,17 @@ namespace Revelator.io24.Wpf.Models
                 ? (value ? 1.0f : 0.0f)
                 : (value ? 0.0f : 1.0f);
 
-            _routingModel.RouteValue[route] = state;
+            _routingModel.RouteValues[route] = state;
         }
 
         private bool GetValue(string route)
         {
-            if (!_routingModel.RouteValue.ContainsKey(route))
+            if (!_routingModel.RouteValues.ContainsKey(route))
                 return false;
 
             return route.EndsWith("mute")
-                ? _routingModel.RouteValue[route] == 0.0f
-                : _routingModel.RouteValue[route] == 1.0f;
+                ? _routingModel.RouteValues[route] == 0.0f
+                : _routingModel.RouteValues[route] == 1.0f;
         }
     }
 }

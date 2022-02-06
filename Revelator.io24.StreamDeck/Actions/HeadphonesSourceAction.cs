@@ -1,4 +1,5 @@
 ﻿using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
@@ -98,7 +99,7 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private async Task StateUpdated(Headphones state)
         {
-            var headphoneSource = _routingModel.RouteValue["global/phonesSrc"];
+            var headphoneSource = _routingModel.RouteValues["global/phonesSrc"];
             switch (state)
             {
                 case Headphones.Main:

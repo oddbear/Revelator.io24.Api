@@ -20,7 +20,7 @@ serviceCollection.AddSingleton<MonitorService>();
 serviceCollection.AddSingleton<UpdateService>();
 
 serviceCollection.AddSingleton<RoutingModel>();
-serviceCollection.AddSingleton<VolumeModel>();
+serviceCollection.AddSingleton<FatChannelModel>();
 
 serviceCollection.AddSingleton<FatChannelMonitorModel>();
 serviceCollection.AddSingleton<ValuesMonitorModel>();
