@@ -60,6 +60,7 @@ namespace Revelator.io24.Api.Services
             RouteValue["line/ch1/bypassDSP"] = lineC.Ch1.Values.BypassDSP;
             RouteValue["line/ch2/bypassDSP"] = lineC.Ch2.Values.BypassDSP;
 
+            //TODO: Remove this from all plugins (use volume model instead):
             //Volume:
             RouteValue["line/ch1/volume"] = lineC.Ch1.Values.Volume;
             RouteValue["line/ch2/volume"] = lineC.Ch2.Values.Volume;

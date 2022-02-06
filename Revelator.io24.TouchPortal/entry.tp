@@ -1,5 +1,6 @@
 {
-  "sdk": 4,
+  "$schema": "https://pjiesco.com/touch-portal/entry-tp.schema.json",
+  "sdk": 5,
   "version": 2,
   "name": "Revelator io24 TouchPortal Plugin",
   "id": "oddbear.touchportal.revelator.io24",
@@ -245,6 +246,40 @@
           "type": "text",
           "desc": "io24: Fat Channel Right",
           "default": ""
+        }
+      ],
+      "connectors": [
+        {
+          "id": "tp_io24_volume",
+          "name": "Volume Slider",
+          "format": "Input {$tp_io24_volume_input$} Output {$tp_io24_volume_output$} Volume",
+          "data": [
+            {
+              "id": "tp_io24_volume_input",
+              "type": "choice",
+              "label": "Input",
+              "default": "Mic L",
+              "valueChoices": [
+                "Mic L",
+                "Mic R",
+                "Playback",
+                "Virtual A",
+                "Virtual B",
+                "Mix"
+              ]
+            },
+            {
+              "id": "tp_io24_volume_output",
+              "type": "choice",
+              "label": "Output",
+              "default": "Main",
+              "valueChoices": [
+                "Main",
+                "Stream Mix A",
+                "Stream Mix B"
+              ]
+            }
+          ]
         }
       ],
       "events": []

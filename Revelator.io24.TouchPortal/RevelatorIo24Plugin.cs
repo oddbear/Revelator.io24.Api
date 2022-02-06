@@ -1,5 +1,7 @@
 ﻿using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Extensions;
 using Revelator.io24.Api.Services;
+using System.Text.Json;
 using TouchPortalSDK;
 using TouchPortalSDK.Interfaces;
 using TouchPortalSDK.Messages.Events;
@@ -14,17 +16,22 @@ namespace Revelator.io24.TouchPortal
         private readonly ITouchPortalClient _client;
         private readonly UpdateService _updateService;
         private readonly RoutingModel _routingModel;
+        private readonly VolumeModel _volumeModel;
 
         public RevelatorIo24Plugin(ITouchPortalClientFactory clientFactory,
             UpdateService updateService,
-            RoutingModel routingModel)
+            RoutingModel routingModel,
+            VolumeModel volumeModel)
         {
             //Set the event handler for TouchPortal:
             _client = clientFactory.Create(this);
 
             _updateService = updateService;
             _routingModel = routingModel;
+            _volumeModel = volumeModel;
+
             routingModel.RoutingUpdated += RoutingUpdated;
+            volumeModel.VolumeUpdated += VolumeUpdated;
         }
 
         private void RoutingUpdated(object? sender, string route)
@@ -44,7 +51,6 @@ namespace Revelator.io24.TouchPortal
             }
 
             UpdateState("line/ch1/mute");
-
             UpdateState("line/ch2/mute");
             UpdateState("return/ch1/mute");
             UpdateState("return/ch2/mute");
@@ -67,6 +73,41 @@ namespace Revelator.io24.TouchPortal
 
             UpdateState("line/ch1/bypassDSP");
             UpdateState("line/ch2/bypassDSP");
+        }
+
+        private void VolumeUpdated(object? sender, string route)
+        {
+            if (route == "synchronize")
+            {
+                foreach (var key in _volumeModel.VolumeValue.Keys)
+                {
+                    UpdateConnector(key);
+                }
+            }
+            else
+            {
+                UpdateConnector(route);
+            }
+        }
+
+        private void UpdateConnector(string route)
+        {
+            var volume = _volumeModel.VolumeValue[route];
+            var value = (int)Math.Round(volume * 100f);
+
+            var (input, output) = _volumeModel.GetInputOutput(route);
+            
+            var inputDesc = input.GetDescription();
+            var outputDesc = output.GetDescription();
+
+            var message = JsonSerializer.Serialize(new
+            {
+                type = "connectorUpdate",
+                connectorId = $"pc_{PluginId}_tp_io24_volume|tp_io24_volume_input={inputDesc}|tp_io24_volume_output={outputDesc}",
+                value
+            });
+
+            _client.SendMessage(message);
         }
 
         private void UpdateState(string route)
@@ -252,7 +293,18 @@ namespace Revelator.io24.TouchPortal
 
         public void OnConnecterChangeEvent(ConnectorChangeEvent message)
         {
-            //Ignore for now, can implement when I have volume set in the API.
+            if(message.ConnectorId == "tp_io24_volume")
+            {
+                var inputDesc = message.Data.Single(d => d.Id == "tp_io24_volume_input").Value;
+                var outputDesc = message.Data.Single(d => d.Id == "tp_io24_volume_output").Value;
+                var input = EnumExtensions.ParseDescription<Input>(inputDesc);
+                var output = EnumExtensions.ParseDescription<Output>(outputDesc);
+
+                var route = _volumeModel.GetRoute(input, output);
+
+                var value = message.Value / 100.0f;
+                _updateService.SetRouteValue(route, value);
+            }
         }
 
         public void OnInfoEvent(InfoEvent message)
