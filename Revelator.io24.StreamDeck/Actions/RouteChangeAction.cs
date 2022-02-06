@@ -89,7 +89,7 @@ namespace Revelator.io24.StreamDeck.Actions
                     : 0.0f;
             }
 
-            var hasRoute = _routingModel.GetBooleanState(route);
+            var hasRoute = _routingModel.GetRouteBooleanState(route);
             return route.EndsWith("mute")
                 ? (hasRoute ? 1.0f : 0.0f)
                 : (hasRoute ? 0.0f : 1.0f);
@@ -154,7 +154,7 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private async Task StateUpdated(string route)
         {
-            var hasRoute = _routingModel.GetBooleanState(route);
+            var hasRoute = _routingModel.GetRouteBooleanState(route);
             var state = route.EndsWith("mute")
                 ? (hasRoute ? 1 : 0)
                 : (hasRoute ? 0 : 1);

@@ -70,7 +70,7 @@ namespace Revelator.io24.StreamDeck.Actions
             {
                 "On" => 0.0f,
                 "Off" => 1.0f,
-                _ => _routingModel.GetBooleanState(settings.Route) ? 0.0f : 1.0f,
+                _ => _routingModel.GetRouteBooleanState(settings.Route) ? 0.0f : 1.0f,
             };
 
         private async void RoutingUpdated(object? sender, string route)
@@ -90,7 +90,7 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private async Task StateUpdated(string route)
         {
-            var state = _routingModel.GetBooleanState(route) ? 1 : 0;
+            var state = _routingModel.GetRouteBooleanState(route) ? 1 : 0;
 
             await SetStateAsync(state);
         }

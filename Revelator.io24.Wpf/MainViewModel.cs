@@ -66,7 +66,7 @@ namespace Revelator.io24.Wpf
             }
             else
             {
-                var value = _routingModel.GetBooleanState(route)
+                var value = _routingModel.GetRouteBooleanState(route)
                     ? 0.0f
                     : 1.0f;
 

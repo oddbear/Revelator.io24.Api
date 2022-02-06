@@ -140,9 +140,7 @@ namespace Revelator.io24.Wpf.Models
             if (!_routingModel.RouteValues.ContainsKey(route))
                 return false;
 
-            return route.EndsWith("mute")
-                ? _routingModel.RouteValues[route] == 0.0f
-                : _routingModel.RouteValues[route] == 1.0f;
+            return _routingModel.GetRouteBooleanState(route);
         }
     }
 }

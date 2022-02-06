@@ -106,7 +106,7 @@ namespace Revelator.io24.TouchPortal
 
         private void UpdateState(string route)
         {
-            var hasRoute = _routingModel.GetBooleanState(route);
+            var hasRoute = _routingModel.GetRouteBooleanState(route);
             if (route.EndsWith("mute") || route.EndsWith("/bypassDSP"))
                 hasRoute = !hasRoute;
 
@@ -173,7 +173,7 @@ namespace Revelator.io24.TouchPortal
                     : 0.0f;
             }
 
-            var hasRoute = _routingModel.GetBooleanState(route);
+            var hasRoute = _routingModel.GetRouteBooleanState(route);
             return route.EndsWith("mute")
                 ? (hasRoute ? 1.0f : 0.0f)
                 : (hasRoute ? 0.0f : 1.0f);
@@ -254,7 +254,7 @@ namespace Revelator.io24.TouchPortal
             };
 
         private bool GetCurrentFatChannelState(string route)
-            => _routingModel.GetBooleanState(route);
+            => _routingModel.GetRouteBooleanState(route);
 
         private float GetFatChannelAction(string action, string route)
             => action switch

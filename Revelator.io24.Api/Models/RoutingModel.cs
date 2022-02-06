@@ -3,6 +3,16 @@ using Revelator.io24.Api.Models.Json;
 
 namespace Revelator.io24.Api.Models
 {
+    public class Route //INotifyPropertyChange?
+    {
+        public Input Input { get; set; }
+        public Output Output { get; set; }
+        public RouteType Type { get; set; }
+        public bool HasRoute { get; set; }
+        public int Volume { get; set; }
+        public float Raw { get; set; }
+    }
+
     public class RoutingModel
     {
         public event EventHandler<string>? RoutingUpdated;
@@ -13,13 +23,21 @@ namespace Revelator.io24.Api.Models
         //Volume Table (volume per route):
         public Dictionary<string, float> VolumeValues = new();
 
-        public bool GetBooleanState(string route)
+        public bool GetRouteBooleanState(string route)
         {
             if (!RouteValues.ContainsKey(route))
                 return false;
 
-            return RouteValues[route] == 1.0f;
+            var type = _routeTableMapping[route].type;
+
+            var value = RouteValues[route];
+            return type == RouteType.Mute
+                ? value == 0.0f
+                : value == 1.0f;
         }
+
+        //Back: Always float and route...
+        //Abstraction: (Input, Output) -> object
 
         public void StateUpdated(string route, float value)
         {
@@ -86,7 +104,7 @@ namespace Revelator.io24.Api.Models
             RoutingUpdated?.Invoke(this, "synchronize");
         }
 
-        private Dictionary<string, (Input, Output, RouteType)> _routeTableMapping = new()
+        private Dictionary<string, (Input input, Output output, RouteType type)> _routeTableMapping = new()
         {
             ["line/ch1/mute"] = (Input.Mic_L, Output.Main, RouteType.Mute),
             ["line/ch1/assign_aux1"] = (Input.Mic_L, Output.Mix_A, RouteType.Assign),
