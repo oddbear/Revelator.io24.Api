@@ -1,7 +1,7 @@
 ﻿// register actions and connect to the Stream Deck
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Configuration;
 using Revelator.io24.Api.Services;
 using SharpDeck.Extensions.DependencyInjection;
 
@@ -16,13 +16,10 @@ while (!System.Diagnostics.Debugger.IsAttached)
 #endif
 
 var serviceCollection = new ServiceCollection();
+
+serviceCollection.AddRevelatorAPI();
+
 serviceCollection.AddStreamDeck();
-serviceCollection.AddSingleton<BroadcastService>();
-serviceCollection.AddSingleton<MonitorService>();
-serviceCollection.AddSingleton<CommunicationService>();
-serviceCollection.AddSingleton<ValuesMonitorModel>();
-serviceCollection.AddSingleton<RoutingModel>();
-serviceCollection.AddSingleton<FatChannelMonitorModel>();
 
 var serviceProvicer = serviceCollection.BuildServiceProvider();
 

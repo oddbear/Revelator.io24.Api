@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Configuration;
 using Revelator.io24.Api.Services;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
-using System;
 using System.Windows;
 
 namespace Revelator.io24.Wpf
@@ -26,15 +25,9 @@ namespace Revelator.io24.Wpf
 #endif
 
             var serviceCollection = new ServiceCollection();
+            serviceCollection.AddRevelatorAPI();
             serviceCollection.AddSingleton<MainWindow>();
             serviceCollection.AddSingleton<MainViewModel>();
-            serviceCollection.AddSingleton<BroadcastService>();
-            serviceCollection.AddSingleton<CommunicationService>();
-            serviceCollection.AddSingleton<MonitorService>();
-            serviceCollection.AddSingleton<RoutingModel>();
-            serviceCollection.AddSingleton<FatChannelModel>();
-            serviceCollection.AddSingleton<FatChannelMonitorModel>();
-            serviceCollection.AddSingleton<ValuesMonitorModel>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
             var broadcastService = serviceProvider.GetRequiredService<BroadcastService>();
