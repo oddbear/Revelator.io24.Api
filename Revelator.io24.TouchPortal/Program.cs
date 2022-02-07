@@ -17,7 +17,6 @@ serviceCollection.AddSingleton<RevelatorIo24Plugin>();
 serviceCollection.AddSingleton<BroadcastService>();
 serviceCollection.AddSingleton<CommunicationService>();
 serviceCollection.AddSingleton<MonitorService>();
-serviceCollection.AddSingleton<UpdateService>();
 
 serviceCollection.AddSingleton<RoutingModel>();
 serviceCollection.AddSingleton<FatChannelModel>();

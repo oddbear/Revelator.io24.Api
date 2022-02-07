@@ -12,7 +12,8 @@ namespace Revelator.io24.Api.Messages.Readers
             var header = data[0..4];
             var messageLength = data[4..6];
             var messageType = data[6..8];
-            var customBytes = data[8..12];
+            var from = data[8..10];
+            var to = data[10..12];
 
             var size = BitConverter.ToInt32(data[12..16]);
 

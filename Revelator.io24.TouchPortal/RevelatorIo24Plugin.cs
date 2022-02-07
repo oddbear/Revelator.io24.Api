@@ -15,17 +15,17 @@ namespace Revelator.io24.TouchPortal
         public string PluginId => "oddbear.touchportal.revelator.io24";
 
         private readonly ITouchPortalClient _client;
-        private readonly UpdateService _updateService;
+        private readonly CommunicationService _communicationService;
         private readonly RoutingModel _routingModel;
 
         public RevelatorIo24Plugin(ITouchPortalClientFactory clientFactory,
-            UpdateService updateService,
+            CommunicationService communicationService,
             RoutingModel routingModel)
         {
             //Set the event handler for TouchPortal:
             _client = clientFactory.Create(this);
 
-            _updateService = updateService;
+            _communicationService = communicationService;
             _routingModel = routingModel;
 
             routingModel.RoutingUpdated += RoutingUpdated;
@@ -154,7 +154,7 @@ namespace Revelator.io24.TouchPortal
             var route = $"{input}/{output}";
             var value = ActionToValue(route, actions);
 
-            _updateService.SetRouteValue(route, value);
+            _communicationService.SetRouteValue(route, value);
         }
 
         private float ActionToValue(string route, string action)
@@ -219,13 +219,13 @@ namespace Revelator.io24.TouchPortal
             switch (headphone)
             {
                 case Headphones.Main:
-                    _updateService.SetRouteValue("global/phonesSrc", 0.0f);
+                    _communicationService.SetRouteValue("global/phonesSrc", 0.0f);
                     break;
                 case Headphones.MixA:
-                    _updateService.SetRouteValue("global/phonesSrc", 0.5f);
+                    _communicationService.SetRouteValue("global/phonesSrc", 0.5f);
                     break;
                 case Headphones.MixB:
-                    _updateService.SetRouteValue("global/phonesSrc", 1.0f);
+                    _communicationService.SetRouteValue("global/phonesSrc", 1.0f);
                     break;
             }
         }
@@ -242,7 +242,7 @@ namespace Revelator.io24.TouchPortal
             var state = GetCurrentFatChannelState(route);
             var value = GetFatChannelAction(action, route);
 
-            _updateService.SetRouteValue(route, value);
+            _communicationService.SetRouteValue(route, value);
         }
 
         private string GetFatChannelRoute(string microphone)
@@ -297,7 +297,7 @@ namespace Revelator.io24.TouchPortal
                 var route = _routingModel.GetVolumeRoute(input, output);
 
                 var value = message.Value / 100.0f;
-                _updateService.SetRouteValue(route, value);
+                _communicationService.SetRouteValue(route, value);
             }
         }
 

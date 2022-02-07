@@ -10,7 +10,7 @@ namespace Revelator.io24.Api.Helpers
             return new byte[] { 0x55, 0x43, 0x00, 0x01 };
         }
 
-        public static byte[] GetFromToBytes()
+        public static byte[] GetFromToBytes(ushort deviceId)
         {
             //Seems to always be this from the device (and inversed pair from service).
             //Not sure what this is.
@@ -21,9 +21,6 @@ namespace Revelator.io24.Api.Helpers
             //             to: 0x68, 0x00, 0x6b, 0x00
             // from firmware 1.19 to 1.21... interesting.
             //6b is a part of the broadcast message, and needs to be the same... the 0x68 can be changed.
-
-            var deviceId = BroadcastService.Current?.DeviceId ?? throw new InvalidOperationException("DeviceId not received yet.");
-
             var clientIdBytes = BitConverter.GetBytes(104);
             var deviceIdBytes = BitConverter.GetBytes(deviceId);
 

@@ -20,7 +20,6 @@ serviceCollection.AddStreamDeck();
 serviceCollection.AddSingleton<BroadcastService>();
 serviceCollection.AddSingleton<MonitorService>();
 serviceCollection.AddSingleton<CommunicationService>();
-serviceCollection.AddSingleton<UpdateService>();
 serviceCollection.AddSingleton<ValuesMonitorModel>();
 serviceCollection.AddSingleton<RoutingModel>();
 serviceCollection.AddSingleton<FatChannelMonitorModel>();

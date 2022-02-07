@@ -1,6 +1,6 @@
 ﻿using Revelator.io24.Api.Helpers;
+using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
-using Revelator.io24.Api.Messages.Writers;
 using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
@@ -12,17 +12,16 @@ namespace Revelator.io24.Api.Services
 {
     public class CommunicationService : IDisposable
     {
-        public delegate void RouteUpdated(string route, ushort state);
-
-        private readonly BroadcastService _broadcastService;
         private readonly MonitorService _monitorService;
 
         private readonly RoutingModel _routingModel;
         private readonly FatChannelModel _fatChannelModel;
 
-        private TcpClient _tcpClient;
+        private TcpClient? _tcpClient;
         private Thread? _listeningThread;
         private Thread? _writingThread;
+
+        private ushort _deviceId;
 
         public bool IsConnected => _tcpClient?.Connected ?? false;
 
@@ -42,9 +41,11 @@ namespace Revelator.io24.Api.Services
             _writingThread.Start();
         }
 
-        public void Connect(int tcpPort)
+        public void Connect(ushort deviceId, int tcpPort)
         {
             _tcpClient?.Dispose();
+
+            _deviceId = deviceId;
 
             _tcpClient = new TcpClient();
             _tcpClient.Connect(IPAddress.Loopback, tcpPort);
@@ -73,11 +74,11 @@ namespace Revelator.io24.Api.Services
         {
             var list = new List<byte>();
 
-            var monitorPort = _monitorService.Port;
-            var welcomeMessage = WelcomeMessage.Create(monitorPort);
+            var tcpMessageWriter = new TcpMessageWriter(_deviceId);
+            var welcomeMessage = tcpMessageWriter.CreateWelcomeMessage(_monitorService.Port);
             list.AddRange(welcomeMessage);
 
-            var jsonMessage = ClientInfoMessage.Create();
+            var jsonMessage = tcpMessageWriter.CreateClientInfoMessage();
             list.AddRange(jsonMessage);
 
             return list.ToArray();
@@ -93,7 +94,8 @@ namespace Revelator.io24.Api.Services
                     if (networkStream is null)
                         continue;
 
-                    var keepAliveMessage = KeepAliveMessage.Create();
+                    var tcpMessageWriter = new TcpMessageWriter(_deviceId);
+                    var keepAliveMessage = tcpMessageWriter.CreateKeepAliveMessage();
                     networkStream.Write(keepAliveMessage);
                 }
                 catch (Exception exception)
@@ -104,23 +106,6 @@ namespace Revelator.io24.Api.Services
                 {
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
-            }
-        }
-
-        public bool SendMessage(byte[] message)
-        {
-            try
-            {
-                var networkStream = GetNetworkStream();
-                if (networkStream is null)
-                    return false;
-
-                networkStream.Write(message);
-                return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -218,7 +203,8 @@ namespace Revelator.io24.Api.Services
             var header = data[0..4];
             var messageLength = data[4..6];
             var messageType = data[6..8];
-            var customBytes = data[8..12];
+            var from = data[8..10];
+            var to = data[10..12];
 
             var route = Encoding.ASCII.GetString(data[12..^7]);
             var emptyBytes = data[^7..^4];
@@ -236,9 +222,34 @@ namespace Revelator.io24.Api.Services
             //TODO: ...
         }
 
+        public void SetRouteValue(string route, float value)
+        {
+            var writer = new TcpMessageWriter(_deviceId);
+            var data = writer.CreateRouteUpdate(route, value);
+
+            SendMessage(data);
+        }
+
+        public bool SendMessage(byte[] message)
+        {
+            try
+            {
+                var networkStream = GetNetworkStream();
+                if (networkStream is null)
+                    return false;
+
+                networkStream.Write(message);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public void Dispose()
         {
-            _tcpClient.Dispose();
+            _tcpClient?.Dispose();
         }
     }
 }

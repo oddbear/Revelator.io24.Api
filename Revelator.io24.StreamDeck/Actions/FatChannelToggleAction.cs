@@ -10,7 +10,7 @@ namespace Revelator.io24.StreamDeck.Actions
     [StreamDeckAction("com.oddbear.revelator.io24.fatchanneltoggle")]
     public class FatChannelToggleAction : StreamDeckAction
     {
-        private readonly UpdateService _updateService;
+        private readonly CommunicationService _communicationService;
         private readonly RoutingModel _routingModel;
 
         //We need some how to know the route when Events are received.
@@ -18,10 +18,10 @@ namespace Revelator.io24.StreamDeck.Actions
         private string? _route;
 
         public FatChannelToggleAction(
-            UpdateService updateService,
+            CommunicationService communicationService,
             RoutingModel routingModel)
         {
-            _updateService = updateService;
+            _communicationService = communicationService;
             _routingModel = routingModel;
         }
 
@@ -62,7 +62,7 @@ namespace Revelator.io24.StreamDeck.Actions
                 .GetSettings<FatChannelToggleSettings>();
 
             var action = Action(settings);
-            _updateService.SetRouteValue(settings.Route, action);
+            _communicationService.SetRouteValue(settings.Route, action);
         }
 
         private float Action(FatChannelToggleSettings settings)

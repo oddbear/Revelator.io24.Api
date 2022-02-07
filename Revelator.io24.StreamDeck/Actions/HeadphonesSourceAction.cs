@@ -11,7 +11,7 @@ namespace Revelator.io24.StreamDeck.Actions
     [StreamDeckAction("com.oddbear.revelator.io24.headphonesource")]
     public class HeadphonesSourceAction : StreamDeckAction
     {
-        private readonly UpdateService _updateService;
+        private readonly CommunicationService _communicationService;
         private readonly RoutingModel _routingModel;
 
         //We need some how to know the state when Events are received.
@@ -19,10 +19,10 @@ namespace Revelator.io24.StreamDeck.Actions
         private Headphones _state;
 
         public HeadphonesSourceAction(
-            UpdateService updateService,
+            CommunicationService communicationService,
             RoutingModel routingModel)
         {
-            _updateService = updateService;
+            _communicationService = communicationService;
             _routingModel = routingModel;
         }
 
@@ -71,13 +71,13 @@ namespace Revelator.io24.StreamDeck.Actions
             switch(settings.Microphone)
             {
                 case Headphones.Main:
-                    _updateService.SetRouteValue("global/phonesSrc", 0.0f);
+                    _communicationService.SetRouteValue("global/phonesSrc", 0.0f);
                     break;
                 case Headphones.MixA:
-                    _updateService.SetRouteValue("global/phonesSrc", 0.5f);
+                    _communicationService.SetRouteValue("global/phonesSrc", 0.5f);
                     break;
                 case Headphones.MixB:
-                    _updateService.SetRouteValue("global/phonesSrc", 1.0f);
+                    _communicationService.SetRouteValue("global/phonesSrc", 1.0f);
                     break;
             }
         }

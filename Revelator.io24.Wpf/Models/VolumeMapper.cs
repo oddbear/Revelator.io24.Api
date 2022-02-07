@@ -5,7 +5,7 @@ namespace Revelator.io24.Wpf.Models
     public class VolumeMapper
     {
         private readonly RoutingModel _routingModel;
-        private readonly UpdateService _updateService;
+        private readonly CommunicationService _communicationService;
 
         public float Main_MicL
         {
@@ -117,10 +117,10 @@ namespace Revelator.io24.Wpf.Models
 
         public VolumeMapper(
             RoutingModel routingModel,
-            UpdateService updateService)
+            CommunicationService communicationService)
         {
             _routingModel = routingModel;
-            _updateService = updateService;
+            _communicationService = communicationService;
         }
 
         private void SetValue(string route, float value)
@@ -128,7 +128,7 @@ namespace Revelator.io24.Wpf.Models
             if (value < 0) value = 0;
             if (value > 100) value = 100;
 
-            _updateService.SetRouteValue(route, value);
+            _communicationService.SetRouteValue(route, value);
         }
 
         private float GetValue(string route)

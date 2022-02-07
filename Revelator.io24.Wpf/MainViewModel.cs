@@ -12,7 +12,7 @@ namespace Revelator.io24.Wpf
     public class MainViewModel : INotifyPropertyChanged
     {
         private readonly RoutingModel _routingModel;
-        private readonly UpdateService _updateService;
+        private readonly CommunicationService _communicationService;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -28,15 +28,15 @@ namespace Revelator.io24.Wpf
         public MainViewModel(RoutingModel routingModel,
             ValuesMonitorModel valuesMonitorModel,
             FatChannelMonitorModel fatChannelMonitorModel,
-            UpdateService updateService)
+            CommunicationService communicationService)
         {
             _routingModel = routingModel;
             MonitorValues = valuesMonitorModel;
             FatChannelValues = fatChannelMonitorModel;
             RoutingMap = new RoutingMapper(routingModel);
-            VolumeMap = new VolumeMapper(routingModel, updateService);
+            VolumeMap = new VolumeMapper(routingModel, communicationService);
 
-            _updateService = updateService ?? throw new ArgumentNullException(nameof(updateService));
+            _communicationService = communicationService ?? throw new ArgumentNullException(nameof(communicationService));
 
             valuesMonitorModel.ValuesUpdated += (sender, args) => OnPropertyChanged(nameof(MonitorValues));
             fatChannelMonitorModel.FatChannelUpdated += (sender, args) => OnPropertyChanged(nameof(FatChannelValues));
@@ -62,7 +62,7 @@ namespace Revelator.io24.Wpf
 
                 var value = float.Parse(split[1], NumberStyles.Any, cultureInfo);
 
-                _updateService.SetRouteValue(route, value);
+                _communicationService.SetRouteValue(route, value);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace Revelator.io24.Wpf
                     ? 0.0f
                     : 1.0f;
 
-                _updateService.SetRouteValue(route, value);
+                _communicationService.SetRouteValue(route, value);
             }
         }
 

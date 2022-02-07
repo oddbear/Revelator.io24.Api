@@ -12,17 +12,12 @@ namespace Revelator.io24.Api.Services
     /// </summary>
     public class BroadcastService : IDisposable
     {
-        public static BroadcastService? Current;
-
         private readonly UdpClient _udpClient;
         private readonly Thread _thread;
         private readonly CommunicationService _communicationService;
 
-        public ushort DeviceId { get; private set; }
-
-        //private readonly ManualResetEvent _infoWaitHandle;
-
-        public BroadcastService(CommunicationService communicationService)
+        public BroadcastService(
+            CommunicationService communicationService)
         {
             _communicationService = communicationService;
 
@@ -31,8 +26,6 @@ namespace Revelator.io24.Api.Services
             _udpClient.Client.Bind(new IPEndPoint(IPAddress.Loopback, 47809)); //IPAddress.Any
 
             _thread = new Thread(Listener) { IsBackground = true };
-
-            Current = this;
         }
 
         public void StartReceive()
@@ -71,12 +64,11 @@ namespace Revelator.io24.Api.Services
 
                     //TODO: What if... multiple devices?
 
-                    //TODO: Fix PackageHelper.GetFromToBytes() to use DeviceId in a non global way.
-                    DeviceId = BitConverter.ToUInt16(data[8..10]);
                     if (!_communicationService.IsConnected)
                     {
+                        var deviceId = BitConverter.ToUInt16(data[8..10]);
                         var tcpPort = BitConverter.ToUInt16(data[4..6]);
-                        _communicationService.Connect(tcpPort);
+                        _communicationService.Connect(deviceId, tcpPort);
                     }
 
                     //1.19 -> 281:
