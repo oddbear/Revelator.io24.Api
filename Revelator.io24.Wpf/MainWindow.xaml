@@ -16,7 +16,7 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="50" />
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -153,6 +153,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition />
@@ -168,82 +169,60 @@
                 <Label Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">Playback L/R</Label>
                 <Label Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" HorizontalContentAlignment="Center">Virtual A L/R</Label>
                 <Label Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" HorizontalContentAlignment="Center">Virtual B L/R</Label>
-                <Label Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" HorizontalContentAlignment="Center">
-                    <TextBlock TextWrapping="Wrap" TextAlignment="Center">Mute Mix<LineBreak/>(mutes all)</TextBlock>
-                </Label>
-                <Label Grid.Row="0" Grid.Column="7" VerticalAlignment="Center" HorizontalContentAlignment="Center">
-                    <TextBlock TextWrapping="Wrap" TextAlignment="Center">Headphones<LineBreak/>(Single only)</TextBlock>
+                <Label Grid.Row="0" Grid.Column="7" VerticalAlignment="Center" HorizontalContentAlignment="Center">Headphones</Label>
+                <Label Grid.Row="0" Grid.Column="8" VerticalAlignment="Center" HorizontalContentAlignment="Center">
+                    <TextBlock TextWrapping="Wrap" TextAlignment="Center">Mix<LineBreak/>(assigned)</TextBlock>
                 </Label>
 
                 <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalContentAlignment="Center">Main</Label>
                 <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalContentAlignment="Center">Stream Mix A</Label>
                 <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalContentAlignment="Center">Stream Mix B</Label>
 
-                <Button Grid.Row="1" Grid.Column="1"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/mute"
-                        Background="{Binding Path=RoutingMap.Main_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="2"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/mute"
-                        Background="{Binding Path=RoutingMap.Main_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="3"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch1/mute"
-                        Background="{Binding Path=RoutingMap.Main_Playback, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="4"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch2/mute"
-                        Background="{Binding Path=RoutingMap.Main_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="5"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch3/mute"
-                        Background="{Binding Path=RoutingMap.Main_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="6"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="main/ch1/mute"
-                        Background="{Binding Path=RoutingMap.Main_Mix, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="1" Grid.Column="7"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="global/phonesSrc:0.0"
-                        Background="{Binding Path=RoutingMap.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0}"></Button>
+                <CheckBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_MicL, Mode=TwoWay}" />
+                <CheckBox Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_MicR, Mode=TwoWay}" />
+                <CheckBox Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_Playback, Mode=TwoWay}" />
+                <CheckBox Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_VirtualA, Mode=TwoWay}" />
+                <CheckBox Grid.Row="1" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_VirtualB, Mode=TwoWay}" />
 
-                <Button Grid.Row="2" Grid.Column="1"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/assign_aux1"
-                        Background="{Binding Path=RoutingMap.MixA_MicL, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="2"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/assign_aux1"
-                        Background="{Binding Path=RoutingMap.MixA_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="3"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch1/assign_aux1"
-                        Background="{Binding Path=RoutingMap.MixA_Playback, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="4"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch2/assign_aux1"
-                        Background="{Binding Path=RoutingMap.MixA_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="5"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch3/assign_aux1"
-                        Background="{Binding Path=RoutingMap.MixA_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="6"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="aux/ch1/mute"
-                        Background="{Binding Path=RoutingMap.MixA_Mix, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="2" Grid.Column="7"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="global/phonesSrc:0.5"
-                        Background="{Binding Path=RoutingMap.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0.5}"></Button>
+                <RadioButton Grid.Row="1" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0}" />
+                <CheckBox Grid.Row="1" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_Mix, Mode=TwoWay}" />
 
-                <Button Grid.Row="3" Grid.Column="1"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/assign_aux2"
-                        Background="{Binding Path=RoutingMap.MixB_MicL, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="2"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/assign_aux2"
-                        Background="{Binding Path=RoutingMap.MixB_MicR, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="3"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch1/assign_aux2"
-                        Background="{Binding Path=RoutingMap.MixB_Playback, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="4"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch2/assign_aux2"
-                        Background="{Binding Path=RoutingMap.MixB_VirtualA, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="5"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="return/ch3/assign_aux2"
-                        Background="{Binding Path=RoutingMap.MixB_VirtualB, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="6"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="aux/ch2/mute"
-                        Background="{Binding Path=RoutingMap.MixB_Mix, Converter={StaticResource routingStateColorConverter}}" />
-                <Button Grid.Row="3" Grid.Column="7"
-                        Command="{Binding Path=ToggleCommand}" CommandParameter="global/phonesSrc:1.0"
-                        Background="{Binding Path=RoutingMap.HeadphonesSource, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=1.0}" />
+                <CheckBox Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_MicL, Mode=TwoWay}" />
+                <CheckBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_MicR, Mode=TwoWay}" />
+                <CheckBox Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_Playback, Mode=TwoWay}" />
+                <CheckBox Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_VirtualA, Mode=TwoWay}" />
+                <CheckBox Grid.Row="2" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_VirtualB, Mode=TwoWay}" />
+                <RadioButton Grid.Row="2" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0.5}" />
+                <CheckBox Grid.Row="2" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_Mix, Mode=TwoWay}" />
+
+                <CheckBox Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_MicL, Mode=TwoWay}" />
+                <CheckBox Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_MicR, Mode=TwoWay}" />
+                <CheckBox Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_Playback, Mode=TwoWay}" />
+                <CheckBox Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_VirtualA, Mode=TwoWay}" />
+                <CheckBox Grid.Row="3" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_VirtualB, Mode=TwoWay}" />
+                <RadioButton Grid.Row="3" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=1.0}" />
+                <CheckBox Grid.Row="3" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_Mix, Mode=TwoWay}" />
             </Grid>
         </GroupBox>
     </Grid>

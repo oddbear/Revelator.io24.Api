@@ -15,7 +15,7 @@ namespace Revelator.io24.Api.Services
         private readonly MonitorService _monitorService;
 
         private readonly RoutingModel _routingModel;
-        private readonly FatChannelModel _fatChannelModel;
+        private readonly MicrophoneModel _microphoneModel;
 
         private TcpClient? _tcpClient;
         private Thread? _listeningThread;
@@ -28,11 +28,11 @@ namespace Revelator.io24.Api.Services
         public CommunicationService(
             MonitorService monitorService,
             RoutingModel routingModel,
-            FatChannelModel fatChannelModel)
+            MicrophoneModel microphoneModel)
         {
             _monitorService = monitorService;
             _routingModel = routingModel;
-            _fatChannelModel = fatChannelModel;
+            _microphoneModel = microphoneModel;
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -180,7 +180,7 @@ namespace Revelator.io24.Api.Services
                     if (model is not null)
                     {
                         _routingModel.Synchronize(model);
-                        _fatChannelModel.Synchronize(model);
+                        _microphoneModel.Synchronize(model);
                     }
                     return;
                 case "SubscriptionReply":
@@ -211,7 +211,7 @@ namespace Revelator.io24.Api.Services
             var state = BitConverter.ToSingle(data[^4..^0]);
 
             _routingModel.StateUpdated(route, state);
-            _fatChannelModel.StateUpdated(route, state);
+            _microphoneModel.StateUpdated(route, state);
         }
 
         /// <summary>

@@ -73,7 +73,7 @@ namespace Revelator.io24.TouchPortal
 
             if (route == "synchronize")
             {
-                foreach (var key in _routingModel.VolumeValues.Keys)
+                foreach (var key in _routingModel.VolumeValue.Keys)
                 {
                     UpdateConnector(key);
                 }
@@ -86,7 +86,7 @@ namespace Revelator.io24.TouchPortal
 
         private void UpdateConnector(string route)
         {
-            var volume = _routingModel.VolumeValues[route];
+            var volume = _routingModel.VolumeValue[route];
             var value = (int)Math.Round(volume * 100f);
 
             var (input, output) = _routingModel.GetVolumeInputOutput(route);

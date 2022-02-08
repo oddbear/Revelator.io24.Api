@@ -3,47 +3,97 @@ using Revelator.io24.Api.Models.Json;
 
 namespace Revelator.io24.Api.Models
 {
-    public class Route //INotifyPropertyChange?
+    public class RouteValues
     {
-        public Input Input { get; set; }
-        public Output Output { get; set; }
-        public RouteType Type { get; set; }
-        public bool HasRoute { get; set; }
-        public int Volume { get; set; }
-        public float Raw { get; set; }
+        public (Input input, Output output) Pair { get; }
+
+        public string Route { get; }
+        public string Volume { get; }
+
+        public float RouteValue { get; set; }
+        public float VolumeValue { get; set; }
+
+        public RouteValues((Input input, Output output) pair, string route, string volume)
+        {
+            Pair = pair;
+            Route = route;
+            Volume = volume;
+        }
+
+        public string SetRouteValue(string route, float value)
+        {
+            if (Route == route)
+            {
+                RouteValue = value;
+                return nameof(RouteValue);
+            }
+
+            if (Volume == route)
+            {
+                VolumeValue = value;
+                return nameof(VolumeValue);
+            }
+
+            return null;
+        }
     }
 
     public class RoutingModel
     {
-        public event EventHandler<string>? RoutingUpdated;
+        public event EventHandler? SynchronizeReceived;
+        public event EventHandler<Headphones>? HeadphoneSourceUpdated;
+        public event EventHandler<(Input, Output)>? RouteValueUpdated;
+        public event EventHandler<(Input, Output)>? VolumeValueUpdated;
 
-        //Route Table:
-        public Dictionary<string, float> RouteValues = new();
+        public Dictionary<(Input input, Output output), RouteValues> PairToValues = new();
+        public Dictionary<string, (Input input, Output output)> RouteToPair = new();
 
-        //Volume Table (volume per route):
-        public Dictionary<string, float> VolumeValues = new();
-
-        public bool GetRouteBooleanState(string route)
-        {
-            if (!RouteValues.ContainsKey(route))
-                return false;
-
-            var type = _routeTableMapping[route].type;
-
-            var value = RouteValues[route];
-            return type == RouteType.Mute
-                ? value == 0.0f
-                : value == 1.0f;
-        }
-
-        //Back: Always float and route...
-        //Abstraction: (Input, Output) -> object
+        public Headphones Headphones { get; private set; }
 
         public void StateUpdated(string route, float value)
         {
-            RouteValues[route] = value;
-            RoutingUpdated?.Invoke(this, route);
+            if (route == "global/phonesSrc")
+            {
+                Headphones = ValueToHeadphones(value);
+                HeadphoneSourceUpdated?.Invoke(this, Headphones);
+                return;
+            }
+
+            if (!RouteToPair.ContainsKey(route))
+                return;
+
+            var pair = RouteToPair[route];
+
+            var propertyName = PairToValues[pair].SetRouteValue(route, value);
+            switch (propertyName)
+            {
+                case nameof(RouteValues.RouteValue):
+                    RouteValueUpdated?.Invoke(this, pair);
+                    break;
+                case nameof(RouteValues.VolumeValue):
+                    VolumeValueUpdated?.Invoke(this, pair);
+                    break;
+            }
         }
+
+        private void Register((Input input, Output output) pair, (string route, float value) assign, (string route, float value) volume)
+        {
+            PairToValues[pair] = new RouteValues(pair, assign.route, volume.route) {
+                RouteValue = assign.value,
+                VolumeValue = volume.value
+            };
+            RouteToPair[assign.route] = pair;
+            RouteToPair[volume.route] = pair;
+        }
+
+        private Headphones ValueToHeadphones(float phonesSrc)
+            => phonesSrc switch
+            {
+                0.0f => Headphones.Main,
+                0.5f => Headphones.MixA,
+                1.0f => Headphones.MixB,
+                _ => throw new InvalidOperationException($"Unknown 'global/phonesSrc' value '{phonesSrc}'")
+            };
 
         public void Synchronize(Synchronize synchronize)
         {
@@ -54,82 +104,72 @@ namespace Revelator.io24.Api.Models
             var mainC = children.Main.Children;
             var auxC = children.Aux.Children;
 
-            //Routing:
-            RouteValues["line/ch1/mute"] = lineC.Ch1.Values.Mute;
-            RouteValues["line/ch2/mute"] = lineC.Ch2.Values.Mute;
-            RouteValues["return/ch1/mute"] = returnC.Ch1.Values.Mute;
-            RouteValues["return/ch2/mute"] = returnC.Ch2.Values.Mute;
-            RouteValues["return/ch3/mute"] = returnC.Ch1.Values.Mute;
-            RouteValues["main/ch1/mute"] = mainC.Ch1.Values.Mute;
-
-            RouteValues["line/ch1/assign_aux1"] = lineC.Ch1.Values.AssignAux1;
-            RouteValues["line/ch2/assign_aux1"] = lineC.Ch2.Values.AssignAux2;
-            RouteValues["return/ch1/assign_aux1"] = returnC.Ch1.Values.AssignAux1;
-            RouteValues["return/ch2/assign_aux1"] = returnC.Ch2.Values.AssignAux1;
-            RouteValues["return/ch3/assign_aux1"] = returnC.Ch3.Values.AssignAux1;
-            RouteValues["aux/ch1/mute"] = auxC.Ch1.Values.Mute;
-
-            RouteValues["line/ch1/assign_aux2"] = lineC.Ch1.Values.AssignAux2;
-            RouteValues["line/ch2/assign_aux2"] = lineC.Ch2.Values.AssignAux2;
-            RouteValues["return/ch1/assign_aux2"] = returnC.Ch1.Values.AssignAux2;
-            RouteValues["return/ch2/assign_aux2"] = returnC.Ch2.Values.AssignAux2;
-            RouteValues["return/ch3/assign_aux2"] = returnC.Ch3.Values.AssignAux2;
-            RouteValues["aux/ch2/mute"] = auxC.Ch2.Values.Mute;
-
             //Headphones:
-            RouteValues["global/phonesSrc"] = globalV.PhonesSrc;
+            Headphones = ValueToHeadphones(globalV.PhonesSrc);
 
-            //Volume:
-            VolumeValues["line/ch1/volume"] = lineC.Ch1.Values.Volume;
-            VolumeValues["line/ch2/volume"] = lineC.Ch2.Values.Volume;
-            VolumeValues["return/ch1/volume"] = returnC.Ch1.Values.Volume;
-            VolumeValues["return/ch2/volume"] = returnC.Ch2.Values.Volume;
-            VolumeValues["return/ch3/volume"] = returnC.Ch3.Values.Volume;
-            VolumeValues["main/ch1/volume"] = mainC.Ch1.Values.Volume;
+            //Routes:
+            Register((Input.Mic_L, Output.Main),
+                ("line/ch1/mute", lineC.Ch1.Values.Mute),
+                ("line/ch1/volume", lineC.Ch1.Values.Volume));
+            Register((Input.Mic_L, Output.Mix_A),
+                ("line/ch1/assign_aux1", lineC.Ch1.Values.AssignAux1),
+                ("line/ch1/aux1", lineC.Ch1.Values.Aux1));
+            Register((Input.Mic_L, Output.Mix_B),
+                ("line/ch1/assign_aux2", lineC.Ch1.Values.AssignAux2),
+                ("line/ch1/aux2", lineC.Ch1.Values.Aux2));
 
-            VolumeValues["line/ch1/aux1"] = lineC.Ch1.Values.Aux1;
-            VolumeValues["line/ch2/aux1"] = lineC.Ch2.Values.Aux1;
-            VolumeValues["return/ch1/aux1"] = returnC.Ch1.Values.Aux1;
-            VolumeValues["return/ch2/aux1"] = returnC.Ch2.Values.Aux1;
-            VolumeValues["return/ch3/aux1"] = returnC.Ch3.Values.Aux1;
-            VolumeValues["aux1/ch1/volume"] = auxC.Ch1.Values.Volume;
+            Register((Input.Mic_R, Output.Main),
+                ("line/ch2/mute", lineC.Ch2.Values.Mute),
+                ("line/ch2/volume", lineC.Ch2.Values.Volume));
+            Register((Input.Mic_R, Output.Mix_A),
+                ("line/ch2/assign_aux1", lineC.Ch2.Values.AssignAux2),
+                ("line/ch2/aux1", lineC.Ch2.Values.Aux1));
+            Register((Input.Mic_R, Output.Mix_B),
+                ("line/ch2/assign_aux2", lineC.Ch2.Values.AssignAux2),
+                ("line/ch2/aux2", lineC.Ch2.Values.Aux2));
 
-            VolumeValues["line/ch1/aux2"] = lineC.Ch1.Values.Aux2;
-            VolumeValues["line/ch2/aux2"] = lineC.Ch2.Values.Aux2;
-            VolumeValues["return/ch1/aux2"] = returnC.Ch1.Values.Aux2;
-            VolumeValues["return/ch2/aux2"] = returnC.Ch2.Values.Aux2;
-            VolumeValues["return/ch3/aux2"] = returnC.Ch3.Values.Aux2;
-            VolumeValues["aux/ch2/volume"] = auxC.Ch2.Values.Volume;
+            Register((Input.Playback, Output.Main),
+                ("return/ch1/mute", returnC.Ch1.Values.Mute),
+                ("return/ch1/volume", returnC.Ch1.Values.Volume));
+            Register((Input.Playback, Output.Mix_A),
+                ("return/ch1/assign_aux1", returnC.Ch1.Values.AssignAux1),
+                ("return/ch1/aux1", returnC.Ch1.Values.Aux1));
+            Register((Input.Playback, Output.Mix_B),
+                ("return/ch1/assign_aux2", returnC.Ch1.Values.AssignAux2),
+                ("return/ch1/aux2", returnC.Ch1.Values.Aux2));
 
-            RoutingUpdated?.Invoke(this, "synchronize");
+            Register((Input.Virtual_A, Output.Main),
+                ("return/ch2/mute", returnC.Ch2.Values.Mute),
+                ("return/ch2/volume", returnC.Ch2.Values.Volume));
+            Register((Input.Virtual_A, Output.Mix_A),
+                ("return/ch2/assign_aux1", returnC.Ch2.Values.AssignAux1),
+                ("return/ch2/aux1", returnC.Ch2.Values.Aux1));
+            Register((Input.Virtual_A, Output.Mix_B),
+                ("return/ch2/assign_aux2", returnC.Ch2.Values.AssignAux2),
+                ("return/ch2/aux2", returnC.Ch2.Values.Aux2));
+
+            Register((Input.Virtual_B, Output.Main),
+                ("return/ch3/mute", returnC.Ch3.Values.Mute),
+                ("return/ch3/volume", returnC.Ch3.Values.Volume));
+            Register((Input.Virtual_B, Output.Mix_A),
+                ("return/ch3/assign_aux1", returnC.Ch3.Values.AssignAux1),
+                ("return/ch3/aux1", returnC.Ch3.Values.Aux1));
+            Register((Input.Virtual_B, Output.Mix_B),
+                ("return/ch3/assign_aux2", returnC.Ch3.Values.AssignAux2),
+                ("return/ch3/aux2", returnC.Ch3.Values.Aux2));
+
+            Register((Input.Mix, Output.Main),
+                ("main/ch1/mute", mainC.Ch1.Values.Mute),
+                ("main/ch1/volume", mainC.Ch1.Values.Volume));
+            Register((Input.Mix, Output.Mix_A),
+                ("aux/ch1/mute", auxC.Ch1.Values.Mute),
+                ("aux/ch1/volume", auxC.Ch1.Values.Volume));
+            Register((Input.Mix, Output.Mix_B),
+                ("aux/ch2/mute", auxC.Ch2.Values.Mute),
+                ("aux/ch2/volume", auxC.Ch2.Values.Volume));
+
+            SynchronizeReceived?.Invoke(this, EventArgs.Empty);
         }
-
-        private Dictionary<string, (Input input, Output output, RouteType type)> _routeTableMapping = new()
-        {
-            ["line/ch1/mute"] = (Input.Mic_L, Output.Main, RouteType.Mute),
-            ["line/ch1/assign_aux1"] = (Input.Mic_L, Output.Mix_A, RouteType.Assign),
-            ["line/ch1/assign_aux2"] = (Input.Mic_L, Output.Mix_B, RouteType.Assign),
-
-            ["line/ch2/mute"] = (Input.Mic_R, Output.Main, RouteType.Mute),
-            ["line/ch2/assign_aux1"] = (Input.Mic_R, Output.Mix_A, RouteType.Assign),
-            ["line/ch2/assign_aux2"] = (Input.Mic_R, Output.Mix_B, RouteType.Assign),
-
-            ["return/ch1/mute"] = (Input.Playback, Output.Main, RouteType.Mute),
-            ["return/ch1/assign_aux1"] = (Input.Playback, Output.Mix_A, RouteType.Assign),
-            ["return/ch1/assign_aux2"] = (Input.Playback, Output.Mix_B, RouteType.Assign),
-
-            ["return/ch2/mute"] = (Input.Virtual_A, Output.Main, RouteType.Mute),
-            ["return/ch2/assign_aux1"] = (Input.Virtual_A, Output.Mix_A, RouteType.Assign),
-            ["return/ch2/assign_aux2"] = (Input.Virtual_A, Output.Mix_B, RouteType.Assign),
-
-            ["return/ch3/mute"] = (Input.Virtual_B, Output.Main, RouteType.Mute),
-            ["return/ch3/assign_aux1"] = (Input.Virtual_B, Output.Mix_A, RouteType.Assign),
-            ["return/ch3/assign_aux2"] = (Input.Virtual_B, Output.Mix_B, RouteType.Assign),
-
-            ["main/ch1/mute"] = (Input.Mix, Output.Main, RouteType.Mute),
-            ["aux/ch1/mute"] = (Input.Mix, Output.Mix_A, RouteType.Mute),
-            ["aux/ch2/mute"] = (Input.Mix, Output.Mix_B, RouteType.Mute)
-        };
 
         private Dictionary<string, (Input, Output)> _volumeRouteMapping = new()
         {

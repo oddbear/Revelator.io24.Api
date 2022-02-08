@@ -1,16 +1,17 @@
 ﻿using Newtonsoft.Json;
+using Revelator.io24.Api.Enums;
 
 namespace Revelator.io24.StreamDeck.Settings
 {
     public class RouteChangeSettings
     {
         [JsonProperty(PropertyName = "inputValue")]
-        public string Input { get; set; } = "Mic L";
+        public Input Input { get; set; } = Input.Mic_L;
 
         [JsonProperty(PropertyName = "outputValue")]
-        public string Output { get; set; } = "Main";
+        public Output Output { get; set; } = Output.Main;
 
         [JsonProperty(PropertyName = "actionValue")]
-        public string Action { get; set; } = "Toggle";
+        public Value Action { get; set; } = Value.Toggle;
     }
 }
