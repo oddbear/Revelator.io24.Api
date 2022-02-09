@@ -39,26 +39,9 @@ namespace Revelator.io24.Wpf.Models
         }
 
         private string GetPreset(MicrophoneChannel channel)
-        {
-            var presetIndex = _microphones.GetPreset(channel);
-            var presets = _microphones.GetPresets(channel);
-            if (presets is null)
-                return null;
-                
-            return presets[presetIndex];
-        }
+            =>_microphones.GetPreset(channel);
 
         private void SetPreset(MicrophoneChannel channel, string presetName)
-        {
-            var presets = _microphones.GetPresets(channel);
-            for (int i = 0; i < presets.Length; i++)
-            {
-                if (presets[i] == presetName)
-                {
-                    _microphones.SetPreset(channel, i);
-                    return;
-                }
-            }
-        }
+            => _microphones.SetPreset(channel, presetName);
     }
 }
