@@ -25,7 +25,10 @@ namespace Revelator.io24.Api.Services
             ValuesMonitorModel valuesMonitorModel)
         {
             _udpClient = new UdpClient(0);
-            var ipEndpoint = (IPEndPoint)_udpClient.Client.LocalEndPoint;
+            var ipEndpoint = _udpClient.Client.LocalEndPoint as IPEndPoint;
+            if (ipEndpoint is null)
+                throw new InvalidOperationException("Failed to start UDP server.");
+
             Port = (ushort)ipEndpoint.Port;
 
             _thread = new Thread(Listener) { IsBackground = true };
@@ -77,7 +80,8 @@ namespace Revelator.io24.Api.Services
             var header = Encoding.ASCII.GetString(data[0..4]); //UC01
             var unknownValue = BitConverter.ToUInt16(data[4..6]); //always: 0x6C, 0xDB : 108, 219: 56172 (27867 inversed)
             var type = Encoding.ASCII.GetString(data[6..8]); //MS: Monitor Status?
-            var customBytes = BitConverter.ToString(data[8..12]).Replace("-", ":"); //66:00:68:00
+            var from = data[8..10];
+            var to = data[10..12];
 
             //Good tool for testing, send to source:
             //https://www.szynalski.com/tone-generator/
@@ -133,13 +137,13 @@ namespace Revelator.io24.Api.Services
                 var unknown4 = data[48..101];
                 var unknown4Val = BitConverter.ToString(unknown4).Replace("-", "");
 
-                //Hva er dette?
-                //FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200
-                //FFFFFFFFF9FFF9FFF9FFF9FFF9FFF9FF0600010000040000020400040000040800040000000C000400040010000400070014000200
+                //What is this, why does it sometimes change, but almost never?
                 var prevValues = new[] {
                     "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200",
+                    "FFFFFFFFF9FFF9FFFFFFFFFFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200",
                     "FFFFFFFFF9FFF9FFF9FFF9FFF9FFF9FF0600010000040000020400040000040800040000000C000400040010000400070014000200",
-                    "FFFFFFFFF9FFF9FFFFFFFFFFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200"
+                    "FFFFFFFFFFFFFFFFF9FFF9FFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200",
+                    "FFFFFFFFFFFFFFFFFFFFF9FFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200"
                 };
                 if (!prevValues.Contains(unknown4Val))
                     Log.Information("Something 3: {val1}", unknown4Val);

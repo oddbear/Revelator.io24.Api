@@ -48,6 +48,21 @@
           "Image": "Images/Plugin/Off"
         }
       ]
+    },
+    {
+      "Name": "Preset change",
+      "UUID": "com.oddbear.revelator.io24.presetchange",
+      "Icon": "Images/Icons/Icon",
+      "Tooltip": "A preset change action",
+      "PropertyInspectorPath": "PropertyInspector/PresetChangeAction.html",
+      "States": [
+        {
+          "Image": "Images/Plugin/On"
+        },
+        {
+          "Image": "Images/Plugin/Off"
+        }
+      ]
     }
   ],
   "Category": "Revelator io24",

@@ -1,4 +1,7 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Services;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
@@ -9,19 +12,16 @@ namespace Revelator.io24.StreamDeck.Actions
     [StreamDeckAction("com.oddbear.revelator.io24.routechange")]
     public class RouteChangeAction : StreamDeckAction
     {
-        private readonly UpdateService _updateService;
-        private readonly RoutingModel _routingModel;
+        private readonly RoutingTable _routingTable;
 
         //We need some how to know the route when Events are received.
         //In other situations, use GetSettings.
-        private string? _route;
+        private (Input input, Output output)? _route;
 
         public RouteChangeAction(
-            UpdateService updateService,
-            RoutingModel routingModel)
+            RoutingTable routingTable)
         {
-            _updateService = updateService;
-            _routingModel = routingModel;
+            _routingTable = routingTable;
         }
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
@@ -31,32 +31,28 @@ namespace Revelator.io24.StreamDeck.Actions
             var settings = args.Payload
                 .GetSettings<RouteChangeSettings>();
 
-            var route = RouteFromSettings(settings);
+            _route = (settings.Input, settings.Output);
 
-            _route = route;
-
-            await StateUpdated(route);
+            await StateUpdated(settings.Input, settings.Output);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
-            _routingModel.RoutingUpdated += RoutingUpdated;
+            _routingTable.RouteUpdated += RouteUpdated;
 
             var settings = args.Payload
                 .GetSettings<RouteChangeSettings>();
 
-            var route = RouteFromSettings(settings);
+            _route = (settings.Input, settings.Output);
 
-            _route = route;
-
-            await StateUpdated(route);
+            await StateUpdated(settings.Input, settings.Output);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-            _routingModel.RoutingUpdated -= RoutingUpdated;
+            _routingTable.RouteUpdated -= RouteUpdated;
         }
 
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
@@ -66,84 +62,19 @@ namespace Revelator.io24.StreamDeck.Actions
             var settings = args.Payload
                 .GetSettings<RouteChangeSettings>();
 
-            var route = RouteFromSettings(settings);
-            var value = ActionToValue(route, settings.Action);
+            _routingTable.SetRouting(settings.Input, settings.Output, settings.Action);
 
-            _updateService.SetRouteValue(route, value);
+            await StateUpdated(settings.Input, settings.Output);
         }
 
-        private float ActionToValue(string route, string action)
-        {
-            if (action == "On")
-            {
-                return route.EndsWith("mute")
-                    ? 0.0f
-                    : 1.0f;
-            }
-
-            if (action == "Off")
-            {
-                return route.EndsWith("mute")
-                    ? 1.0f
-                    : 0.0f;
-            }
-
-            var hasRoute = _routingModel.GetBooleanState(route);
-            return route.EndsWith("mute")
-                ? (hasRoute ? 1.0f : 0.0f)
-                : (hasRoute ? 0.0f : 1.0f);
-        }
-
-        private string RouteFromSettings(RouteChangeSettings settings)
-        {
-            //Special case:
-            if (settings.Input == "Mute All")
-            {
-                switch (settings.Output)
-                {
-                    case "Main":
-                        return "main/ch1/mute";
-                    case "Stream Mix A":
-                        return "aux/ch1/mute";
-                    case "Stream Mix B":
-                        return "aux/ch2/mute";
-                }
-            }
-
-            var input = InputToPart(settings.Input);
-            var output = OutputToPart(settings.Output);
-
-            return $"{input}/{output}";
-        }
-
-        private string InputToPart(string input)
-            => input switch
-            {
-                "Mic L" => "line/ch1",
-                "Mic R" => "line/ch2",
-                "Playback" => "return/ch1",
-                "Virual A" => "return/ch2",
-                "Virual B" => "return/ch3",
-                _ => throw new InvalidOperationException(),
-            };
-
-        private string OutputToPart(string output)
-            => output switch
-            {
-                "Main" => "mute",
-                "Stream Mix A" => "assign_aux1",
-                "Stream Mix B" => "assign_aux2",
-                _ => throw new InvalidOperationException(),
-            };
-
-        private async void RoutingUpdated(object? sender, string route)
+        private async void RouteUpdated(object? sender, (Input input, Output output) e)
         {
             try
             {
-                if (route != _route && route != "synchronize")
+                if (e != _route)
                     return;
 
-                await StateUpdated(route);
+                await StateUpdated(e.input, e.output);
             }
             catch (Exception exception)
             {
@@ -151,12 +82,9 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        private async Task StateUpdated(string route)
+        private async Task StateUpdated(Input input, Output output)
         {
-            var hasRoute = _routingModel.GetBooleanState(route);
-            var state = route.EndsWith("mute")
-                ? (hasRoute ? 1 : 0)
-                : (hasRoute ? 0 : 1);
+            var state = _routingTable.GetRouting(input, output) ? 0 : 1;
 
             await SetStateAsync(state);
         }

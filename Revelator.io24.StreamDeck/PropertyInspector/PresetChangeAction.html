@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Preset change</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+</head>
+<body>
+    <div class="sdpi-item" id="selectMicrophone">
+        <div class="sdpi-item-label">Microphone</div>
+        <select id="routeValue"
+                class="sdpi-item-value sdProperty"
+                onchange="setSettings()">
+            <option value="Left">Mic L</option>
+            <option value="Right">Mic R</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="selectPresets">
+        <div class="sdpi-item-label">Preset</div>
+        <select id="presetValues"
+                sdValueField="presetValue"
+                sdListTextProperty="name"
+                sdListValueProperty="index"
+                class="sdpi-item-value sdProperty sdList"
+                onchange="setSettings()">
+        </select>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
+</body>

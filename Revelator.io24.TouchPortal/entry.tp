@@ -34,7 +34,7 @@
                 "Playback",
                 "Virual A",
                 "Virual B",
-                "Mute All"
+                "Mix"
               ]
             },
             {
@@ -114,6 +114,33 @@
               ]
             }
           ]
+        },
+        {
+          "id": "oddbear.touchportal.revelator.io24.presetchange.action.change",
+          "prefix": "io24:",
+          "name": "io24 Preset Change",
+          "type": "communicate",
+          "tryInline": true,
+          "format": "Microphone {$oddbear.touchportal.revelator.io24.presetchange.action.change.data.microphone$} Preset {$oddbear.touchportal.revelator.io24.presetchange.action.change.data.preset$}",
+          "description": "Change the preset on the selected microphone channel.",
+          "data": [
+            {
+              "id": "oddbear.touchportal.revelator.io24.presetchange.action.change.data.microphone",
+              "type": "choice",
+              "label": "Microphone",
+              "default": "Mic L",
+              "valueChoices": [
+                "Mic L",
+                "Mic R"
+              ]
+            },
+            {
+              "id": "oddbear.touchportal.revelator.io24.presetchange.action.change.data.preset",
+              "type": "choice",
+              "label": "Preset",
+              "default": ""
+            }
+          ]
         }
       ],
       "states": [
@@ -125,126 +152,139 @@
         },
 
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch1/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Mic_L|Main",
           "type": "text",
           "desc": "io24: Mic L / Main",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch2/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Mic_R|Main",
           "type": "text",
           "desc": "io24: Mic R / Main",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch1/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Playback|Main",
           "type": "text",
           "desc": "io24: Playback / Main",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch2/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Virual_A|Main",
           "type": "text",
           "desc": "io24: Virual A / Main",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch3/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Virual_B|Main",
           "type": "text",
           "desc": "io24: Virual B / Main",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.main/ch1/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Mix|Main",
           "type": "text",
-          "desc": "io24: Mute All / Main",
+          "desc": "io24: Mix / Main",
           "default": ""
         },
 
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch1/assign_aux1",
+          "id": "oddbear.touchportal.revelator.io24.states.Mic_L|Mix_A",
           "type": "text",
           "desc": "io24: Mic L / Stream Mix A",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch2/assign_aux1",
+          "id": "oddbear.touchportal.revelator.io24.states.Mic_R|Mix_A",
           "type": "text",
           "desc": "io24: Mic R / Stream Mix A",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch1/assign_aux1",
+          "id": "oddbear.touchportal.revelator.io24.states.Playback|Mix_A",
           "type": "text",
           "desc": "io24: Playback / Stream Mix A",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch2/assign_aux1",
+          "id": "oddbear.touchportal.revelator.io24.states.Virtual_A|Mix_A",
           "type": "text",
           "desc": "io24: Virual A / Stream Mix A",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch3/assign_aux1",
+          "id": "oddbear.touchportal.revelator.io24.states.Virtual_B|Mix_A",
           "type": "text",
           "desc": "io24: Virual B / Stream Mix A",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.aux/ch1/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Mix|Mix_A",
           "type": "text",
-          "desc": "io24: Mute All / Stream Mix A",
+          "desc": "io24: Mix / Stream Mix A",
           "default": ""
         },
 
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch1/assign_aux2",
+          "id": "oddbear.touchportal.revelator.io24.states.Mic_L|Mix_B",
           "type": "text",
           "desc": "io24: Mic L / Stream Mix B",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch2/assign_aux2",
+          "id": "oddbear.touchportal.revelator.io24.states.Mic_R|Mix_B",
           "type": "text",
           "desc": "io24: Mic R / Stream Mix B",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch1/assign_aux2",
+          "id": "oddbear.touchportal.revelator.io24.states.Playback|Mix_B",
           "type": "text",
           "desc": "io24: Playback / Stream Mix B",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch2/assign_aux2",
+          "id": "oddbear.touchportal.revelator.io24.states.Virual_A|Mix_B",
           "type": "text",
           "desc": "io24: Virual A / Stream Mix B",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.return/ch3/assign_aux2",
+          "id": "oddbear.touchportal.revelator.io24.states.Virual_B|Mix_B",
           "type": "text",
           "desc": "io24: Virual B / Stream Mix B",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.aux/ch2/mute",
+          "id": "oddbear.touchportal.revelator.io24.states.Mix|Mix_B",
           "type": "text",
-          "desc": "io24: Mute All / Stream Mix B",
+          "desc": "io24: Mix / Stream Mix B",
           "default": ""
         },
 
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch1/bypassDSP",
+          "id": "oddbear.touchportal.revelator.io24.states.fatchannel.Left",
           "type": "text",
           "desc": "io24: Fat Channel Left",
           "default": ""
         },
         {
-          "id": "oddbear.touchportal.revelator.io24.states.line/ch2/bypassDSP",
+          "id": "oddbear.touchportal.revelator.io24.states.fatchannel.Right",
           "type": "text",
           "desc": "io24: Fat Channel Right",
+          "default": ""
+        },
+
+        {
+          "id": "oddbear.touchportal.revelator.io24.states.preset.Left",
+          "type": "text",
+          "desc": "io24: Preset Left",
+          "default": ""
+        },
+        {
+          "id": "oddbear.touchportal.revelator.io24.states.preset.Right",
+          "type": "text",
+          "desc": "io24: Preset Right",
           "default": ""
         }
       ],

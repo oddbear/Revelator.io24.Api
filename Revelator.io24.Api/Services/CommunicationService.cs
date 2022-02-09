@@ -1,6 +1,7 @@
 ﻿using Revelator.io24.Api.Helpers;
+using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
-using Revelator.io24.Api.Messages.Writers;
+using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -11,28 +12,27 @@ namespace Revelator.io24.Api.Services
 {
     public class CommunicationService : IDisposable
     {
-        public delegate void RouteUpdated(string route, ushort state);
-
-        private readonly BroadcastService _broadcastService;
         private readonly MonitorService _monitorService;
 
         private readonly RoutingModel _routingModel;
-        private readonly VolumeModel _volumeModel;
+        private readonly MicrophoneModel _microphoneModel;
 
-        private TcpClient _tcpClient;
+        private TcpClient? _tcpClient;
         private Thread? _listeningThread;
         private Thread? _writingThread;
+
+        private ushort _deviceId;
 
         public bool IsConnected => _tcpClient?.Connected ?? false;
 
         public CommunicationService(
             MonitorService monitorService,
             RoutingModel routingModel,
-            VolumeModel volumeModel)
+            MicrophoneModel microphoneModel)
         {
             _monitorService = monitorService;
             _routingModel = routingModel;
-            _volumeModel = volumeModel;
+            _microphoneModel = microphoneModel;
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -41,9 +41,11 @@ namespace Revelator.io24.Api.Services
             _writingThread.Start();
         }
 
-        public void Connect(int tcpPort)
+        public void Connect(ushort deviceId, int tcpPort)
         {
             _tcpClient?.Dispose();
+
+            _deviceId = deviceId;
 
             _tcpClient = new TcpClient();
             _tcpClient.Connect(IPAddress.Loopback, tcpPort);
@@ -72,11 +74,11 @@ namespace Revelator.io24.Api.Services
         {
             var list = new List<byte>();
 
-            var monitorPort = _monitorService.Port;
-            var welcomeMessage = WelcomeMessage.Create(monitorPort);
+            var tcpMessageWriter = new TcpMessageWriter(_deviceId);
+            var welcomeMessage = tcpMessageWriter.CreateWelcomeMessage(_monitorService.Port);
             list.AddRange(welcomeMessage);
 
-            var jsonMessage = ClientInfoMessage.Create();
+            var jsonMessage = tcpMessageWriter.CreateClientInfoMessage();
             list.AddRange(jsonMessage);
 
             return list.ToArray();
@@ -92,7 +94,8 @@ namespace Revelator.io24.Api.Services
                     if (networkStream is null)
                         continue;
 
-                    var keepAliveMessage = KeepAliveMessage.Create();
+                    var tcpMessageWriter = new TcpMessageWriter(_deviceId);
+                    var keepAliveMessage = tcpMessageWriter.CreateKeepAliveMessage();
                     networkStream.Write(keepAliveMessage);
                 }
                 catch (Exception exception)
@@ -103,23 +106,6 @@ namespace Revelator.io24.Api.Services
                 {
                     Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
-            }
-        }
-
-        public bool SendMessage(byte[] message)
-        {
-            try
-            {
-                var networkStream = GetNetworkStream();
-                if (networkStream is null)
-                    return false;
-
-                networkStream.Write(message);
-                return true;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -147,6 +133,13 @@ namespace Revelator.io24.Api.Services
                         var messageType = PackageHelper.GetMessageType(chunck);
                         switch (messageType)
                         {
+                            case "PL":
+                            case "PR":
+                                //Happens when lining and unlinking mic channels.
+                                //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
+                                //Fatchannel is bound to "both"
+                                //Fatchannel is bound to "both", ex. toggle toggles both to same state.
+                                break;
                             case "PV":
                                 //PV Settings packet
                                 PV(chunck);
@@ -189,12 +182,17 @@ namespace Revelator.io24.Api.Services
 
             switch (id)
             {
+                case "SynchronizePart":
+                    //Happens when lining and unlinking mic channels.
+                    //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
+                    //Fatchannel is bound to "both", ex. toggle toggles both to same state.
+                    return;
                 case "Synchronize":
                     var model = ZM.GetSynchronizeModel(json);
                     if (model is not null)
                     {
                         _routingModel.Synchronize(model);
-                        _volumeModel.Synchronize(model);
+                        _microphoneModel.Synchronize(model);
                     }
                     return;
                 case "SubscriptionReply":
@@ -217,14 +215,15 @@ namespace Revelator.io24.Api.Services
             var header = data[0..4];
             var messageLength = data[4..6];
             var messageType = data[6..8];
-            var customBytes = data[8..12];
+            var from = data[8..10];
+            var to = data[10..12];
 
             var route = Encoding.ASCII.GetString(data[12..^7]);
             var emptyBytes = data[^7..^4];
             var state = BitConverter.ToSingle(data[^4..^0]);
 
             _routingModel.StateUpdated(route, state);
-            _volumeModel.StateUpdated(route, state);
+            _microphoneModel.StateUpdated(route, state);
         }
 
         /// <summary>
@@ -235,9 +234,34 @@ namespace Revelator.io24.Api.Services
             //TODO: ...
         }
 
+        public void SetRouteValue(string route, float value)
+        {
+            var writer = new TcpMessageWriter(_deviceId);
+            var data = writer.CreateRouteUpdate(route, value);
+
+            SendMessage(data);
+        }
+
+        public bool SendMessage(byte[] message)
+        {
+            try
+            {
+                var networkStream = GetNetworkStream();
+                if (networkStream is null)
+                    return false;
+
+                networkStream.Write(message);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public void Dispose()
         {
-            _tcpClient.Dispose();
+            _tcpClient?.Dispose();
         }
     }
 }

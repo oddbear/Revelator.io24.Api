@@ -1,141 +1,130 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Services;
 namespace Revelator.io24.Wpf.Models
 {
     public class VolumeMapper
     {
-        private readonly RoutingModel _routingModel;
-        private readonly UpdateService _updateService;
+        private readonly RoutingTable _routingTable;
 
-        public float Main_MicL
+        public int Main_MicL
         {
-            get => GetValue("line/ch1/volume");
-            set => SetValue("line/ch1/volume", value);
+            get => GetValue(Input.Mic_L, Output.Main);
+            set => SetValue(Input.Mic_L, Output.Main, value);
         }
 
-        public float Main_MicR
+        public int Main_MicR
         {
-            get => GetValue("line/ch2/volume");
-            set => SetValue("line/ch2/volume", value);
+            get => GetValue(Input.Mic_R, Output.Main);
+            set => SetValue(Input.Mic_R, Output.Main, value);
         }
 
-        public float Main_Playback
+        public int Main_Playback
         {
-            get => GetValue("return/ch1/volume");
-            set => SetValue("return/ch1/volume", value);
+            get => GetValue(Input.Playback, Output.Main);
+            set => SetValue(Input.Playback, Output.Main, value);
         }
 
-        public float Main_VirtualA
+        public int Main_VirtualA
         {
-            get => GetValue("return/ch2/volume");
-            set => SetValue("return/ch2/volume", value);
+            get => GetValue(Input.Virtual_A, Output.Main);
+            set => SetValue(Input.Virtual_A, Output.Main, value);
         }
 
-        public float Main_VirtualB
+        public int Main_VirtualB
         {
-            get => GetValue("return/ch3/volume");
-            set => SetValue("return/ch3/volume", value);
+            get => GetValue(Input.Virtual_B, Output.Main);
+            set => SetValue(Input.Virtual_B, Output.Main, value);
         }
 
-        public float Main_Mix
+        public int Main_Mix
         {
-            get => GetValue("main/ch1/volume");
-            set => SetValue("main/ch1/volume", value);
+            get => GetValue(Input.Mix, Output.Main);
+            set => SetValue(Input.Mix, Output.Main, value);
         }
 
-        public float MixA_MicL
+        public int MixA_MicL
         {
-            get => GetValue("line/ch1/aux1");
-            set => SetValue("line/ch1/aux1", value);
+            get => GetValue(Input.Mic_L, Output.Mix_A);
+            set => SetValue(Input.Mic_L, Output.Mix_A, value);
         }
 
-        public float MixA_MicR
+        public int MixA_MicR
         {
-            get => GetValue("line/ch2/aux1");
-            set => SetValue("line/ch2/aux1", value);
+            get => GetValue(Input.Mic_R, Output.Mix_A);
+            set => SetValue(Input.Mic_R, Output.Mix_A, value);
         }
 
-        public float MixA_Playback
+        public int MixA_Playback
         {
-            get => GetValue("return/ch1/aux1");
-            set => SetValue("return/ch1/aux1", value);
+            get => GetValue(Input.Playback, Output.Mix_A);
+            set => SetValue(Input.Playback, Output.Mix_A, value);
         }
 
-        public float MixA_VirtualA
+        public int MixA_VirtualA
         {
-            get => GetValue("return/ch2/aux1");
-            set => SetValue("return/ch2/aux1", value);
+            get => GetValue(Input.Virtual_A, Output.Mix_A);
+            set => SetValue(Input.Virtual_A, Output.Mix_A, value);
         }
 
-        public float MixA_VirtualB
+        public int MixA_VirtualB
         {
-            get => GetValue("return/ch3/aux1");
-            set => SetValue("return/ch3/aux1", value);
+            get => GetValue(Input.Virtual_B, Output.Mix_A);
+            set => SetValue(Input.Virtual_B, Output.Mix_A, value);
         }
 
-        public float MixA_Mix
+        public int MixA_Mix
         {
-            get => GetValue("aux/ch1/volume");
-            set => SetValue("aux/ch1/volume", value);
+            get => GetValue(Input.Mix, Output.Mix_A);
+            set => SetValue(Input.Mix, Output.Mix_A, value);
         }
 
-        public float MixB_MicL
+        public int MixB_MicL
         {
-            get => GetValue("line/ch1/aux2");
-            set => SetValue("line/ch1/aux2", value);
+            get => GetValue(Input.Mic_L, Output.Mix_B);
+            set => SetValue(Input.Mic_L, Output.Mix_B, value);
         }
 
-        public float MixB_MicR
+        public int MixB_MicR
         {
-            get => GetValue("line/ch2/aux2");
-            set => SetValue("line/ch2/aux2", value);
+            get => GetValue(Input.Mic_R, Output.Mix_B);
+            set => SetValue(Input.Mic_R, Output.Mix_B, value);
         }
 
-        public float MixB_Playback
+        public int MixB_Playback
         {
-            get => GetValue("return/ch1/aux2");
-            set => SetValue("return/ch1/aux2", value);
+            get => GetValue(Input.Playback, Output.Mix_B);
+            set => SetValue(Input.Playback, Output.Mix_B, value);
         }
 
-        public float MixB_VirtualA
+        public int MixB_VirtualA
         {
-            get => GetValue("return/ch2/aux2");
-            set => SetValue("return/ch2/aux2", value);
+            get => GetValue(Input.Virtual_A, Output.Mix_B);
+            set => SetValue(Input.Virtual_A, Output.Mix_B, value);
         }
 
-        public float MixB_VirtualB
+        public int MixB_VirtualB
         {
-            get => GetValue("return/ch3/aux2");
-            set => SetValue("return/ch3/aux2", value);
+            get => GetValue(Input.Virtual_B, Output.Mix_B);
+            set => SetValue(Input.Virtual_B, Output.Mix_B, value);
         }
 
-        public float MixB_Mix
+        public int MixB_Mix
         {
-            get => GetValue("aux/ch2/volume");
-            set => SetValue("aux/ch2/volume", value);
+            get => GetValue(Input.Mix, Output.Mix_B);
+            set => SetValue(Input.Mix, Output.Mix_B, value);
         }
 
-        public VolumeMapper(
-            RoutingModel routingModel,
-            UpdateService updateService)
+        public VolumeMapper(RoutingTable routingTable)
         {
-            _routingModel = routingModel;
-            _updateService = updateService;
+            _routingTable = routingTable;
         }
 
-        private void SetValue(string route, float value)
-        {
-            if (value < 0) value = 0;
-            if (value > 100) value = 100;
+        private int GetValue(Input input, Output output)
+            => _routingTable.GetVolume(input, output);
 
-            _updateService.SetRouteValue(route, value);
-        }
-
-        private float GetValue(string route)
-        {
-            if (!_routingModel.RouteValue.ContainsKey(route))
-                return 0;
-
-            return _routingModel.RouteValue[route];
-        }
+        private void SetValue(Input input, Output output, int value)
+            => _routingTable.SetVolume(input, output, value);
     }
 }

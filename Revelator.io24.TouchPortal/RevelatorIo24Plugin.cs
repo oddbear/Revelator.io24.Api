@@ -1,6 +1,9 @@
-﻿using Revelator.io24.Api.Enums;
+﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Extensions;
+using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
+using Revelator.io24.TouchPortal.Converters;
 using System.Text.Json;
 using TouchPortalSDK;
 using TouchPortalSDK.Interfaces;
@@ -14,91 +17,35 @@ namespace Revelator.io24.TouchPortal
         public string PluginId => "oddbear.touchportal.revelator.io24";
 
         private readonly ITouchPortalClient _client;
-        private readonly UpdateService _updateService;
-        private readonly RoutingModel _routingModel;
-        private readonly VolumeModel _volumeModel;
+        private readonly RoutingTable _routingTable;
+        private readonly Microphones _microphones;
 
-        public RevelatorIo24Plugin(ITouchPortalClientFactory clientFactory,
-            UpdateService updateService,
-            RoutingModel routingModel,
-            VolumeModel volumeModel)
+        public RevelatorIo24Plugin(
+            ITouchPortalClientFactory clientFactory,
+            RoutingTable routingTable,
+            Microphones microphones)
         {
             //Set the event handler for TouchPortal:
             _client = clientFactory.Create(this);
 
-            _updateService = updateService;
-            _routingModel = routingModel;
-            _volumeModel = volumeModel;
+            _routingTable = routingTable;
+            _microphones = microphones;
 
-            routingModel.RoutingUpdated += RoutingUpdated;
-            volumeModel.VolumeUpdated += VolumeUpdated;
+            _routingTable.HeadphoneUpdated += HeadphoneUpdated;
+            _routingTable.RouteUpdated += RouteUpdated;
+            _routingTable.VolumeUpdated += VolumeUpdated;
+
+            _microphones.FatChannelUpdated += FatChannelUpdated;
+            _microphones.PresetsUpdated += (s, e) => { };
+            _microphones.PresetUpdated += PresetUpdated;
         }
 
-        private void RoutingUpdated(object? sender, string route)
+        private void VolumeUpdated(object? sender, (Input input, Output output) e)
         {
-            var headphones = _routingModel.RouteValue["global/phonesSrc"];
-            switch (headphones)
-            {
-                case 0.0f:
-                    _client.StateUpdate(PluginId + ".states.headphonessource", "Main");
-                    break;
-                case 0.5f:
-                    _client.StateUpdate(PluginId + ".states.headphonessource", "Mix A");
-                    break;
-                case 1.0f:
-                    _client.StateUpdate(PluginId + ".states.headphonessource", "Mix B");
-                    break;
-            }
+            var value = _routingTable.GetVolume(e.input, e.output);
 
-            UpdateState("line/ch1/mute");
-            UpdateState("line/ch2/mute");
-            UpdateState("return/ch1/mute");
-            UpdateState("return/ch2/mute");
-            UpdateState("return/ch3/mute");
-            UpdateState("main/ch1/mute");
-
-            UpdateState("line/ch1/assign_aux1");
-            UpdateState("line/ch2/assign_aux1");
-            UpdateState("return/ch1/assign_aux1");
-            UpdateState("return/ch2/assign_aux1");
-            UpdateState("return/ch3/assign_aux1");
-            UpdateState("aux/ch1/mute");
-
-            UpdateState("line/ch1/assign_aux2");
-            UpdateState("line/ch2/assign_aux2");
-            UpdateState("return/ch1/assign_aux2");
-            UpdateState("return/ch2/assign_aux2");
-            UpdateState("return/ch3/assign_aux2");
-            UpdateState("aux/ch2/mute");
-
-            UpdateState("line/ch1/bypassDSP");
-            UpdateState("line/ch2/bypassDSP");
-        }
-
-        private void VolumeUpdated(object? sender, string route)
-        {
-            if (route == "synchronize")
-            {
-                foreach (var key in _volumeModel.VolumeValue.Keys)
-                {
-                    UpdateConnector(key);
-                }
-            }
-            else
-            {
-                UpdateConnector(route);
-            }
-        }
-
-        private void UpdateConnector(string route)
-        {
-            var volume = _volumeModel.VolumeValue[route];
-            var value = (int)Math.Round(volume * 100f);
-
-            var (input, output) = _volumeModel.GetInputOutput(route);
-            
-            var inputDesc = input.GetDescription();
-            var outputDesc = output.GetDescription();
+            var inputDesc = e.input.GetDescription();
+            var outputDesc = e.output.GetDescription();
 
             var message = JsonSerializer.Serialize(new
             {
@@ -110,13 +57,90 @@ namespace Revelator.io24.TouchPortal
             _client.SendMessage(message);
         }
 
+        private void HeadphoneUpdated(object? sender, Headphones e)
+        {
+            var description = e.GetDescription();
+            _client.StateUpdate(PluginId + ".states.headphonessource", description);
+        }
+
+        private void RouteUpdated(object? sender, (Input input, Output output) e)
+        {
+            var value = _routingTable.GetRouting(e.input, e.output);
+            _client.StateUpdate($"{PluginId}.states.{e.input}|{e.output}", value ? "On" : "Off");
+        }
+
+        private void FatChannelUpdated(object? sender, MicrophoneChannel e)
+        {
+            var value = _microphones.GetFatChannelStatus(e);
+            _client.StateUpdate($"{PluginId}.states.fatchannel.{e}", value ? "On" : "Off");
+        }
+
+        private void PresetUpdated(object? sender, MicrophoneChannel e)
+        {
+            var value = _microphones.GetPreset(e);
+            _client.StateUpdate($"{PluginId}.states.preset.{e}", value);
+        }
+
+        private void RoutingUpdated(object? sender, string route)
+        {
+            //var headphones = _routingModel.RouteValues["global/phonesSrc"];
+            //switch (headphones)
+            //{
+            //    case 0.0f:
+            //        _client.StateUpdate(PluginId + ".states.headphonessource", "Main");
+            //        break;
+            //    case 0.5f:
+            //        _client.StateUpdate(PluginId + ".states.headphonessource", "Mix A");
+            //        break;
+            //    case 1.0f:
+            //        _client.StateUpdate(PluginId + ".states.headphonessource", "Mix B");
+            //        break;
+            //}
+
+            //UpdateState("line/ch1/mute");
+            //UpdateState("line/ch2/mute");
+            //UpdateState("return/ch1/mute");
+            //UpdateState("return/ch2/mute");
+            //UpdateState("return/ch3/mute");
+            //UpdateState("main/ch1/mute");
+
+            //UpdateState("line/ch1/assign_aux1");
+            //UpdateState("line/ch2/assign_aux1");
+            //UpdateState("return/ch1/assign_aux1");
+            //UpdateState("return/ch2/assign_aux1");
+            //UpdateState("return/ch3/assign_aux1");
+            //UpdateState("aux/ch1/mute");
+
+            //UpdateState("line/ch1/assign_aux2");
+            //UpdateState("line/ch2/assign_aux2");
+            //UpdateState("return/ch1/assign_aux2");
+            //UpdateState("return/ch2/assign_aux2");
+            //UpdateState("return/ch3/assign_aux2");
+            //UpdateState("aux/ch2/mute");
+
+            //UpdateState("line/ch1/bypassDSP");
+            //UpdateState("line/ch2/bypassDSP");
+
+            //if (route == "synchronize")
+            //{
+            //    foreach (var key in _routingModel.VolumeValue.Keys)
+            //    {
+            //        UpdateConnector(key);
+            //    }
+            //}
+            //else
+            //{
+            //    UpdateConnector(route);
+            //}
+        }
+
         private void UpdateState(string route)
         {
-            var hasRoute = _routingModel.GetBooleanState(route);
-            if (route.EndsWith("mute") || route.EndsWith("/bypassDSP"))
-                hasRoute = !hasRoute;
+            //var hasRoute = _routingModel.GetRouteBooleanState(route);
+            //if (route.EndsWith("mute") || route.EndsWith("/bypassDSP"))
+            //    hasRoute = !hasRoute;
 
-            _client.StateUpdate(PluginId + ".states." + route, hasRoute ? "On" : "Off");
+            //_client.StateUpdate(PluginId + ".states." + route, hasRoute ? "On" : "Off");
         }
 
         public void Init()
@@ -143,6 +167,11 @@ namespace Revelator.io24.TouchPortal
             {
                 FatChannelChange(actionId + ".data", message.Data);
             }
+
+            if (actionId.EndsWith(".presetchange.action.change"))
+            {
+                PresetChange(actionId + ".data", message.Data);
+            }
         }
 
         private void RouteChange(string name, IReadOnlyCollection<ActionDataSelected> datalist)
@@ -154,64 +183,11 @@ namespace Revelator.io24.TouchPortal
             var outputs = dict[name + ".outputs"];
             var actions = dict[name + ".actions"];
 
-            var input = InputToPart(inputs);
-            var output = OutputToPart(outputs);
+            var input = InputConverter.GetInput(inputs);
+            var output = OutputConverter.GetOutput(outputs);
+            var action = ValueConverter.GetValue(actions);
 
-            var route = $"{input}/{output}";
-            var value = ActionToValue(route, actions);
-
-            _updateService.SetRouteValue(route, value);
-        }
-
-        private float ActionToValue(string route, string action)
-        {
-            if (action == "Turn On")
-            {
-                return route.EndsWith("mute")
-                    ? 0.0f
-                    : 1.0f;
-            }
-
-            if (action == "Turn Off")
-            {
-                return route.EndsWith("mute")
-                    ? 1.0f
-                    : 0.0f;
-            }
-
-            var hasRoute = _routingModel.GetBooleanState(route);
-            return route.EndsWith("mute")
-                ? (hasRoute ? 1.0f : 0.0f)
-                : (hasRoute ? 0.0f : 1.0f);
-        }
-
-        private string InputToPart(string input)
-        {
-            return input switch
-            {
-                "Mic L" => "line/ch1",
-                "Mic R" => "line/ch2",
-                "Playback" => "return/ch1",
-                "Virual A" => "return/ch2",
-                "Virual B" => "return/ch3",
-                "Mute All" => "main/ch1",
-                _ => throw new InvalidOperationException(),
-            };
-        }
-
-        private string OutputToPart(string output)
-        {
-            switch (output)
-            {
-                case "Main":
-                    return "mute";
-                case "Stream Mix A":
-                    return "assign_aux1";
-                case "Stream Mix B":
-                    return "assign_aux2";
-                default:
-                    throw new InvalidOperationException();
-            }
+            _routingTable.SetRouting(input, output, action);
         }
 
         private void HeadphonesSourceChange(string name, IReadOnlyCollection<ActionDataSelected> datalist)
@@ -222,18 +198,7 @@ namespace Revelator.io24.TouchPortal
             var headphoneValue = dict[name + ".headphones"];
             var headphone = GetHeadphoneEnum(headphoneValue);
 
-            switch (headphone)
-            {
-                case Headphones.Main:
-                    _updateService.SetRouteValue("global/phonesSrc", 0.0f);
-                    break;
-                case Headphones.MixA:
-                    _updateService.SetRouteValue("global/phonesSrc", 0.5f);
-                    break;
-                case Headphones.MixB:
-                    _updateService.SetRouteValue("global/phonesSrc", 1.0f);
-                    break;
-            }
+            _routingTable.SetHeadphoneSource(headphone);
         }
 
         private void FatChannelChange(string name, IReadOnlyCollection<ActionDataSelected> datalist)
@@ -242,33 +207,26 @@ namespace Revelator.io24.TouchPortal
                 .ToDictionary(kv => kv.Id, kv => kv.Value);
 
             var microphone = dict[name + ".microphone"];
-            var action = dict[name + ".actions"];
+            var actions = dict[name + ".actions"];
 
-            var route = GetFatChannelRoute(microphone);
-            var state = GetCurrentFatChannelState(route);
-            var value = GetFatChannelAction(action, route);
+            var channel = MicrophoneChannelConverter.GetMicrophoneChannel(microphone);
+            var value = ValueConverter.GetValue(actions);
 
-            _updateService.SetRouteValue(route, value);
+            _microphones.SetFatChannelStatus(channel, value);
         }
 
-        private string GetFatChannelRoute(string microphone)
-            => microphone switch
-            {
-                "Mic L" => "line/ch1/bypassDSP",
-                "Mic R" => "line/ch2/bypassDSP",
-                _ => throw new InvalidOperationException()
-            };
+        private void PresetChange(string name, IReadOnlyCollection<ActionDataSelected> datalist)
+        {
+            var dict = datalist
+                .ToDictionary(kv => kv.Id, kv => kv.Value);
 
-        private bool GetCurrentFatChannelState(string route)
-            => _routingModel.GetBooleanState(route);
+            var microphone = dict[name + ".microphone"];
+            var action = dict[name + ".preset"];
 
-        private float GetFatChannelAction(string action, string route)
-            => action switch
-            {
-                "Turn On" => 0.0f,
-                "Turn Off" => 1.0f,
-                _ => GetCurrentFatChannelState(route) ? 0.0f : 1.0f,
-            };
+            var channel = MicrophoneChannelConverter.GetMicrophoneChannel(microphone);
+
+            _microphones.SetPreset(channel, action);
+        }
 
         private Headphones GetHeadphoneEnum(string headphoneValue)
         {
@@ -300,10 +258,7 @@ namespace Revelator.io24.TouchPortal
                 var input = EnumExtensions.ParseDescription<Input>(inputDesc);
                 var output = EnumExtensions.ParseDescription<Output>(outputDesc);
 
-                var route = _volumeModel.GetRoute(input, output);
-
-                var value = message.Value / 100.0f;
-                _updateService.SetRouteValue(route, value);
+                _routingTable.SetVolume(input, output, message.Value);
             }
         }
 
@@ -314,7 +269,13 @@ namespace Revelator.io24.TouchPortal
 
         public void OnListChangedEvent(ListChangeEvent message)
         {
-            //Ignore for now.
+            if (message.ActionId.EndsWith(".presetchange.action.change")
+             && message.ListId.EndsWith(".microphone"))
+            {
+                var microphone = MicrophoneChannelConverter.GetMicrophoneChannel(message.Value);
+                var presets = _microphones.GetPresets(microphone);
+                _client.ChoiceUpdate(PluginId + ".presetchange.action.change.data.preset", presets, message.InstanceId);
+            }
         }
 
         public void OnNotificationOptionClickedEvent(NotificationOptionClickedEvent message)

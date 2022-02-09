@@ -1,4 +1,4 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
@@ -9,19 +9,16 @@ namespace Revelator.io24.StreamDeck.Actions
     [StreamDeckAction("com.oddbear.revelator.io24.fatchanneltoggle")]
     public class FatChannelToggleAction : StreamDeckAction
     {
-        private readonly UpdateService _updateService;
-        private readonly RoutingModel _routingModel;
+        private readonly Microphones _microphones;
 
         //We need some how to know the route when Events are received.
         //In other situations, use GetSettings.
-        private string? _route;
+        private MicrophoneChannel? _channel;
 
         public FatChannelToggleAction(
-            UpdateService updateService,
-            RoutingModel routingModel)
+            Microphones microphones)
         {
-            _updateService = updateService;
-            _routingModel = routingModel;
+            _microphones = microphones;
         }
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
@@ -31,26 +28,28 @@ namespace Revelator.io24.StreamDeck.Actions
             var settings = args.Payload
                 .GetSettings<FatChannelToggleSettings>();
 
-            _route = settings.Route;
+            _channel = settings.Channel;
+
+            await StateUpdated(settings.Channel);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
-            _routingModel.RoutingUpdated += RoutingUpdated;
+            _microphones.FatChannelUpdated += FatChannelUpdated;
 
             var settings = args.Payload
                 .GetSettings<FatChannelToggleSettings>();
 
-            _route = settings.Route;
+            _channel = settings.Channel;
 
-            await StateUpdated(settings.Route);
+            await StateUpdated(settings.Channel);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-            _routingModel.RoutingUpdated -= RoutingUpdated;
+            _microphones.FatChannelUpdated -= FatChannelUpdated;
         }
 
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
@@ -60,26 +59,19 @@ namespace Revelator.io24.StreamDeck.Actions
             var settings = args.Payload
                 .GetSettings<FatChannelToggleSettings>();
 
-            var action = Action(settings);
-            _updateService.SetRouteValue(settings.Route, action);
+            _microphones.SetFatChannelStatus(settings.Channel, settings.Action);
+
+            await StateUpdated(settings.Channel);
         }
 
-        private float Action(FatChannelToggleSettings settings)
-            => settings.Action switch
-            {
-                "On" => 0.0f,
-                "Off" => 1.0f,
-                _ => _routingModel.GetBooleanState(settings.Route) ? 0.0f : 1.0f,
-            };
-
-        private async void RoutingUpdated(object? sender, string route)
+        private async void FatChannelUpdated(object? sender, MicrophoneChannel e)
         {
             try
             {
-                if (route != _route && route != "synchronize")
+                if (e != _channel)
                     return;
 
-                await StateUpdated(route);
+                await StateUpdated(e);
             }
             catch (Exception exception)
             {
@@ -87,9 +79,9 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        private async Task StateUpdated(string route)
+        private async Task StateUpdated(MicrophoneChannel channel)
         {
-            var state = _routingModel.GetBooleanState(route) ? 1 : 0;
+            var state = _microphones.GetFatChannelStatus(channel) ? 0 : 1;
 
             await SetStateAsync(state);
         }
