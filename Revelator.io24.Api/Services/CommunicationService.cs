@@ -133,6 +133,13 @@ namespace Revelator.io24.Api.Services
                         var messageType = PackageHelper.GetMessageType(chunck);
                         switch (messageType)
                         {
+                            case "PL":
+                            case "PR":
+                                //Happens when lining and unlinking mic channels.
+                                //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
+                                //Fatchannel is bound to "both"
+                                //Fatchannel is bound to "both", ex. toggle toggles both to same state.
+                                break;
                             case "PV":
                                 //PV Settings packet
                                 PV(chunck);
@@ -175,6 +182,11 @@ namespace Revelator.io24.Api.Services
 
             switch (id)
             {
+                case "SynchronizePart":
+                    //Happens when lining and unlinking mic channels.
+                    //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
+                    //Fatchannel is bound to "both", ex. toggle toggles both to same state.
+                    return;
                 case "Synchronize":
                     var model = ZM.GetSynchronizeModel(json);
                     if (model is not null)

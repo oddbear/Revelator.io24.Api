@@ -10,9 +10,7 @@
         Title="MainWindow" Height="450" Width="830">
     <Window.Resources>
         <converter:DecibelConverter x:Key="decibelConverter" />
-        <converter:HeadphonesStateColorConverter x:Key="headphonesStateColorConverter" />
-        <converter:RoutingStateColorConverter x:Key="routingStateColorConverter" />
-        <converter:VolumeConverter x:Key="volumeConverter" />
+        <converter:HeadphonesStateConverter x:Key="headphonesStateConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -21,10 +19,8 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button
-                Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch1/bypassDSP">Toggle Fatchannel Mic L</Button>
-            <Button
-                Command="{Binding Path=ToggleCommand}" CommandParameter="line/ch2/bypassDSP">Toggle Fatchannel Mic 3</Button>
+            <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelLeft, Mode=TwoWay}">Fat Channel Left</CheckBox>
+            <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelRight, Mode=TwoWay}">Fat Channel Right</CheckBox>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -39,11 +35,11 @@
                         <ProgressBar Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_L, Converter={StaticResource decibelConverter}}" />
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.Main_MicL, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.Main_MicL}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixA_MicL, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixA_MicL}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixB_MicL, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixB_MicL}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -54,11 +50,11 @@
                         <ProgressBar Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_R, Converter={StaticResource decibelConverter}}" />
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.Main_MicR, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.Main_MicR}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixA_MicR, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixA_MicR}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixB_MicR, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixB_MicR}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -69,11 +65,11 @@
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Playback_R, Converter={StaticResource decibelConverter}}" />
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.Main_Playback, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.Main_Playback}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixA_Playback, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixA_Playback}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixB_Playback, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixB_Playback}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -84,11 +80,11 @@
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_R, Converter={StaticResource decibelConverter}}" />
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.Main_VirtualA, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.Main_VirtualA}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixA_VirtualA, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixA_VirtualA}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixB_VirtualA, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixB_VirtualA}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -99,11 +95,11 @@
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_R, Converter={StaticResource decibelConverter}}" />
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.Main_VirtualB, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.Main_VirtualB}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixA_VirtualB, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixA_VirtualB}"/>
                         <Slider Orientation="Vertical" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixB_VirtualB, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixB_VirtualB}"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -113,7 +109,7 @@
                 <GroupBox Header="Main" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Slider Orientation="Vertical" Margin="10" Maximum="100"
-                                Value="{Binding Path=VolumeMap.Main_Mix, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.Main_Mix}"/>
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Main_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
@@ -123,7 +119,7 @@
                 <GroupBox Header="Stream Mix 1" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Slider Orientation="Vertical" Margin="10" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixA_Mix, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixA_Mix}"/>
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.StreamMix1_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
@@ -133,7 +129,7 @@
                 <GroupBox Header="Stream Mix 2" Width="90" Background="LightGray">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Slider Orientation="Vertical" Margin="10" Maximum="100"
-                                Value="{Binding Path=VolumeMap.MixB_Mix, Converter={StaticResource volumeConverter}}"/>
+                                Value="{Binding Path=VolumeMap.MixB_Mix}"/>
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.StreamMix2_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
@@ -190,7 +186,7 @@
                           IsChecked="{Binding Path=RoutingMap.Main_VirtualB, Mode=TwoWay}" />
 
                 <RadioButton Grid.Row="1" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0}" />
+                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0}" />
                 <CheckBox Grid.Row="1" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.Main_Mix, Mode=TwoWay}" />
 
@@ -205,7 +201,7 @@
                 <CheckBox Grid.Row="2" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixA_VirtualB, Mode=TwoWay}" />
                 <RadioButton Grid.Row="2" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=0.5}" />
+                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0.5}" />
                 <CheckBox Grid.Row="2" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixA_Mix, Mode=TwoWay}" />
 
@@ -220,7 +216,7 @@
                 <CheckBox Grid.Row="3" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixB_VirtualB, Mode=TwoWay}" />
                 <RadioButton Grid.Row="3" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateColorConverter}, ConverterParameter=1.0}" />
+                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=1.0}" />
                 <CheckBox Grid.Row="3" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixB_Mix, Mode=TwoWay}" />
             </Grid>

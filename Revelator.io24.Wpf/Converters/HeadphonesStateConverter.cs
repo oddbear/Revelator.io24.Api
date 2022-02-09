@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace Revelator.io24.Wpf.Converters
 {
-    public class HeadphonesStateColorConverter : IValueConverter
+    public class HeadphonesStateConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

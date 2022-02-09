@@ -4,6 +4,11 @@ using Revelator.io24.Api.Services;
 
 namespace Revelator.io24.Api
 {
+    /// <summary>
+    /// API for functions bound to the Microphone channels.
+    /// - FatChannel Toggle
+    /// - Presets Switching
+    /// </summary>
     public class Microphones
     {
         public event EventHandler<MicrophoneChannel>? FatChannelUpdated;
@@ -27,6 +32,14 @@ namespace Revelator.io24.Api
             FatChannelUpdated?.Invoke(this, MicrophoneChannel.Left);
             FatChannelUpdated?.Invoke(this, MicrophoneChannel.Right);
         }
+
+        //TODO: Implement, remember... presets are kind of seperated between channels.
+        public string GetPreset(MicrophoneChannel channel)
+            => throw new NotImplementedException();
+
+        //TODO: Implement, remember... presets are kind of seperated between channels.
+        public void SetPreset(MicrophoneChannel channel, string preset)
+            => throw new NotImplementedException();
 
         public bool GetFatChannelStatus(MicrophoneChannel channel)
         {

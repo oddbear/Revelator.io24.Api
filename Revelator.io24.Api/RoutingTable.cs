@@ -4,6 +4,12 @@ using Revelator.io24.Api.Services;
 
 namespace Revelator.io24.Api
 {
+    /// <summary>
+    /// API for turning routing.
+    /// - Toggle routing
+    /// - Change Volume on a route
+    /// Warning: Mute / Assign might get confusing. Mute = unassigned, and Unmuted = Assigned.
+    /// </summary>
     public class RoutingTable
     {
         public event EventHandler<(Input, Output)>? RouteUpdated;
