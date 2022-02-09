@@ -7,6 +7,20 @@ namespace Revelator.io24.Wpf.Models
     {
         private readonly Microphones _microphones;
 
+        public string PresetLeft {
+            get => GetPreset(MicrophoneChannel.Left);
+            set => SetPreset(MicrophoneChannel.Left, value);
+        }
+
+        public string PresetRight
+        {
+            get => GetPreset(MicrophoneChannel.Right);
+            set => SetPreset(MicrophoneChannel.Right, value);
+        }
+
+        public string[] PresetsLeft => _microphones.GetPresets(MicrophoneChannel.Left);
+        public string[] PresetsRight => _microphones.GetPresets(MicrophoneChannel.Right);
+
         public bool FatChannelLeft
         {
             get => _microphones.GetFatChannelStatus(MicrophoneChannel.Left);
@@ -22,6 +36,29 @@ namespace Revelator.io24.Wpf.Models
         public MicrophoneMapper(Microphones microphones)
         {
             _microphones = microphones;
+        }
+
+        private string GetPreset(MicrophoneChannel channel)
+        {
+            var presetIndex = _microphones.GetPreset(channel);
+            var presets = _microphones.GetPresets(channel);
+            if (presets is null)
+                return null;
+                
+            return presets[presetIndex];
+        }
+
+        private void SetPreset(MicrophoneChannel channel, string presetName)
+        {
+            var presets = _microphones.GetPresets(channel);
+            for (int i = 0; i < presets.Length; i++)
+            {
+                if (presets[i] == presetName)
+                {
+                    _microphones.SetPreset(channel, i);
+                    return;
+                }
+            }
         }
     }
 }

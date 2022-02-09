@@ -19,8 +19,14 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelLeft, Mode=TwoWay}">Fat Channel Left</CheckBox>
-            <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelRight, Mode=TwoWay}">Fat Channel Right</CheckBox>
+            <StackPanel>
+                <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelLeft, Mode=TwoWay}">Fat Channel Left</CheckBox>
+                <ComboBox ItemsSource="{Binding Path=MicrophoneMap.PresetsLeft}" SelectedValue="{Binding Path=MicrophoneMap.PresetLeft}" />
+            </StackPanel>
+            <StackPanel>
+                <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelRight, Mode=TwoWay}">Fat Channel Right</CheckBox>
+                <ComboBox ItemsSource="{Binding Path=MicrophoneMap.PresetsRight}" SelectedValue="{Binding Path=MicrophoneMap.PresetRight}" />
+            </StackPanel>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
