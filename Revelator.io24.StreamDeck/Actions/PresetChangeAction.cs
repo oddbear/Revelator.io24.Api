@@ -11,7 +11,7 @@ namespace Revelator.io24.StreamDeck.Actions
     {
         private readonly Microphones _microphones;
 
-        private int _preset;
+        private PresetChangeSettings? _settings;
 
         public PresetChangeAction(
             Microphones microphones)
@@ -23,50 +23,98 @@ namespace Revelator.io24.StreamDeck.Actions
         {
             await base.OnDidReceiveSettings(args);
 
-            var settings = args.Payload
+            _settings = args.Payload
                 .GetSettings<PresetChangeSettings>();
 
-            _preset = settings.Preset;
+            await FetchPresets();
+
+            await StateUpdated(_settings.Channel);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
             _microphones.PresetUpdated += PresetUpdated;
+            _microphones.PresetsUpdated += PresetsUpdated;
 
-            var settings = args.Payload
+            _settings = args.Payload
                 .GetSettings<PresetChangeSettings>();
 
-            _preset = settings.Preset;
+            await FetchPresets();
 
-            await StateUpdated(settings.Channel);
+            await StateUpdated(_settings.Channel);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
             _microphones.PresetUpdated -= PresetUpdated;
+            _microphones.PresetsUpdated -= PresetsUpdated;
         }
 
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
         {
             await base.OnKeyUp(args);
 
-            var settings = args.Payload
+            _settings = args.Payload
                 .GetSettings<PresetChangeSettings>();
 
-            _preset = settings.Preset;
+            if (_settings.Preset is null)
+                return;
 
-            _microphones.SetPreset(settings.Channel, settings.Preset);
+            var presetIndex = _settings.Preset.Value;
+            var preset = _settings.Presets[presetIndex].Name;
+            _microphones.SetPreset(_settings.Channel, preset);
 
-            await StateUpdated(settings.Channel);
+            await StateUpdated(_settings.Channel);
         }
 
         private async void PresetUpdated(object? sender, MicrophoneChannel e)
         {
             try
             {
+                if (_settings?.Channel != e)
+                    return;
+
                 await StateUpdated(e);
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError(exception.ToString());
+            }
+        }
+
+        private async Task FetchPresets()
+        {
+            if (_settings is null)
+                return;
+
+            var presets = _microphones.GetPresets(_settings.Channel);
+            if (presets is null)
+                return;
+
+            var presetNames = _settings.Presets
+                .Select(preset => preset.Name);
+
+            if (presets.SequenceEqual(presetNames))
+                return;
+            
+            for (int i = 0; i < 14; i++)
+                _settings.Presets[i].Name = presets[i];
+
+            await SetSettingsAsync(_settings);
+        }
+
+        private async void PresetsUpdated(object? sender, MicrophoneChannel e)
+        {
+            try
+            {
+                if (_settings?.Channel != e)
+                    return;
+
+                await FetchPresets();
+
+                await SetSettingsAsync(_settings);
             }
             catch (Exception exception)
             {
@@ -76,7 +124,13 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private async Task StateUpdated(MicrophoneChannel channel)
         {
-            var presetSelected = _microphones.GetPreset(channel) == _preset;
+            if (_settings?.Preset is null)
+                return;
+
+            var index = _settings.Preset.Value;
+            var selectedPreset = _settings.Presets[index].Name;
+
+            var presetSelected = _microphones.GetPreset(channel) == selectedPreset;
             var state = presetSelected ? 0 : 1;
 
             await SetStateAsync(state);

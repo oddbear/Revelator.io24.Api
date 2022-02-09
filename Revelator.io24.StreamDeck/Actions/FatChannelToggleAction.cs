@@ -29,6 +29,8 @@ namespace Revelator.io24.StreamDeck.Actions
                 .GetSettings<FatChannelToggleSettings>();
 
             _channel = settings.Channel;
+
+            await StateUpdated(settings.Channel);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)

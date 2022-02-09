@@ -1,4 +1,5 @@
 ﻿using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Extensions;
 using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Services;
 
@@ -13,6 +14,7 @@ namespace Revelator.io24.Api
     {
         public event EventHandler<MicrophoneChannel>? FatChannelUpdated;
         public event EventHandler<MicrophoneChannel>? PresetUpdated;
+        public event EventHandler<MicrophoneChannel>? PresetsUpdated;
 
         private readonly CommunicationService _communicationService;
         private readonly MicrophoneModel _microphoneModel;
@@ -34,20 +36,23 @@ namespace Revelator.io24.Api
             FatChannelUpdated?.Invoke(this, MicrophoneChannel.Left);
             FatChannelUpdated?.Invoke(this, MicrophoneChannel.Right);
 
+            PresetsUpdated?.Invoke(this, MicrophoneChannel.Left);
+            PresetsUpdated?.Invoke(this, MicrophoneChannel.Right);
+
             PresetUpdated?.Invoke(this, MicrophoneChannel.Left);
             PresetUpdated?.Invoke(this, MicrophoneChannel.Right);
         }
 
-        public int GetPreset(MicrophoneChannel channel)
+        public string GetPreset(MicrophoneChannel channel)
             => _microphoneModel.GetPreset(channel);
 
         public string[] GetPresets(MicrophoneChannel channel)
             => _microphoneModel.GetPresets(channel);
 
-        public void SetPreset(MicrophoneChannel channel, int index)
+        public void SetPreset(MicrophoneChannel channel, string preset)
         {
-            //This is a strange one... the values are from 0-1 (steps: x/14).
-            //This have to be calculated to 360° wheel, where 0 is down, and 1 is 334.28574°
+            var presets = _microphoneModel.GetPresets(channel);
+            var index = Array.IndexOf(presets, preset);
             var valueFloat = index / 13f;
 
             var route = GetPresetRoute(channel);

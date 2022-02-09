@@ -75,17 +75,25 @@ namespace Revelator.io24.Api.Models
                 _ => throw new InvalidOperationException($"Unknown '{nameof(MicrophoneChannel)}' enum value '{channel}'"),
             };
 
-        public int GetPreset(MicrophoneChannel channel)
-            => channel switch
-            {
-                MicrophoneChannel.Left =>
-                    MicrophoneValues.TryGetValue("line/ch1/presets/preset", out var value)
-                        ? PresetFloatToIndex(value) : 0,
-                MicrophoneChannel.Right =>
-                    MicrophoneValues.TryGetValue("line/ch2/presets/preset", out var value)
-                        ? PresetFloatToIndex(value) : 0,
-                _ => throw new InvalidOperationException($"Unknown '{nameof(MicrophoneChannel)}' enum value '{channel}'"),
-            };
+        public string GetPreset(MicrophoneChannel channel)
+        {
+            var route = channel == MicrophoneChannel.Left
+                ? "line/ch1/presets/preset"
+                : "line/ch2/presets/preset";
+
+            if (!MicrophoneValues.ContainsKey(route))
+                return null;
+
+            var value = MicrophoneValues[route];
+
+            //This is a strange one... the values are from 0-1 (steps: x/14).
+            //This have to be calculated to 360° wheel, where 0 is down, and 1 is 334.28574°
+            var stepSize = 1 / 13f;
+            int index = (int)Math.Round(value / stepSize);
+
+            var presets = GetPresets(channel);
+            return presets[index];
+        }
 
         public bool GetFatChannelState(MicrophoneChannel channel)
             => channel switch
