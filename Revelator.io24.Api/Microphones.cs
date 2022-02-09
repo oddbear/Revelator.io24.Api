@@ -12,6 +12,7 @@ namespace Revelator.io24.Api
     public class Microphones
     {
         public event EventHandler<MicrophoneChannel>? FatChannelUpdated;
+        public event EventHandler<MicrophoneChannel>? PresetUpdated;
 
         private readonly CommunicationService _communicationService;
         private readonly MicrophoneModel _microphoneModel;
@@ -25,30 +26,40 @@ namespace Revelator.io24.Api
 
             _microphoneModel.SynchronizeReceived += SynchronizeReceived;
             _microphoneModel.FatChannelValueUpdated += (sender, channel) => FatChannelUpdated?.Invoke(this, channel);
+            _microphoneModel.PresetIndexValueUpdated += (sender, channel) => PresetUpdated?.Invoke(this, channel);
         }
 
         private void SynchronizeReceived(object? sender, EventArgs e)
         {
             FatChannelUpdated?.Invoke(this, MicrophoneChannel.Left);
             FatChannelUpdated?.Invoke(this, MicrophoneChannel.Right);
+
+            PresetUpdated?.Invoke(this, MicrophoneChannel.Left);
+            PresetUpdated?.Invoke(this, MicrophoneChannel.Right);
         }
 
-        //TODO: Implement, remember... presets are kind of seperated between channels.
-        public string GetPreset(MicrophoneChannel channel)
-            => throw new NotImplementedException();
+        public int GetPreset(MicrophoneChannel channel)
+            => _microphoneModel.GetPreset(channel);
 
-        //TODO: Implement, remember... presets are kind of seperated between channels.
-        public void SetPreset(MicrophoneChannel channel, string preset)
-            => throw new NotImplementedException();
+        public string[] GetPresets(MicrophoneChannel channel)
+            => _microphoneModel.GetPresets(channel);
+
+        public void SetPreset(MicrophoneChannel channel, int index)
+        {
+            //This is a strange one... the values are from 0-1 (steps: x/14).
+            //This have to be calculated to 360° wheel, where 0 is down, and 1 is 334.28574°
+            var valueFloat = index / 13f;
+
+            var route = GetPresetRoute(channel);
+            _communicationService.SetRouteValue(route, valueFloat);
+        }
 
         public bool GetFatChannelStatus(MicrophoneChannel channel)
-        {
-            return _microphoneModel.GetFatChannelState(channel);
-        }
+            =>  _microphoneModel.GetFatChannelState(channel);
 
         public void SetFatChannelStatus(MicrophoneChannel channel, Value value)
         {
-            var route = GetRoute(channel);
+            var route = GetByPassDspRoute(channel);
             switch (value)
             {
                 case Value.On:
@@ -64,7 +75,15 @@ namespace Revelator.io24.Api
             }
         }
 
-        private string GetRoute(MicrophoneChannel channel)
+        private string GetPresetRoute(MicrophoneChannel channel)
+            => channel switch
+            {
+                MicrophoneChannel.Left => "line/ch1/presets/preset",
+                MicrophoneChannel.Right => "line/ch2/presets/preset",
+                _ => throw new InvalidOperationException($"Unknown '{nameof(MicrophoneChannel)}' enum value '{channel}'")
+            };
+
+        private string GetByPassDspRoute(MicrophoneChannel channel)
             => channel switch
             {
                 MicrophoneChannel.Left => "line/ch1/bypassDSP",

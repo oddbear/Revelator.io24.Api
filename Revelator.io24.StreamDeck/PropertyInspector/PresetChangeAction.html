@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Preset change</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+</head>
+<body>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Microphone</div>
+        <select id="routeValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+            <option value="Left">Mic L</option>
+            <option value="Right">Mic R</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Preset</div>
+        <select id="presetValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+            <option value="0">Broadcast</option>
+            <option value="1">Vocal</option>
+            <option value="3">Acoustic Guitar</option>
+            <option value="4">Electric Guitar</option>
+            <option value="5">Vintage Channel</option>
+            <option value="6">Slap Echo</option>
+            <option value="7">Detuned Vocal</option>
+            <option value="8">Robot</option>
+            <option value="9">Preset 1</option>
+            <option value="10">Preset 2</option>
+            <option value="11">Preset 3</option>
+            <option value="12">Preset 4</option>
+            <option value="13">Preset 5</option>
+            <option value="14">Preset 6</option>
+        </select>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
+</body>
