@@ -8,7 +8,7 @@ namespace Revelator.io24.StreamDeck.Settings
     {
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "routeValue")]
-        public MicrophoneChannel Channel { get; set; }
+        public MicrophoneChannel Channel { get; set; } = MicrophoneChannel.Left;
 
         [JsonProperty(PropertyName = "presetValue")]
         public int? Preset { get; set; }
