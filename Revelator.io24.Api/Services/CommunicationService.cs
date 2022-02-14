@@ -1,4 +1,5 @@
-﻿using Revelator.io24.Api.Helpers;
+﻿using LiteDB;
+using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
 using Revelator.io24.Api.Models;
@@ -7,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Revelator.io24.Api.Services
 {
@@ -182,6 +184,12 @@ namespace Revelator.io24.Api.Services
 
             switch (id)
             {
+                case "StoredPreset":
+                    Log.Information("[{className}] JSON {messageType}", nameof(CommunicationService), id);
+                    return;
+                case "DeletedPreset":
+                    Log.Information("[{className}] JSON {messageType}", nameof(CommunicationService), id);
+                    return;
                 case "SynchronizePart":
                     //Happens when lining and unlinking mic channels.
                     //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
@@ -197,6 +205,7 @@ namespace Revelator.io24.Api.Services
                     return;
                 case "SubscriptionReply":
                     //We now have communication.
+                    Log.Information("[{className}] JSON {messageType}", nameof(CommunicationService), id);
                     return;
                 case "SubscriptionLost":
                     RequestCommunicationMessage();
@@ -214,16 +223,18 @@ namespace Revelator.io24.Api.Services
         {
             var header = data[0..4];
             var messageLength = data[4..6];
-            var messageType = data[6..8];
+            var messageType = Encoding.ASCII.GetString(data[6..8]);
             var from = data[8..10];
             var to = data[10..12];
 
             var route = Encoding.ASCII.GetString(data[12..^7]);
-            var emptyBytes = data[^7..^4];
+            var emptyBytes = BitConverter.ToString(data[^7..^4]); //deviation: line/ch1/preset_name, state is not a value but a string.
             var state = BitConverter.ToSingle(data[^4..^0]);
 
             _routingModel.StateUpdated(route, state);
             _microphoneModel.StateUpdated(route, state);
+
+            UpdateValueDatabase(route, emptyBytes, state);
         }
 
         /// <summary>
@@ -231,7 +242,93 @@ namespace Revelator.io24.Api.Services
         /// </summary>
         private void PS(byte[] data)
         {
-            //TODO: ...
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = Encoding.ASCII.GetString(data[6..8]);
+            var from = data[8..10];
+            var to = data[10..12];
+
+
+            //Ex. "line/ch1/preset_name\0\0\0Slap Echo\0"
+            var str = Encoding.ASCII.GetString(data[12..]);
+            var split = str.Split('\0');
+            var route = split.First();
+            var values = split.Skip(1).ToArray();
+
+            UpdateStringDatabase(route, values);
+        }
+
+        private void UpdateStringDatabase(string route, string[] values)
+        {
+            using var db = new LiteDatabase(@"C:\Temp\route_values.db");
+
+            var col = db.GetCollection<RouteString>("PS");
+            col.EnsureIndex(r => r.Route);
+
+            var records = col.Query()
+                .Where(x => x.Route == route)
+                .ToList();
+
+            //Max cap:
+            if (records.Count >= 50)
+                return;
+
+            //Already recorded:
+            if (records.Any(r => r.Values.SequenceEqual(values)))
+                return;
+
+            col.Insert(new RouteString
+            {
+                FirstRecorded = DateTime.Now,
+                Route = route,
+                Values = values
+            });
+        }
+
+        private void UpdateValueDatabase(string route, string unknown, float value)
+        {
+            //var hexStr = BitConverter.ToString(data).Replace("-", " ");
+
+            using var db = new LiteDatabase(@"C:\Temp\route_values.db");
+
+            var col = db.GetCollection<RouteValue>("PV");
+            col.EnsureIndex(r => r.Route);
+
+            var records = col.Query()
+                .Where(x => x.Route == route)
+                .ToList();
+
+            //Max cap:
+            if (records.Count >= 50)
+                return;
+
+            //Already recorded:
+            if (records.Any(r => r.Value == value))
+                return;
+
+            col.Insert(new RouteValue {
+                FirstRecorded = DateTime.Now,
+                Route = route,
+                Unknown = unknown, 
+                Value = value
+            });
+        }
+
+        public class RouteString
+        {
+            //Will usually tell a storry about multiple things getting set in a chain.
+            public DateTime FirstRecorded { get; set; }
+            public string Route { get; set; }
+            public string[] Values { get; set; }
+        }
+
+        public class RouteValue
+        {
+            //Will usually tell a storry about multiple things getting set in a chain.
+            public DateTime FirstRecorded { get; set; }
+            public string Route { get; set; }
+            public string Unknown { get; set; }
+            public float Value { get; set; }
         }
 
         public void SetRouteValue(string route, float value)
