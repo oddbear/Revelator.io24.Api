@@ -42,10 +42,14 @@
       "PropertyInspectorPath": "PropertyInspector/FatChannelToggleAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/Fat_on",
+          "Title": "Fat On",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/Fat_off",
+          "Title": "Fat Off",
+          "TitleAlignment": "bottom"
         }
       ]
     },
