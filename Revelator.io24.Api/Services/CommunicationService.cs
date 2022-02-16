@@ -13,7 +13,7 @@ namespace Revelator.io24.Api.Services
     public class CommunicationService : IDisposable
     {
         private readonly MonitorService _monitorService;
-
+        private readonly RawService _rawService;
         private readonly RoutingModel _routingModel;
         private readonly MicrophoneModel _microphoneModel;
 
@@ -27,10 +27,12 @@ namespace Revelator.io24.Api.Services
 
         public CommunicationService(
             MonitorService monitorService,
+            RawService rawService,
             RoutingModel routingModel,
             MicrophoneModel microphoneModel)
         {
             _monitorService = monitorService;
+            _rawService = rawService;
             _routingModel = routingModel;
             _microphoneModel = microphoneModel;
 
@@ -191,6 +193,7 @@ namespace Revelator.io24.Api.Services
                     var model = ZM.GetSynchronizeModel(json);
                     if (model is not null)
                     {
+                        _rawService.Syncronize(json);
                         _routingModel.Synchronize(model);
                         _microphoneModel.Synchronize(model);
                     }

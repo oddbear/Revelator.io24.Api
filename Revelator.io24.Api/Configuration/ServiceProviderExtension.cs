@@ -12,7 +12,7 @@ namespace Revelator.io24.Api.Configuration
             serviceCollection.AddSingleton<BroadcastService>();
             serviceCollection.AddSingleton<CommunicationService>();
             serviceCollection.AddSingleton<MonitorService>();
-
+            
             //Models:
             serviceCollection.AddSingleton<RoutingModel>();
             serviceCollection.AddSingleton<MicrophoneModel>();
@@ -22,6 +22,7 @@ namespace Revelator.io24.Api.Configuration
             //API:
             serviceCollection.AddSingleton<RoutingTable>();
             serviceCollection.AddSingleton<Microphones>();
+            serviceCollection.AddSingleton<RawService>();
         }
     }
 }
