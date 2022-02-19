@@ -14,7 +14,6 @@ namespace Revelator.io24.Api.Services
     {
         private readonly MonitorService _monitorService;
         private readonly RawService _rawService;
-        private readonly RoutingModel _routingModel;
         private readonly MicrophoneModel _microphoneModel;
 
         private TcpClient? _tcpClient;
@@ -28,13 +27,13 @@ namespace Revelator.io24.Api.Services
         public CommunicationService(
             MonitorService monitorService,
             RawService rawService,
-            RoutingModel routingModel,
             MicrophoneModel microphoneModel)
         {
             _monitorService = monitorService;
             _rawService = rawService;
-            _routingModel = routingModel;
             _microphoneModel = microphoneModel;
+
+            _rawService.SetValueMethod = SetRouteValue;
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -194,7 +193,6 @@ namespace Revelator.io24.Api.Services
                     if (model is not null)
                     {
                         _rawService.Syncronize(json);
-                        _routingModel.Synchronize(model);
                         _microphoneModel.Synchronize(model);
                     }
                     return;
@@ -225,7 +223,7 @@ namespace Revelator.io24.Api.Services
             var emptyBytes = data[^7..^4];
             var state = BitConverter.ToSingle(data[^4..^0]);
 
-            _routingModel.StateUpdated(route, state);
+            _rawService.UpdateValueState(route, state);
             _microphoneModel.StateUpdated(route, state);
         }
 
@@ -234,7 +232,19 @@ namespace Revelator.io24.Api.Services
         /// </summary>
         private void PS(byte[] data)
         {
-            //TODO: ...
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = Encoding.ASCII.GetString(data[6..8]);
+            var from = data[8..10];
+            var to = data[10..12];
+
+            //Ex. "line/ch1/preset_name\0\0\0Slap Echo\0"
+            var str = Encoding.ASCII.GetString(data[12..]);
+            var split = str.Split('\0');
+            var route = split[0];
+            var value = split[2];
+
+            _rawService.UpdateStringState(route, value);
         }
 
         public void SetRouteValue(string route, float value)

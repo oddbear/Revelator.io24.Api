@@ -4,9 +4,50 @@ namespace Revelator.io24.Api
 {
     public class RawService
     {
+        public delegate void SyncronizeEvent();
+        public delegate void ValueStateEvent(string route, float value);
+        public delegate void StringStateEvent(string route, string value);
+
         private Dictionary<string, float> _values = new();
         private Dictionary<string, string> _string = new();
         private Dictionary<string, string[]> _strings = new();
+
+        public event SyncronizeEvent Syncronized;
+        public event ValueStateEvent ValueStateUpdated;
+        public event StringStateEvent StringStateUpdated;
+
+        internal Action<string, float> SetValueMethod;
+
+        public void SetValue(string route, float value)
+        {
+            //TODO: Refactor... We will need to split listen and send for that to work.
+            SetValueMethod?.Invoke(route, value);
+        }
+
+        public float GetValue(string route)
+            => _values.TryGetValue(route, out var value)
+                ? value : default;
+
+        public string? GetString(string route)
+            => _string.TryGetValue(route, out var value)
+                ? value : default;
+
+        internal void UpdateValueState(string route, float value)
+        {
+            _values[route] = value;
+            ValueStateUpdated?.Invoke(route, value);
+        }
+
+        internal void UpdateStringState(string route, string value)
+        {
+            _string[route] = value;
+            StringStateUpdated?.Invoke(route, value);
+        }
+
+        internal void UpdateStringsState(string route, string[] values)
+        {
+
+        }
 
         internal void Syncronize(string json)
         {
@@ -26,6 +67,8 @@ namespace Revelator.io24.Api
                 .ToArray();
 
             Traverse(children, string.Empty);
+
+            Syncronized?.Invoke();
         }
 
 
@@ -62,24 +105,32 @@ namespace Revelator.io24.Api
             {
                 switch (property.Name)
                 {
+                    //Theese we can get from the ValueKind, should just be passed up with no '/' added.
                     case "children":
                     case "values":
                     case "ranges":
                     case "strings":
-                        if (path.Length < 1 || path[^1] == '/')
-                            Traverse(property.Value, path);
-                        else
-                            Traverse(property.Value, $"{path}/");
+                        Traverse(property.Value, CreatePath(path));
                         continue;
                     default:
-                        if (path.Length < 1 || path[^1] == '/')
-                            Traverse(property.Value, $"{path}{property.Name}");
-                        else
-                            Traverse(property.Value, $"{path}/{property.Name}");
+                        Traverse(property.Value, CreatePath(path, property.Name));
                         continue;
                 }
             }
         }
 
+        private string CreatePath(string path, string? propertyName = null)
+        {
+            //Path should never start with a '/'
+            if (path is null || path.Length < 1)
+                return $"{path}{propertyName}";
+
+            //Path already ends with '/', should not add another one
+            if (path[^1] == '/')
+                return $"{path}{propertyName}";
+
+            //Add '/' to path:
+            return $"{path}/{propertyName}";
+        }
     }
 }

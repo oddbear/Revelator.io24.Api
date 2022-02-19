@@ -14,7 +14,6 @@ namespace Revelator.io24.Api.Configuration
             serviceCollection.AddSingleton<MonitorService>();
             
             //Models:
-            serviceCollection.AddSingleton<RoutingModel>();
             serviceCollection.AddSingleton<MicrophoneModel>();
             serviceCollection.AddSingleton<FatChannelMonitorModel>();
             serviceCollection.AddSingleton<ValuesMonitorModel>();
