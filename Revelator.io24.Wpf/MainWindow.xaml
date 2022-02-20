@@ -110,6 +110,14 @@
                 </GroupBox>
 
                 <GroupBox Header="Reverb" Width="90">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Slider Orientation="Vertical" Maximum="100"
+                                    Value="{Binding Path=VolumeMap.Main_Reverb}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                    Value="{Binding Path=VolumeMap.MixA_Reverb}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                    Value="{Binding Path=VolumeMap.MixB_Reverb}"/>
+                    </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Main" Width="90" Background="LightGray">
@@ -171,6 +179,7 @@
                 <Label Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">Playback L/R</Label>
                 <Label Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" HorizontalContentAlignment="Center">Virtual A L/R</Label>
                 <Label Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" HorizontalContentAlignment="Center">Virtual B L/R</Label>
+                <Label Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" HorizontalContentAlignment="Center">Reverb</Label>
                 <Label Grid.Row="0" Grid.Column="7" VerticalAlignment="Center" HorizontalContentAlignment="Center">Headphones</Label>
                 <Label Grid.Row="0" Grid.Column="8" VerticalAlignment="Center" HorizontalContentAlignment="Center">
                     <TextBlock TextWrapping="Wrap" TextAlignment="Center">Mix<LineBreak/>(assigned)</TextBlock>
@@ -190,7 +199,8 @@
                           IsChecked="{Binding Path=RoutingMap.Main_VirtualA, Mode=TwoWay}" />
                 <CheckBox Grid.Row="1" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.Main_VirtualB, Mode=TwoWay}" />
-
+                <CheckBox Grid.Row="1" Grid.Column="6" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_Reverb, Mode=TwoWay}" />
                 <RadioButton Grid.Row="1" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0}" />
                 <CheckBox Grid.Row="1" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -206,6 +216,8 @@
                           IsChecked="{Binding Path=RoutingMap.MixA_VirtualA, Mode=TwoWay}" />
                 <CheckBox Grid.Row="2" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixA_VirtualB, Mode=TwoWay}" />
+                <CheckBox Grid.Row="2" Grid.Column="6" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_Reverb, Mode=TwoWay}" />
                 <RadioButton Grid.Row="2" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0.5}" />
                 <CheckBox Grid.Row="2" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -221,6 +233,8 @@
                           IsChecked="{Binding Path=RoutingMap.MixB_VirtualA, Mode=TwoWay}" />
                 <CheckBox Grid.Row="3" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixB_VirtualB, Mode=TwoWay}" />
+                <CheckBox Grid.Row="3" Grid.Column="6" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_Reverb, Mode=TwoWay}" />
                 <RadioButton Grid.Row="3" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=1.0}" />
                 <CheckBox Grid.Row="3" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"

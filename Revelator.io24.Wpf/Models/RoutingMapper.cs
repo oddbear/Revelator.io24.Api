@@ -43,6 +43,12 @@ namespace Revelator.io24.Wpf.Models
             set => SetValue(Input.Virtual_B, Output.Main, value);
         }
 
+        public bool Main_Reverb
+        {
+            get => GetValue(Input.Reverb, Output.Main);
+            set => SetValue(Input.Reverb, Output.Main, value);
+        }
+
         public bool Main_Mix
         {
             get => GetValue(Input.Mix, Output.Main);
@@ -79,6 +85,12 @@ namespace Revelator.io24.Wpf.Models
             set => SetValue(Input.Virtual_B, Output.Mix_A, value);
         }
 
+        public bool MixA_Reverb
+        {
+            get => GetValue(Input.Reverb, Output.Mix_A);
+            set => SetValue(Input.Reverb, Output.Mix_A, value);
+        }
+
         public bool MixA_Mix
         {
             get => GetValue(Input.Mix, Output.Mix_A);
@@ -113,6 +125,12 @@ namespace Revelator.io24.Wpf.Models
         {
             get => GetValue(Input.Virtual_B, Output.Mix_B);
             set => SetValue(Input.Virtual_B, Output.Mix_B, value);
+        }
+
+        public bool MixB_Reverb
+        {
+            get => GetValue(Input.Reverb, Output.Mix_B);
+            set => SetValue(Input.Reverb, Output.Mix_B, value);
         }
 
         public bool MixB_Mix

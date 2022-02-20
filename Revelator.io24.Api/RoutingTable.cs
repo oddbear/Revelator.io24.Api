@@ -222,6 +222,16 @@ namespace Revelator.io24.Api
                 "return/ch3/assign_aux2",
                 "return/ch3/aux2");
 
+            Register((Input.Reverb, Output.Main),
+                "fxreturn/ch1/mute",
+                "fxreturn/ch1/volume");
+            Register((Input.Reverb, Output.Mix_A),
+                "fxreturn/ch1/assign_aux1",
+                "fxreturn/ch1/aux1");
+            Register((Input.Reverb, Output.Mix_B),
+                "fxreturn/ch1/assign_aux2",
+                "fxreturn/ch1/aux2");
+
             Register((Input.Mix, Output.Main),
                 "main/ch1/mute",
                 "main/ch1/volume");

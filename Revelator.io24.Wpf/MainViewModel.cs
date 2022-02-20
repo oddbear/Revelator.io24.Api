@@ -1,9 +1,7 @@
 ﻿using Revelator.io24.Api;
 using Revelator.io24.Api.Models;
-using Revelator.io24.Wpf.Commands;
 using Revelator.io24.Wpf.Models;
 using System.ComponentModel;
-using System.Windows.Input;
 
 namespace Revelator.io24.Wpf
 {
