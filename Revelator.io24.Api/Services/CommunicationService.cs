@@ -14,7 +14,6 @@ namespace Revelator.io24.Api.Services
     {
         private readonly MonitorService _monitorService;
         private readonly RawService _rawService;
-        private readonly MicrophoneModel _microphoneModel;
 
         private TcpClient? _tcpClient;
         private Thread? _listeningThread;
@@ -26,12 +25,10 @@ namespace Revelator.io24.Api.Services
 
         public CommunicationService(
             MonitorService monitorService,
-            RawService rawService,
-            MicrophoneModel microphoneModel)
+            RawService rawService)
         {
             _monitorService = monitorService;
             _rawService = rawService;
-            _microphoneModel = microphoneModel;
 
             _rawService.SetValueMethod = SetRouteValue;
 
@@ -135,6 +132,9 @@ namespace Revelator.io24.Api.Services
                         switch (messageType)
                         {
                             case "PL":
+                                //PL List:
+                                PL(chunck);
+                                break;
                             case "PR":
                                 //Happens when lining and unlinking mic channels.
                                 //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
@@ -189,12 +189,7 @@ namespace Revelator.io24.Api.Services
                     //Fatchannel is bound to "both", ex. toggle toggles both to same state.
                     return;
                 case "Synchronize":
-                    var model = ZM.GetSynchronizeModel(json);
-                    if (model is not null)
-                    {
-                        _rawService.Syncronize(json);
-                        _microphoneModel.Synchronize(model);
-                    }
+                    _rawService.Syncronize(json);
                     return;
                 case "SubscriptionReply":
                     //We now have communication.
@@ -209,6 +204,35 @@ namespace Revelator.io24.Api.Services
         }
 
         /// <summary>
+        /// Updates list value
+        /// </summary>
+        /// <param name="data"></param>
+        private void PL(byte[] data)
+        {
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = data[6..8];
+            var from = data[8..10];
+            var to = data[10..12];
+
+            var i = Array.IndexOf<byte>(data, 0x00, 12);
+            var route = Encoding.ASCII.GetString(data[12..i]);
+            if (!route.EndsWith("/presets/preset"))
+            {
+                Log.Warning("[{className}] PL unknown list on route {route}", nameof(CommunicationService), route);
+                return;
+            }
+
+            var selectedPreset = BitConverter.ToSingle(data[(i + 3)..(i + 7)]);
+
+            //0x0A (\n): List delimiter
+            //Last char is a 0x00 (\0)
+            var list = Encoding.ASCII.GetString(data[(i + 7)..^1]).Split('\n');
+            _rawService.UpdateStringsState(route, list);
+        }
+
+        /// <summary>
+        /// Updates float value.
         /// Happens ex. on turning thing on and of, ex. EQ
         /// </summary>
         private void PV(byte[] data)
@@ -224,11 +248,11 @@ namespace Revelator.io24.Api.Services
             var state = BitConverter.ToSingle(data[^4..^0]);
 
             _rawService.UpdateValueState(route, state);
-            _microphoneModel.StateUpdated(route, state);
         }
 
         /// <summary>
-        /// Changing profile, changing names... Updates of strings?
+        /// Updates string value.
+        /// Changing profile, changing names...
         /// </summary>
         private void PS(byte[] data)
         {
@@ -242,7 +266,7 @@ namespace Revelator.io24.Api.Services
             var str = Encoding.ASCII.GetString(data[12..]);
             var split = str.Split('\0');
             var route = split[0];
-            var value = split[2];
+            var value = split[3];
 
             _rawService.UpdateStringState(route, value);
         }

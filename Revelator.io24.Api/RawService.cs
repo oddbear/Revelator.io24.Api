@@ -7,19 +7,28 @@ namespace Revelator.io24.Api
         public delegate void SyncronizeEvent();
         public delegate void ValueStateEvent(string route, float value);
         public delegate void StringStateEvent(string route, string value);
+        public delegate void StringsStateEvent(string route, string[] value);
 
         private Dictionary<string, float> _values = new();
         private Dictionary<string, string> _string = new();
         private Dictionary<string, string[]> _strings = new();
 
-        public event SyncronizeEvent Syncronized;
-        public event ValueStateEvent ValueStateUpdated;
-        public event StringStateEvent StringStateUpdated;
+        public event SyncronizeEvent? Syncronized;
+        public event ValueStateEvent? ValueStateUpdated;
+        public event StringStateEvent? StringStateUpdated;
+        public event StringsStateEvent? StringsStateUpdated;
 
-        internal Action<string, float> SetValueMethod;
+        internal Action<string, float>? SetValueMethod;
 
         public void SetValue(string route, float value)
         {
+            if (route is null)
+                return;
+
+            //Check if value has actually changed:
+            //if (_values.TryGetValue(route, out var oldValue) && oldValue == value)
+            //    return;
+
             //TODO: Refactor... We will need to split listen and send for that to work.
             SetValueMethod?.Invoke(route, value);
         }
@@ -31,6 +40,10 @@ namespace Revelator.io24.Api
         public string? GetString(string route)
             => _string.TryGetValue(route, out var value)
                 ? value : default;
+
+        public string[] GetStrings(string route)
+            => _strings.TryGetValue(route, out var value)
+                ? value : Array.Empty<string>();
 
         internal void UpdateValueState(string route, float value)
         {
@@ -46,7 +59,8 @@ namespace Revelator.io24.Api
 
         internal void UpdateStringsState(string route, string[] values)
         {
-
+            _strings[route] = values;
+            StringsStateUpdated?.Invoke(route, values);
         }
 
         internal void Syncronize(string json)

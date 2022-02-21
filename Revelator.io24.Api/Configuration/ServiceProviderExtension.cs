@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Models.Monitor;
 using Revelator.io24.Api.Services;
 
 namespace Revelator.io24.Api.Configuration
@@ -22,6 +23,7 @@ namespace Revelator.io24.Api.Configuration
             serviceCollection.AddSingleton<RoutingTable>();
             serviceCollection.AddSingleton<Microphones>();
             serviceCollection.AddSingleton<RawService>();
+            serviceCollection.AddSingleton<Device>();
         }
     }
 }
