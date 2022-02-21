@@ -7,26 +7,98 @@
         xmlns:converter="clr-namespace:Revelator.io24.Wpf.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
-        Title="MainWindow" Height="450" Width="830">
+        Title="MainWindow" Height="500" Width="830">
     <Window.Resources>
         <converter:DecibelConverter x:Key="decibelConverter" />
         <converter:HeadphonesStateConverter x:Key="headphonesStateConverter" />
+        <converter:BooleanInverterConverter x:Key="booleanInverterConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
+            <RowDefinition Height="100" />
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <StackPanel>
-                <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelLeft, Mode=TwoWay}">Fat Channel Left</CheckBox>
-                <ComboBox ItemsSource="{Binding Path=MicrophoneMap.PresetsLeft}" SelectedValue="{Binding Path=MicrophoneMap.PresetLeft}" />
-            </StackPanel>
-            <StackPanel>
-                <CheckBox IsChecked="{Binding Path=MicrophoneMap.FatChannelRight, Mode=TwoWay}">Fat Channel Right</CheckBox>
-                <ComboBox ItemsSource="{Binding Path=MicrophoneMap.PresetsRight}" SelectedValue="{Binding Path=MicrophoneMap.PresetRight}" />
-            </StackPanel>
+            <GroupBox Header="Michrophone Left">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding Path=Device.MicrohoneLeft.BypassDSP, Mode=TwoWay, Converter={StaticResource booleanInverterConverter}}">Fat Channel Left</CheckBox>
+                    <ComboBox ItemsSource="{Binding Path=Device.MicrohoneLeft.Presets}" SelectedValue="{Binding Path=Device.MicrohoneLeft.Preset}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Reverb:</Label>
+                        <Slider Value="{Binding Path=Device.MicrohoneLeft.Reverb, Mode=TwoWay}" Width="60" Maximum="100" />
+                    </StackPanel>
+                    <CheckBox IsChecked="{Binding Path=Device.MicrohoneLeft.PhantomPower, Mode=TwoWay}">48V Phantom</CheckBox>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Microphone Right">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding Path=Device.MicrohoneRight.BypassDSP, Mode=TwoWay, Converter={StaticResource booleanInverterConverter}}">Fat Channel Right</CheckBox>
+                    <ComboBox ItemsSource="{Binding Path=Device.MicrohoneRight.Presets}" SelectedValue="{Binding Path=Device.MicrohoneRight.Preset}" />
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Reverb:</Label>
+                        <Slider Value="{Binding Path=Device.MicrohoneRight.Reverb, Mode=TwoWay}" Width="60" Maximum="100" />
+                    </StackPanel>
+                    <CheckBox IsChecked="{Binding Path=Device.MicrohoneRight.PhantomPower, Mode=TwoWay}">48V Phantom</CheckBox>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Output Volume">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0">Main Out</Label>
+                    <Label Grid.Row="1" Grid.Column="0">Phones</Label>
+                    <Label Grid.Row="2" Grid.Column="0">Blend</Label>
+                    <Slider Grid.Row="0" Grid.Column="1" Value="{Binding Path=Device.Global.MainOutVolume, Mode=TwoWay}" Maximum="100" Width="100" />
+                    <Slider Grid.Row="1" Grid.Column="1" Value="{Binding Path=Device.Global.HeadphonesVolume, Mode=TwoWay}" Maximum="100" Width="100" />
+                    <Slider Grid.Row="2" Grid.Column="1" Value="{Binding Path=Device.Global.MonitorBlend, Mode=TwoWay}" Maximum="1" Width="100" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Outputs">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding Path=Device.Global.Mix_A_Mirror_Main, Mode=TwoWay}">Link Mix A</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.Global.Mix_B_Mirror_Main, Mode=TwoWay}">Link Mix B</CheckBox>
+
+                    <CheckBox IsChecked="{Binding Path=Device.Main.Mono, Mode=TwoWay}">Mono Main</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.StreamMixA.Mono, Mode=TwoWay}">Mono Mix A</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.StreamMixB.Mono, Mode=TwoWay}">Mono Mix B</CheckBox>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Inputs Solo">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding Path=Device.MicrohoneLeft.Solo, Mode=TwoWay}">Microphone L</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.MicrohoneRight.Solo, Mode=TwoWay}">Microphone R</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.Playback.Solo, Mode=TwoWay}">Playback</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.VirtualA.Solo, Mode=TwoWay}">Virtual A</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Device.VirtualB.Solo, Mode=TwoWay}">Virtual B</CheckBox>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Reverb (FX)">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0">HPS</Label>
+                    <Label Grid.Row="1" Grid.Column="0">Size</Label>
+                    <Label Grid.Row="2" Grid.Column="0">Pre Del</Label>
+                    <Slider Grid.Row="0" Grid.Column="1" Value="{Binding Path=Device.Reverb.Effects.HighPassFreq, Mode=TwoWay}" Maximum="100" Width="100" />
+                    <Slider Grid.Row="1" Grid.Column="1" Value="{Binding Path=Device.Reverb.Effects.Size, Mode=TwoWay}" Maximum="100" Width="100" />
+                    <Slider Grid.Row="2" Grid.Column="1" Value="{Binding Path=Device.Reverb.Effects.PreDelay, Mode=TwoWay}" Maximum="100" Width="100" />
+                </Grid>
+            </GroupBox>
         </StackPanel>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -34,7 +106,19 @@
                 <ColumnDefinition Width="87*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2">
-                <GroupBox Header="Microphone L" Width="90" Background="LightGray">
+                <GroupBox Header="{Binding Path=Device.MicrohoneLeft.UserDefinedName}" Width="90">
+                    <GroupBox.Style>
+                        <Style TargetType="{x:Type GroupBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Device.MicrohoneLeft.Clip}" Value="False">
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Device.MicrohoneLeft.Clip}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Microphone_L, Converter={StaticResource decibelConverter}}" />
@@ -49,7 +133,19 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Microphone R" Width="90" Background="LightGray">
+                <GroupBox Header="{Binding Path=Device.MicrohoneRight.UserDefinedName}" Width="90">
+                    <GroupBox.Style>
+                        <Style TargetType="{x:Type GroupBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Device.MicrohoneRight.Clip}" Value="False">
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Device.MicrohoneRight.Clip}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Microphone_R, Converter={StaticResource decibelConverter}}" />
@@ -64,7 +160,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Playback L/R" Width="90">
+                <GroupBox Header="{Binding Path=Device.Playback.UserDefinedName}" Width="90">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.Playback_L, Converter={StaticResource decibelConverter}}" />
@@ -79,7 +175,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Virtual A L/R" Width="90">
+                <GroupBox Header="{Binding Path=Device.VirtualA.UserDefinedName}" Width="90">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_L, Converter={StaticResource decibelConverter}}" />
@@ -94,7 +190,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Virtual B L/R" Width="90">
+                <GroupBox Header="{Binding Path=Device.VirtualB.UserDefinedName}" Width="90">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_L, Converter={StaticResource decibelConverter}}" />
@@ -109,7 +205,15 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Reverb" Width="90">
+                <GroupBox Header="{Binding Path=Device.Reverb.UserDefinedName}" Width="90">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Slider Orientation="Vertical" Maximum="100"
+                                    Value="{Binding Path=VolumeMap.Main_Reverb}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                    Value="{Binding Path=VolumeMap.MixA_Reverb}"/>
+                        <Slider Orientation="Vertical" Maximum="100"
+                                    Value="{Binding Path=VolumeMap.MixB_Reverb}"/>
+                    </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Main" Width="90" Background="LightGray">
@@ -171,6 +275,7 @@
                 <Label Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalContentAlignment="Center">Playback L/R</Label>
                 <Label Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" HorizontalContentAlignment="Center">Virtual A L/R</Label>
                 <Label Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" HorizontalContentAlignment="Center">Virtual B L/R</Label>
+                <Label Grid.Row="0" Grid.Column="6" VerticalAlignment="Center" HorizontalContentAlignment="Center">Reverb</Label>
                 <Label Grid.Row="0" Grid.Column="7" VerticalAlignment="Center" HorizontalContentAlignment="Center">Headphones</Label>
                 <Label Grid.Row="0" Grid.Column="8" VerticalAlignment="Center" HorizontalContentAlignment="Center">
                     <TextBlock TextWrapping="Wrap" TextAlignment="Center">Mix<LineBreak/>(assigned)</TextBlock>
@@ -190,9 +295,10 @@
                           IsChecked="{Binding Path=RoutingMap.Main_VirtualA, Mode=TwoWay}" />
                 <CheckBox Grid.Row="1" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.Main_VirtualB, Mode=TwoWay}" />
-
+                <CheckBox Grid.Row="1" Grid.Column="6" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.Main_Reverb, Mode=TwoWay}" />
                 <RadioButton Grid.Row="1" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0}" />
+                          IsChecked="{Binding Path=Device.Global.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0}" />
                 <CheckBox Grid.Row="1" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.Main_Mix, Mode=TwoWay}" />
 
@@ -206,8 +312,10 @@
                           IsChecked="{Binding Path=RoutingMap.MixA_VirtualA, Mode=TwoWay}" />
                 <CheckBox Grid.Row="2" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixA_VirtualB, Mode=TwoWay}" />
+                <CheckBox Grid.Row="2" Grid.Column="6" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixA_Reverb, Mode=TwoWay}" />
                 <RadioButton Grid.Row="2" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0.5}" />
+                          IsChecked="{Binding Path=Device.Global.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=0.5}" />
                 <CheckBox Grid.Row="2" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixA_Mix, Mode=TwoWay}" />
 
@@ -221,8 +329,10 @@
                           IsChecked="{Binding Path=RoutingMap.MixB_VirtualA, Mode=TwoWay}" />
                 <CheckBox Grid.Row="3" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixB_VirtualB, Mode=TwoWay}" />
+                <CheckBox Grid.Row="3" Grid.Column="6" VerticalAlignment="Center" HorizontalAlignment="Center"
+                          IsChecked="{Binding Path=RoutingMap.MixB_Reverb, Mode=TwoWay}" />
                 <RadioButton Grid.Row="3" Grid.Column="7" VerticalAlignment="Center" HorizontalAlignment="Center"
-                          IsChecked="{Binding Path=RoutingMap.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=1.0}" />
+                          IsChecked="{Binding Path=Device.Global.HeadphonesSource, Mode=TwoWay, Converter={StaticResource headphonesStateConverter}, ConverterParameter=1.0}" />
                 <CheckBox Grid.Row="3" Grid.Column="8" VerticalAlignment="Center" HorizontalAlignment="Center"
                           IsChecked="{Binding Path=RoutingMap.MixB_Mix, Mode=TwoWay}" />
             </Grid>

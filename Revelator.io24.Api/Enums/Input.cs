@@ -14,6 +14,8 @@ namespace Revelator.io24.Api.Enums
         Virtual_A,
         [Description("Virtual B")]
         Virtual_B,
+        [Description("Reverb")]
+        Reverb,
         [Description("Mix")]
         Mix
     }

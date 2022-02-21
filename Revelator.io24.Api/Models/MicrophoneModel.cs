@@ -1,7 +1,6 @@
-﻿using Revelator.io24.Api.Models.Json;
-
-namespace Revelator.io24.Api.Models
+﻿namespace Revelator.io24.Api.Models
 {
+    //TODO: Remove:
     public class MicrophoneModel
     {
         public event EventHandler? SynchronizeReceived;
@@ -38,28 +37,28 @@ namespace Revelator.io24.Api.Models
             }
         }
 
-        public void Synchronize(Synchronize synchronize)
-        {
-            var children = synchronize.Children;
-            var globalV = children.Global.Values;
-            var lineC = children.Line.Children;
-            var returnC = children.Return.Children;
-            var mainC = children.Main.Children;
-            var auxC = children.Aux.Children;
+        //public void Synchronize(Synchronize synchronize)
+        //{
+        //    var children = synchronize.Children;
+        //    var globalV = children.Global.Values;
+        //    var lineC = children.Line.Children;
+        //    var returnC = children.Return.Children;
+        //    var mainC = children.Main.Children;
+        //    var auxC = children.Aux.Children;
 
-            //Fat Channel:
-            MicrophoneValues["line/ch1/bypassDSP"] = lineC.Ch1.Values.BypassDSP;
-            MicrophoneValues["line/ch2/bypassDSP"] = lineC.Ch2.Values.BypassDSP;
+        //    //Fat Channel:
+        //    MicrophoneValues["line/ch1/bypassDSP"] = lineC.Ch1.Values.BypassDSP;
+        //    MicrophoneValues["line/ch2/bypassDSP"] = lineC.Ch2.Values.BypassDSP;
 
-            //Presets:
-            MicrophoneValues["line/ch1/presets/preset"] = lineC.Ch1.Children.Presets.Values.Preset;
-            MicrophoneValues["line/ch2/presets/preset"] = lineC.Ch2.Children.Presets.Values.Preset;
+        //    //Presets:
+        //    MicrophoneValues["line/ch1/presets/preset"] = lineC.Ch1.Children.Presets.Values.Preset;
+        //    MicrophoneValues["line/ch2/presets/preset"] = lineC.Ch2.Children.Presets.Values.Preset;
 
-            _presetsLeft = lineC.Ch1.Children.Presets.Strings.Preset;
-            _presetsRight = lineC.Ch2.Children.Presets.Strings.Preset;
+        //    _presetsLeft = lineC.Ch1.Children.Presets.Strings.Preset;
+        //    _presetsRight = lineC.Ch2.Children.Presets.Strings.Preset;
 
-            SynchronizeReceived?.Invoke(this, EventArgs.Empty);
-        }
+        //    SynchronizeReceived?.Invoke(this, EventArgs.Empty);
+        //}
 
         private static int PresetFloatToIndex(float value)
         {

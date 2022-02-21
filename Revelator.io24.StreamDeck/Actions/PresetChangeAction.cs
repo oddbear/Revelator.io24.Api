@@ -1,7 +1,9 @@
 ﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Models.Inputs;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
@@ -9,14 +11,14 @@ namespace Revelator.io24.StreamDeck.Actions
     [StreamDeckAction("com.oddbear.revelator.io24.presetchange")]
     public class PresetChangeAction : StreamDeckAction
     {
-        private readonly Microphones _microphones;
+        private readonly Device _device;
 
         private PresetChangeSettings? _settings;
 
         public PresetChangeAction(
-            Microphones microphones)
+            Device device)
         {
-            _microphones = microphones;
+            _device = device;
         }
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
@@ -26,30 +28,30 @@ namespace Revelator.io24.StreamDeck.Actions
             _settings = args.Payload
                 .GetSettings<PresetChangeSettings>();
 
-            await FetchPresets();
+            await UpdateSettingsPresets();
 
-            await StateUpdated(_settings.Channel);
+            await StateUpdated();
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
-            _microphones.PresetUpdated += PresetUpdated;
-            _microphones.PresetsUpdated += PresetsUpdated;
+            _device.MicrohoneLeft.PropertyChanged += PropertyChanged;
+            _device.MicrohoneRight.PropertyChanged += PropertyChanged;
 
             _settings = args.Payload
                 .GetSettings<PresetChangeSettings>();
 
-            await FetchPresets();
+            await UpdateSettingsPresets();
 
-            await StateUpdated(_settings.Channel);
+            await StateUpdated();
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-            _microphones.PresetUpdated -= PresetUpdated;
-            _microphones.PresetsUpdated -= PresetsUpdated;
+            _device.MicrohoneLeft.PropertyChanged -= PropertyChanged;
+            _device.MicrohoneRight.PropertyChanged -= PropertyChanged;
         }
 
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
@@ -59,39 +61,22 @@ namespace Revelator.io24.StreamDeck.Actions
             _settings = args.Payload
                 .GetSettings<PresetChangeSettings>();
 
-            if (_settings.Preset is null)
-                return;
-
-            var presetIndex = _settings.Preset.Value;
+            var presetIndex = _settings.Preset;
             var preset = _settings.Presets[presetIndex].Name;
-            _microphones.SetPreset(_settings.Channel, preset);
 
-            await StateUpdated(_settings.Channel);
+            var lineChannel = GetMicrophoneChannel(_settings.Channel);
+            lineChannel.Preset = preset;
+
+            await StateUpdated();
         }
 
-        private async void PresetUpdated(object? sender, MicrophoneChannel e)
-        {
-            try
-            {
-                if (_settings?.Channel != e)
-                    return;
-
-                await StateUpdated(e);
-            }
-            catch (Exception exception)
-            {
-                Trace.TraceError(exception.ToString());
-            }
-        }
-
-        private async Task FetchPresets()
+        private async Task UpdateSettingsPresets()
         {
             if (_settings is null)
                 return;
 
-            var presets = _microphones.GetPresets(_settings.Channel);
-            if (presets is null)
-                return;
+            var lineChannel = GetMicrophoneChannel(_settings.Channel);
+            var presets = lineChannel.Presets;
 
             var presetNames = _settings.Presets
                 .Select(preset => preset.Name);
@@ -105,16 +90,21 @@ namespace Revelator.io24.StreamDeck.Actions
             await SetSettingsAsync(_settings);
         }
 
-        private async void PresetsUpdated(object? sender, MicrophoneChannel e)
+        private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             try
             {
-                if (_settings?.Channel != e)
+                if (e.PropertyName == nameof(LineChannel.Preset))
+                {
+                    await StateUpdated();
                     return;
+                }
 
-                await FetchPresets();
-
-                await SetSettingsAsync(_settings);
+                if (e.PropertyName == nameof(LineChannel.Presets))
+                {
+                    await UpdateSettingsPresets();
+                    return;
+                }
             }
             catch (Exception exception)
             {
@@ -122,18 +112,24 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        private async Task StateUpdated(MicrophoneChannel channel)
+        private async Task StateUpdated()
         {
             if (_settings?.Preset is null)
                 return;
 
-            var index = _settings.Preset.Value;
-            var selectedPreset = _settings.Presets[index].Name;
+            var index = _settings.Preset;
 
-            var presetSelected = _microphones.GetPreset(channel) == selectedPreset;
+            var lineChannel = GetMicrophoneChannel(_settings.Channel);
+            var lineIndex = Array.IndexOf<string>(lineChannel.Presets, lineChannel.Preset);
+            var presetSelected = index == lineIndex;
             var state = presetSelected ? 0 : 1;
 
             await SetStateAsync(state);
         }
+
+        private LineChannel GetMicrophoneChannel(MicrophoneChannel channel)
+            => channel == MicrophoneChannel.Left
+                ? _device.MicrohoneLeft
+                : _device.MicrohoneRight;
     }
 }

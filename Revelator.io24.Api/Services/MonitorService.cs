@@ -1,5 +1,5 @@
 ﻿using Revelator.io24.Api.Helpers;
-using Revelator.io24.Api.Models;
+using Revelator.io24.Api.Models.Monitor;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;

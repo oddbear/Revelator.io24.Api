@@ -22,10 +22,7 @@ serviceCollection.AddRevelatorAPI();
 serviceCollection.AddStreamDeck();
 
 var serviceProvicer = serviceCollection.BuildServiceProvider();
-
-serviceProvicer
-    .GetRequiredService<BroadcastService>()
-    .StartReceive();
+serviceProvicer.UseRevelatorAPI();
 
 var services = serviceProvicer.GetServices<IHostedService>();
 

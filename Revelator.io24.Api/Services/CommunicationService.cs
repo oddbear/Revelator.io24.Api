@@ -1,7 +1,6 @@
 ﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
-using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -13,9 +12,7 @@ namespace Revelator.io24.Api.Services
     public class CommunicationService : IDisposable
     {
         private readonly MonitorService _monitorService;
-
-        private readonly RoutingModel _routingModel;
-        private readonly MicrophoneModel _microphoneModel;
+        private readonly RawService _rawService;
 
         private TcpClient? _tcpClient;
         private Thread? _listeningThread;
@@ -27,12 +24,13 @@ namespace Revelator.io24.Api.Services
 
         public CommunicationService(
             MonitorService monitorService,
-            RoutingModel routingModel,
-            MicrophoneModel microphoneModel)
+            RawService rawService)
         {
             _monitorService = monitorService;
-            _routingModel = routingModel;
-            _microphoneModel = microphoneModel;
+            _rawService = rawService;
+
+            _rawService.SetValueMethod = SetRouteValue;
+            _rawService.SetStringMethod = SetStringValue;
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -134,6 +132,9 @@ namespace Revelator.io24.Api.Services
                         switch (messageType)
                         {
                             case "PL":
+                                //PL List:
+                                PL(chunck);
+                                break;
                             case "PR":
                                 //Happens when lining and unlinking mic channels.
                                 //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
@@ -188,12 +189,7 @@ namespace Revelator.io24.Api.Services
                     //Fatchannel is bound to "both", ex. toggle toggles both to same state.
                     return;
                 case "Synchronize":
-                    var model = ZM.GetSynchronizeModel(json);
-                    if (model is not null)
-                    {
-                        _routingModel.Synchronize(model);
-                        _microphoneModel.Synchronize(model);
-                    }
+                    _rawService.Syncronize(json);
                     return;
                 case "SubscriptionReply":
                     //We now have communication.
@@ -208,6 +204,35 @@ namespace Revelator.io24.Api.Services
         }
 
         /// <summary>
+        /// Updates list value
+        /// </summary>
+        /// <param name="data"></param>
+        private void PL(byte[] data)
+        {
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = data[6..8];
+            var from = data[8..10];
+            var to = data[10..12];
+
+            var i = Array.IndexOf<byte>(data, 0x00, 12);
+            var route = Encoding.ASCII.GetString(data[12..i]);
+            if (!route.EndsWith("/presets/preset"))
+            {
+                Log.Warning("[{className}] PL unknown list on route {route}", nameof(CommunicationService), route);
+                return;
+            }
+
+            var selectedPreset = BitConverter.ToSingle(data[(i + 3)..(i + 7)]);
+
+            //0x0A (\n): List delimiter
+            //Last char is a 0x00 (\0)
+            var list = Encoding.ASCII.GetString(data[(i + 7)..^1]).Split('\n');
+            _rawService.UpdateStringsState(route, list);
+        }
+
+        /// <summary>
+        /// Updates float value.
         /// Happens ex. on turning thing on and of, ex. EQ
         /// </summary>
         private void PV(byte[] data)
@@ -222,22 +247,42 @@ namespace Revelator.io24.Api.Services
             var emptyBytes = data[^7..^4];
             var state = BitConverter.ToSingle(data[^4..^0]);
 
-            _routingModel.StateUpdated(route, state);
-            _microphoneModel.StateUpdated(route, state);
+            _rawService.UpdateValueState(route, state);
         }
 
         /// <summary>
-        /// Changing profile, changing names... Updates of strings?
+        /// Updates string value.
+        /// Changing profile, changing names...
         /// </summary>
         private void PS(byte[] data)
         {
-            //TODO: ...
+            var header = data[0..4];
+            var messageLength = data[4..6];
+            var messageType = Encoding.ASCII.GetString(data[6..8]);
+            var from = data[8..10];
+            var to = data[10..12];
+
+            //Ex. "line/ch1/preset_name\0\0\0Slap Echo\0"
+            var str = Encoding.ASCII.GetString(data[12..]);
+            var split = str.Split('\0');
+            var route = split[0];
+            var value = split[3];
+
+            _rawService.UpdateStringState(route, value);
+        }
+
+        public void SetStringValue(string route, string value)
+        {
+            var writer = new TcpMessageWriter(_deviceId);
+            var data = writer.CreateRouteStringUpdate(route, value);
+
+            SendMessage(data);
         }
 
         public void SetRouteValue(string route, float value)
         {
             var writer = new TcpMessageWriter(_deviceId);
-            var data = writer.CreateRouteUpdate(route, value);
+            var data = writer.CreateRouteValueUpdate(route, value);
 
             SendMessage(data);
         }

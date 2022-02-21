@@ -1,6 +1,4 @@
 ﻿using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Models;
-using Revelator.io24.Api.Services;
 
 namespace Revelator.io24.Api
 {
@@ -12,132 +10,204 @@ namespace Revelator.io24.Api
     /// </summary>
     public class RoutingTable
     {
+        private readonly RawService _rawService;
+
         public event EventHandler<(Input, Output)>? RouteUpdated;
         public event EventHandler<(Input, Output)>? VolumeUpdated;
         public event EventHandler<Headphones>? HeadphoneUpdated;
 
-        private readonly CommunicationService _communicationService;
-        private readonly RoutingModel _routingModel;
-
-        public RoutingTable(
-            CommunicationService communicationService,
-            RoutingModel routingModel)
+        public RoutingTable(RawService rawService)
         {
-            _communicationService = communicationService;
-            _routingModel = routingModel;
-
-            _routingModel.SynchronizeReceived += SynchronizeReceived;
-            _routingModel.HeadphoneSourceUpdated += (sender, headphones) => HeadphoneUpdated?.Invoke(this, headphones);
-            _routingModel.VolumeValueUpdated += (sender, pair) => VolumeUpdated?.Invoke(this, pair);
-            _routingModel.RouteValueUpdated += (sender, pair) => RouteUpdated?.Invoke(this, pair);
+            _rawService = rawService;
+            _rawService.Syncronized += Syncronized;
+            _rawService.ValueStateUpdated += ValueStateUpdated;
         }
 
-        private void SynchronizeReceived(object? sender, EventArgs e)
-        {
-            var allPairs = _routingModel.PairToValues.Keys;
-            foreach (var pair in allPairs)
-            {
-                VolumeUpdated?.Invoke(this, pair);
-                RouteUpdated?.Invoke(this, pair);
-            }
-        }
-
-        public Headphones GetHeadphoneSource()
-            => _routingModel.Headphones;
-
-        public void SetHeadphoneSource(Headphones headphones)
-        {
-            switch (headphones)
-            {
-                case Headphones.Main:
-                    _communicationService.SetRouteValue("global/phonesSrc", 0.0f);
-                    break;
-                case Headphones.MixA:
-                    _communicationService.SetRouteValue("global/phonesSrc", 0.5f);
-                    break;
-                case Headphones.MixB:
-                    _communicationService.SetRouteValue("global/phonesSrc", 1.0f);
-                    break;
-            }
-        }
+        private Dictionary<(Input input, Output output), (string route, string volume)> _routes = new();
+        private Dictionary<string, (Input input, Output output)> _routeToKey = new();
 
         public bool GetRouting(Input input, Output output)
         {
-            var key = (input, output);
-            if (!_routingModel.PairToValues.ContainsKey(key))
+            if (!_routes.TryGetValue((input, output), out var routes))
                 return false;
 
-            var pair = _routingModel.PairToValues[key];
-            return IsRouted(pair);
+            var value = _rawService.GetValue(routes.route);
+            return IsRouted(routes.route, value);
         }
 
         public void SetRouting(Input input, Output output, Value value)
         {
-            var key = (input, output);
-            if (!_routingModel.PairToValues.ContainsKey(key))
+            if (!_routes.TryGetValue((input, output), out var routes))
                 return;
 
-            var pair = _routingModel.PairToValues[key];
+            var on = GetOnState(routes.route);
+            var off = GetOffState(routes.route);
 
             switch (value)
             {
                 case Value.On:
-                    _communicationService.SetRouteValue(pair.Route, GetOnState(pair));
+                    _rawService.SetValue(routes.route, on);
                     break;
                 case Value.Off:
-                    _communicationService.SetRouteValue(pair.Route, GetOffState(pair));
+                    _rawService.SetValue(routes.route, off);
                     break;
                 default:
-                    var valueFloat = IsRouted(pair)
-                        ? GetOffState(pair)
-                        : GetOnState(pair);
-
-                    _communicationService.SetRouteValue(pair.Route, valueFloat);
+                    var floatValue = _rawService.GetValue(routes.route);
+                    if (IsRouted(routes.route, floatValue))
+                        _rawService.SetValue(routes.route, off);
+                    else
+                        _rawService.SetValue(routes.route, on);
                     break;
             }
         }
 
         public int GetVolume(Input input, Output output)
         {
-            var key = (input, output);
-
-            if (!_routingModel.PairToValues.ContainsKey(key))
+            if (!_routes.TryGetValue((input, output), out var routes))
                 return 0;
 
-            var pair = _routingModel.PairToValues[key];
-            return (int)Math.Round(pair.VolumeValue * 100);
+            var value = _rawService.GetValue(routes.volume);
+            var volume = (int)Math.Round(value * 100f);
+
+            return EnsureVolumeRange(volume);
         }
 
-        public void SetVolume(Input input, Output output, int volume)
+        public void SetVolume(Input input, Output output, int value)
         {
-            var key = (input, output);
-            if (!_routingModel.PairToValues.ContainsKey(key))
+            if (!_routes.TryGetValue((input, output), out var routes))
                 return;
 
+            var floatValue = EnsureVolumeRange(value) / 100f;
+
+            _rawService.SetValue(routes.volume, floatValue);
+        }
+
+        private int EnsureVolumeRange(int volume)
+        {
             if (volume < 0) volume = 0;
             if (volume > 100) volume = 100;
 
-            var volumeValue = volume / 100f;
-            var pair = _routingModel.PairToValues[key];
-
-            _communicationService.SetRouteValue(pair.Volume, volumeValue);
+            return volume;
         }
 
-        private float GetOnState(RouteValues routeValue)
-            => routeValue.Route.EndsWith("mute")
+        private bool IsRouted(string route, float value)
+            => route.EndsWith("mute")
+                ? (value == 0.0f)
+                : (value == 1.0f);
+
+        private float GetOnState(string route)
+            => route.EndsWith("mute")
                 ? 0.0f
                 : 1.0f;
 
-        private float GetOffState(RouteValues routeValue)
-            => routeValue.Route.EndsWith("mute")
+        private float GetOffState(string route)
+            => route.EndsWith("mute")
                 ? 1.0f
                 : 0.0f;
 
-        private bool IsRouted(RouteValues routeValue)
+        private void Register((Input input, Output output) key, string routeAssign, string routeVolume)
         {
-            return routeValue.Route.EndsWith("mute")
-                ? (routeValue.RouteValue == 0.0f)
-                : (routeValue.RouteValue == 1.0f);
+            _routeToKey[routeAssign] = key;
+            _routeToKey[routeVolume] = key;
+            _routes[key] = (routeAssign, routeVolume);
+
+            RouteUpdated?.Invoke(this, key);
+            VolumeUpdated?.Invoke(this, key);
+        }
+
+        private void ValueStateUpdated(string route, float value)
+        {
+            if (!_routeToKey.TryGetValue(route, out var key))
+                return;
+
+            if (!_routes.TryGetValue(key, out var routes))
+                return;
+
+            if (route == routes.route)
+            {
+                RouteUpdated?.Invoke(this, key);
+                return;
+            }
+
+            if (route == routes.volume)
+            {
+                Console.WriteLine($"{route} : {value}");
+                VolumeUpdated?.Invoke(this, key);
+                return;
+            }
+        }
+
+        private void Syncronized()
+        {
+            Register((Input.Mic_L, Output.Main),
+                "line/ch1/mute",
+                "line/ch1/volume");
+            Register((Input.Mic_L, Output.Mix_A),
+                "line/ch1/assign_aux1",
+                "line/ch1/aux1");
+            Register((Input.Mic_L, Output.Mix_B),
+                "line/ch1/assign_aux2",
+                "line/ch1/aux2");
+
+            Register((Input.Mic_R, Output.Main),
+                "line/ch2/mute",
+                "line/ch2/volume");
+            Register((Input.Mic_R, Output.Mix_A),
+                "line/ch2/assign_aux1",
+                "line/ch2/aux1");
+            Register((Input.Mic_R, Output.Mix_B),
+                "line/ch2/assign_aux2",
+                "line/ch2/aux2");
+
+            Register((Input.Playback, Output.Main),
+                "return/ch1/mute",
+                "return/ch1/volume");
+            Register((Input.Playback, Output.Mix_A),
+                "return/ch1/assign_aux1",
+                "return/ch1/aux1");
+            Register((Input.Playback, Output.Mix_B),
+                "return/ch1/assign_aux2",
+                "return/ch1/aux2");
+
+            Register((Input.Virtual_A, Output.Main),
+                "return/ch2/mute",
+                "return/ch2/volume");
+            Register((Input.Virtual_A, Output.Mix_A),
+                "return/ch2/assign_aux1",
+                "return/ch2/aux1");
+            Register((Input.Virtual_A, Output.Mix_B),
+                "return/ch2/assign_aux2",
+                "return/ch2/aux2");
+
+            Register((Input.Virtual_B, Output.Main),
+                "return/ch3/mute",
+                "return/ch3/volume");
+            Register((Input.Virtual_B, Output.Mix_A),
+                "return/ch3/assign_aux1",
+                "return/ch3/aux1");
+            Register((Input.Virtual_B, Output.Mix_B),
+                "return/ch3/assign_aux2",
+                "return/ch3/aux2");
+
+            Register((Input.Reverb, Output.Main),
+                "fxreturn/ch1/mute",
+                "fxreturn/ch1/volume");
+            Register((Input.Reverb, Output.Mix_A),
+                "fxreturn/ch1/assign_aux1",
+                "fxreturn/ch1/aux1");
+            Register((Input.Reverb, Output.Mix_B),
+                "fxreturn/ch1/assign_aux2",
+                "fxreturn/ch1/aux2");
+
+            Register((Input.Mix, Output.Main),
+                "main/ch1/mute",
+                "main/ch1/volume");
+            Register((Input.Mix, Output.Mix_A),
+                "aux/ch1/mute",
+                "aux/ch1/volume");
+            Register((Input.Mix, Output.Mix_B),
+                "aux/ch2/mute",
+                "aux/ch2/volume");
         }
     }
 }

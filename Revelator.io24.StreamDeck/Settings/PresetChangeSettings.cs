@@ -11,7 +11,7 @@ namespace Revelator.io24.StreamDeck.Settings
         public MicrophoneChannel Channel { get; set; } = MicrophoneChannel.Left;
 
         [JsonProperty(PropertyName = "presetValue")]
-        public int? Preset { get; set; }
+        public int Preset { get; set; } = 0;
 
         [JsonProperty(PropertyName = "presetValues")]
         public SelectData[] Presets { get; set; } = new SelectData[] {
