@@ -32,7 +32,6 @@ namespace Revelator.io24.Wpf
             valuesMonitorModel.ValuesUpdated += (sender, args) => OnPropertyChanged(nameof(MonitorValues));
             fatChannelMonitorModel.FatChannelUpdated += (sender, args) => OnPropertyChanged(nameof(FatChannelValues));
 
-            routingTable.HeadphoneUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingMap));
             routingTable.RouteUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingMap));
             routingTable.VolumeUpdated += (sender, args) => OnPropertyChanged(nameof(VolumeMap));
         }

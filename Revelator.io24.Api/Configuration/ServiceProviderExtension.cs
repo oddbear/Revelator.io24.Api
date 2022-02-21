@@ -22,7 +22,6 @@ namespace Revelator.io24.Api.Configuration
             
             //API:
             serviceCollection.AddSingleton<RoutingTable>();
-            serviceCollection.AddSingleton<Microphones>();
             serviceCollection.AddSingleton<RawService>();
             serviceCollection.AddSingleton<Device>();
         }

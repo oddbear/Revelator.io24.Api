@@ -90,34 +90,6 @@ namespace Revelator.io24.Api
             return volume;
         }
 
-        public Headphones GetHeadphoneSource()
-        {
-            var value = _rawService.GetValue("global/phonesSrc");
-            return value switch
-            {
-                1.0f => Headphones.MixB,
-                0.5f => Headphones.MixA,
-                _ => Headphones.Main,
-            };
-        }
-
-        public void SetHeadphoneSource(Headphones value)
-        {
-            switch (value)
-            {
-                default:
-                case Headphones.Main:
-                    _rawService.SetValue("global/phonesSrc", 0.0f);
-                    return;
-                case Headphones.MixA:
-                    _rawService.SetValue("global/phonesSrc", 0.5f);
-                    return;
-                case Headphones.MixB:
-                    _rawService.SetValue("global/phonesSrc", 1.0f);
-                    return;
-            }
-        }
-
         private bool IsRouted(string route, float value)
             => route.EndsWith("mute")
                 ? (value == 0.0f)
@@ -145,12 +117,6 @@ namespace Revelator.io24.Api
 
         private void ValueStateUpdated(string route, float value)
         {
-            if (route == "global/phonesSrc")
-            {
-                HeadphoneUpdated?.Invoke(this, GetHeadphoneSource());
-                return;
-            }
-
             if (!_routeToKey.TryGetValue(route, out var key))
                 return;
 
