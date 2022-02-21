@@ -1,7 +1,10 @@
 ﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models.Inputs;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
 using SharpDeck.Events.Received;
+using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
@@ -9,16 +12,16 @@ namespace Revelator.io24.StreamDeck.Actions
     [StreamDeckAction("com.oddbear.revelator.io24.fatchanneltoggle")]
     public class FatChannelToggleAction : StreamDeckAction
     {
-        private readonly Microphones _microphones;
+        private readonly Device _device;
 
         //We need some how to know the route when Events are received.
         //In other situations, use GetSettings.
         private MicrophoneChannel? _channel;
 
         public FatChannelToggleAction(
-            Microphones microphones)
+            Device device)
         {
-            _microphones = microphones;
+            _device = device;
         }
 
         protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
@@ -36,7 +39,8 @@ namespace Revelator.io24.StreamDeck.Actions
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillAppear(args);
-            _microphones.FatChannelUpdated += FatChannelUpdated;
+            _device.MicrohoneLeft.PropertyChanged += PropertyChanged;
+            _device.MicrohoneRight.PropertyChanged += PropertyChanged;
 
             var settings = args.Payload
                 .GetSettings<FatChannelToggleSettings>();
@@ -49,7 +53,8 @@ namespace Revelator.io24.StreamDeck.Actions
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
         {
             await base.OnWillDisappear(args);
-            _microphones.FatChannelUpdated -= FatChannelUpdated;
+            _device.MicrohoneLeft.PropertyChanged -= PropertyChanged;
+            _device.MicrohoneRight.PropertyChanged -= PropertyChanged;
         }
 
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
@@ -59,19 +64,32 @@ namespace Revelator.io24.StreamDeck.Actions
             var settings = args.Payload
                 .GetSettings<FatChannelToggleSettings>();
 
-            _microphones.SetFatChannelStatus(settings.Channel, settings.Action);
+            var c = GetMicrophoneChannel(settings.Channel);
+            switch (settings.Action)
+            {
+                case Value.On:
+                    c.BypassDSP = false;
+                    break;
+                case Value.Off:
+                    c.BypassDSP = true;
+                    break;
+                case Value.Toggle:
+                default:
+                    c.BypassDSP = !c.BypassDSP;
+                    break;
+            }
 
             await StateUpdated(settings.Channel);
         }
 
-        private async void FatChannelUpdated(object? sender, MicrophoneChannel e)
+        private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             try
             {
-                if (e != _channel)
+                if (e.PropertyName != nameof(LineChannel.BypassDSP) || _channel is null)
                     return;
 
-                await StateUpdated(e);
+                await StateUpdated(_channel.Value);
             }
             catch (Exception exception)
             {
@@ -81,9 +99,14 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private async Task StateUpdated(MicrophoneChannel channel)
         {
-            var state = _microphones.GetFatChannelStatus(channel) ? 0 : 1;
+            var state = GetMicrophoneChannel(channel).BypassDSP ? 1 : 0;
 
             await SetStateAsync(state);
         }
+
+        private LineChannel GetMicrophoneChannel(MicrophoneChannel channel)
+            => channel == MicrophoneChannel.Left
+                ? _device.MicrohoneLeft
+                : _device.MicrohoneRight;
     }
 }
