@@ -26,6 +26,7 @@ namespace Revelator.io24.Api.Models
 
         protected abstract void OnPropertyChanged(PropertyChangedEventArgs eventArgs);
 
+        //TODO: Add GetStringRoute and GetStringsRoute? Could be refactored to be isolated away from each other.
         public string? GetValueRoute(string propertyName)
             => _propertyValueNameRoute.TryGetValue(propertyName, out var route)
                 ? route
