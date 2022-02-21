@@ -56,7 +56,20 @@
                     <Label Grid.Row="0" Grid.Column="0">Main Out</Label>
                     <Label Grid.Row="1" Grid.Column="0">Phones</Label>
                     <Label Grid.Row="2" Grid.Column="0">Blend</Label>
-                    <Slider Grid.Row="0" Grid.Column="1" Value="{Binding Path=Device.Global.MainOutVolume, Mode=TwoWay}" Maximum="100" Width="100" />
+                    <Slider Grid.Row="0" Grid.Column="1" Value="{Binding Path=Device.Global.MainOutVolume, Mode=TwoWay}" Maximum="100" Width="100">
+                        <Slider.Style>
+                            <Style TargetType="{x:Type Slider}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Device.Main.HardwareMute}" Value="False">
+                                        <Setter Property="Background" Value="LightGreen"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Device.Main.HardwareMute}" Value="True">
+                                        <Setter Property="Background" Value="Red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Slider.Style>
+                    </Slider>
                     <Slider Grid.Row="1" Grid.Column="1" Value="{Binding Path=Device.Global.HeadphonesVolume, Mode=TwoWay}" Maximum="100" Width="100" />
                     <Slider Grid.Row="2" Grid.Column="1" Value="{Binding Path=Device.Global.MonitorBlend, Mode=TwoWay}" Maximum="1" Width="100" />
                 </Grid>
@@ -216,7 +229,19 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Main" Width="90" Background="LightGray">
+                <GroupBox Header="{Binding Path=Device.Main.UserDefinedName}" Width="90">
+                    <GroupBox.Style>
+                        <Style TargetType="{x:Type GroupBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Device.Main.Clip}" Value="False">
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Device.Main.Clip}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Slider Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_Mix}"/>
@@ -226,7 +251,19 @@
                                      Value="{Binding Path=MonitorValues.Main_R, Converter={StaticResource decibelConverter}}" />
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Stream Mix 1" Width="90" Background="LightGray">
+                <GroupBox Header="{Binding Path=Device.StreamMixA.UserDefinedName}" Width="90">
+                    <GroupBox.Style>
+                        <Style TargetType="{x:Type GroupBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Device.StreamMixA.Clip}" Value="False">
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Device.StreamMixA.Clip}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Slider Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_Mix}"/>
@@ -236,7 +273,19 @@
                                      Value="{Binding Path=MonitorValues.StreamMix1_R, Converter={StaticResource decibelConverter}}" />
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Stream Mix 2" Width="90" Background="LightGray">
+                <GroupBox Header="{Binding Path=Device.StreamMixB.UserDefinedName}" Width="90">
+                    <GroupBox.Style>
+                        <Style TargetType="{x:Type GroupBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=Device.StreamMixB.Clip}" Value="False">
+                                    <Setter Property="Background" Value="LightGreen"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Device.StreamMixB.Clip}" Value="True">
+                                    <Setter Property="Background" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </GroupBox.Style>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <Slider Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_Mix}"/>

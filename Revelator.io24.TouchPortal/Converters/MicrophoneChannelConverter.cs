@@ -1,4 +1,4 @@
-﻿using Revelator.io24.Api;
+﻿using Revelator.io24.Api.Enums;
 
 namespace Revelator.io24.TouchPortal.Converters
 {

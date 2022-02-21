@@ -5,7 +5,7 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
 
 ## Progress
 
-- API: Still early, but man features are implemented. Try the Windows App.
+- API: Still early, but many features are implemented. Try the Windows App to see what is possible.
 - Stream Deck plugin: Fat Channel Toggle, Routing, presets and headphone sources, with status.
 - Touch Portal plugin: Volume control, Fat Channel Toggle, Routing, presets and headphone sources, with status.
 - Loupedeck plugin: not started.

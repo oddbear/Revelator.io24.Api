@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Revelator.io24.Api;
+using Revelator.io24.Api.Enums;
 
 namespace Revelator.io24.StreamDeck.Settings
 {

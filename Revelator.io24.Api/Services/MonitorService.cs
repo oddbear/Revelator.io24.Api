@@ -146,6 +146,9 @@ namespace Revelator.io24.Api.Services
                     "FFFFFFFFFFFFFFFFFFFFF9FFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200",
                     "FFFFFFFFF9FFF9FFF9FFF9FFFFFFFFFF0600010000040000020400040000040800040000000C000400040010000400070014000200"
                 };
+
+                //This FF->something->FF changes a lot if I clip the output channels. Ex. playing music at 100% percent and run +10db on Input and Output
+                // WARNING: (be carefull on this test).
                 if (!prevValues.Contains(unknown4Val))
                     Log.Information("Something 3: {val1}", unknown4Val);
 

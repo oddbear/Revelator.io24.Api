@@ -48,7 +48,6 @@ namespace Revelator.io24.Api.Services
 
                     var messageType = PackageHelper.GetMessageType(data);
                     Log.Debug("[{className}] {messageType}", nameof(BroadcastService), messageType);
-                    //Console.WriteLine($"{DateTime.Now} [{nameof(BroadcastService)}]: {messageType}");
 
                     //DA is udp broadcast message from PreSonusHardwareAccessService.exe
                     //NO is udp broadcast message sent from the UC Surface App

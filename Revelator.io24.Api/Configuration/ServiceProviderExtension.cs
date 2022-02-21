@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Revelator.io24.Api.Models;
 using Revelator.io24.Api.Models.Monitor;
 using Revelator.io24.Api.Services;
-using System;
 
 namespace Revelator.io24.Api.Configuration
 {
@@ -16,7 +14,6 @@ namespace Revelator.io24.Api.Configuration
             serviceCollection.AddSingleton<MonitorService>();
             
             //Models:
-            serviceCollection.AddSingleton<MicrophoneModel>();
             serviceCollection.AddSingleton<FatChannelMonitorModel>();
             serviceCollection.AddSingleton<ValuesMonitorModel>();
             

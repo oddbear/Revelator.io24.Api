@@ -131,7 +131,6 @@ namespace Revelator.io24.Api
 
             if (route == routes.volume)
             {
-                Console.WriteLine($"{route} : {value}");
                 VolumeUpdated?.Invoke(this, key);
                 return;
             }

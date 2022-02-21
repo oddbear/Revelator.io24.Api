@@ -7,12 +7,6 @@ namespace Revelator.io24.Wpf.Models
     {
         private readonly RoutingTable _routingTable;
 
-        public Headphones HeadphonesSource
-        {
-            get => _routingTable.GetHeadphoneSource();
-            set => _routingTable.SetHeadphoneSource(value);
-        }
-
         public bool Main_MicL
         {
             get => GetValue(Input.Mic_L, Output.Main);

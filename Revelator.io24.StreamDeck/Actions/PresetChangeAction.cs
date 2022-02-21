@@ -1,4 +1,5 @@
 ﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Models.Inputs;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;

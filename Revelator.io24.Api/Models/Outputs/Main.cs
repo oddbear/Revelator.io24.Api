@@ -10,5 +10,12 @@ namespace Revelator.io24.Api.Models.Outputs
         {
             //
         }
+
+        [RouteValue("hardwareMute")]
+        public bool HardwareMute
+        {
+            get => GetBoolean();
+            //set => SetBoolean(value);
+        }
     }
 }
