@@ -18,7 +18,16 @@ namespace Revelator.io24.Api
         public event StringStateEvent? StringStateUpdated;
         public event StringsStateEvent? StringsStateUpdated;
 
+        internal Action<string, string>? SetStringMethod;
         internal Action<string, float>? SetValueMethod;
+
+        public void SetString(string route, string value)
+        {
+            if (route is null)
+                return;
+
+            SetStringMethod?.Invoke(route, value);
+        }
 
         public void SetValue(string route, float value)
         {

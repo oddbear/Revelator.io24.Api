@@ -54,7 +54,23 @@ namespace Revelator.io24.Api.Messages
             return Create(data, "UM");
         }
 
-        public byte[] CreateRouteUpdate(string route, float value)
+        public byte[] CreateRouteStringUpdate(string route, string value)
+        {
+            var data = CreateHeader(_deviceId);
+
+            //Text [12..x]:
+            data.AddRange(Encoding.ASCII.GetBytes(route));
+
+            //Empty [0..3]:
+            data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
+
+            //State [x+3..]:
+            data.AddRange(Encoding.ASCII.GetBytes(value + "\0"));
+
+            return Create(data, "PS");
+        }
+
+        public byte[] CreateRouteValueUpdate(string route, float value)
         {
             var data = CreateHeader(_deviceId);
 

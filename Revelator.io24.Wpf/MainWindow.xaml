@@ -23,7 +23,7 @@
             <GroupBox Header="Michrophone Left">
                 <StackPanel>
                     <CheckBox IsChecked="{Binding Path=Device.MicrohoneLeft.BypassDSP, Mode=TwoWay, Converter={StaticResource booleanInverterConverter}}">Fat Channel Left</CheckBox>
-                    <ComboBox ItemsSource="{Binding Path=Device.MicrohoneLeft.Presets}" SelectedValue="{Binding Path=MicrophoneMap.PresetLeft}" />
+                    <ComboBox ItemsSource="{Binding Path=Device.MicrohoneLeft.Presets}" SelectedValue="{Binding Path=Device.MicrohoneLeft.Preset}" />
                     <StackPanel Orientation="Horizontal">
                         <Label>Reverb:</Label>
                         <Slider Value="{Binding Path=Device.MicrohoneLeft.Reverb, Mode=TwoWay}" Width="60" Maximum="100" />
@@ -34,7 +34,7 @@
             <GroupBox Header="Microphone Right">
                 <StackPanel>
                     <CheckBox IsChecked="{Binding Path=Device.MicrohoneRight.BypassDSP, Mode=TwoWay, Converter={StaticResource booleanInverterConverter}}">Fat Channel Right</CheckBox>
-                    <ComboBox ItemsSource="{Binding Path=Device.MicrohoneRight.Presets}" SelectedValue="{Binding Path=MicrophoneMap.PresetRight}" />
+                    <ComboBox ItemsSource="{Binding Path=Device.MicrohoneRight.Presets}" SelectedValue="{Binding Path=Device.MicrohoneRight.Preset}" />
                     <StackPanel Orientation="Horizontal">
                         <Label>Reverb:</Label>
                         <Slider Value="{Binding Path=Device.MicrohoneRight.Reverb, Mode=TwoWay}" Width="60" Maximum="100" />

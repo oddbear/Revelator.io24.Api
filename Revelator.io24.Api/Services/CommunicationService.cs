@@ -1,7 +1,6 @@
 ﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
-using Revelator.io24.Api.Models;
 using Serilog;
 using System.Net;
 using System.Net.Sockets;
@@ -31,6 +30,7 @@ namespace Revelator.io24.Api.Services
             _rawService = rawService;
 
             _rawService.SetValueMethod = SetRouteValue;
+            _rawService.SetStringMethod = SetStringValue;
 
             _listeningThread = new Thread(Listener) { IsBackground = true };
             _listeningThread.Start();
@@ -271,10 +271,18 @@ namespace Revelator.io24.Api.Services
             _rawService.UpdateStringState(route, value);
         }
 
+        public void SetStringValue(string route, string value)
+        {
+            var writer = new TcpMessageWriter(_deviceId);
+            var data = writer.CreateRouteStringUpdate(route, value);
+
+            SendMessage(data);
+        }
+
         public void SetRouteValue(string route, float value)
         {
             var writer = new TcpMessageWriter(_deviceId);
-            var data = writer.CreateRouteUpdate(route, value);
+            var data = writer.CreateRouteValueUpdate(route, value);
 
             SendMessage(data);
         }

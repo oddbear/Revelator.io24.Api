@@ -20,7 +20,7 @@ namespace Revelator.io24.Api.Models.Global
             _rawService = rawService;
         }
 
-        public Headphones GetHeadphoneSource()
+        private Headphones GetHeadphoneSource()
         {
             var value = _rawService.GetValue("global/phonesSrc");
             return value switch
@@ -31,7 +31,7 @@ namespace Revelator.io24.Api.Models.Global
             };
         }
 
-        public void SetHeadphoneSource(Headphones value)
+        private void SetHeadphoneSource(Headphones value)
         {
             switch (value)
             {

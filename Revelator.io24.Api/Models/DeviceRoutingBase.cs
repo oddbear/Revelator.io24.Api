@@ -9,7 +9,9 @@ namespace Revelator.io24.Api.Models
     {
         private readonly RawService _rawService;
 
-        private readonly Dictionary<string, string> _propertyNameRoute = new();
+        private readonly Dictionary<string, string> _propertyValueNameRoute = new();
+        private readonly Dictionary<string, string> _propertyStringNameRoute = new();
+        private readonly Dictionary<string, string> _propertyStringsNameRoute = new();
 
         public DeviceRoutingBase(RawService rawService)
         {
@@ -19,11 +21,15 @@ namespace Revelator.io24.Api.Models
             _rawService.StringStateUpdated += StringStateUpdated;
             _rawService.StringsStateUpdated += StringsStateUpdated;
 
-            _propertyNameRoute = GetRoutes()
-                .ToDictionary(pair => pair.propertyName, r => r.route);
+            InitMapRoutes();
         }
 
         protected abstract void OnPropertyChanged(PropertyChangedEventArgs eventArgs);
+
+        public string? GetValueRoute(string propertyName)
+            => _propertyValueNameRoute.TryGetValue(propertyName, out var route)
+                ? route
+                : default;
 
         private void Syncronized()
         {
@@ -37,7 +43,7 @@ namespace Revelator.io24.Api.Models
 
         private void ValueStateUpdated(string route, float value)
         {
-            var propertyName = _propertyNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
+            var propertyName = _propertyValueNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
             if (propertyName is null)
                 return;
 
@@ -46,7 +52,7 @@ namespace Revelator.io24.Api.Models
 
         private void StringStateUpdated(string route, string value)
         {
-            var propertyName = _propertyNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
+            var propertyName = _propertyStringNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
             if (propertyName is null)
                 return;
 
@@ -55,19 +61,19 @@ namespace Revelator.io24.Api.Models
 
         private void StringsStateUpdated(string route, string[] value)
         {
-            var propertyName = _propertyNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
+            var propertyName = _propertyStringsNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
             if (propertyName is null)
                 return;
 
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
 
-        private IEnumerable<(string route, string propertyName)> GetRoutes()
+        private void InitMapRoutes()
         {
             var type = this.GetType();
             var routePrefix = type.GetCustomAttribute<RoutePrefixAttribute>();
             if (routePrefix is null)
-                yield break;
+                return;
 
             var properties = type.GetProperties();
             foreach (var property in properties)
@@ -79,7 +85,7 @@ namespace Revelator.io24.Api.Models
                 if (routeValue is not null)
                 {
                     var route = $"{routePrefix.RoutePrefixName}/{routeValue.RouteValueName}";
-                    yield return (route, property.Name);
+                    _propertyValueNameRoute[property.Name] = route;
                     continue;
                 }
 
@@ -87,7 +93,7 @@ namespace Revelator.io24.Api.Models
                 if (routeString is not null)
                 {
                     var route = $"{routePrefix.RoutePrefixName}/{routeString.RouteStringName}";
-                    yield return (route, property.Name);
+                    _propertyStringNameRoute[property.Name] = route;
                     continue;
                 }
 
@@ -96,7 +102,7 @@ namespace Revelator.io24.Api.Models
                 if (routeStrings is not null)
                 {
                     var route = $"{routePrefix.RoutePrefixName}/{routeStrings.RouteStringsName}";
-                    yield return (route, property.Name);
+                    _propertyStringsNameRoute[property.Name] = route;
                     continue;
                 }
             }
@@ -104,7 +110,7 @@ namespace Revelator.io24.Api.Models
 
         protected string[] GetStrings([CallerMemberName] string propertyName = "")
         {
-            if (!_propertyNameRoute.TryGetValue(propertyName, out var route))
+            if (!_propertyStringsNameRoute.TryGetValue(propertyName, out var route))
                 return Array.Empty<string>();
 
             return _rawService.GetStrings(route);
@@ -112,15 +118,26 @@ namespace Revelator.io24.Api.Models
 
         protected string? GetString([CallerMemberName] string propertyName = "")
         {
-            if (!_propertyNameRoute.TryGetValue(propertyName, out var route))
+            if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
                 return default;
 
             return _rawService.GetString(route);
         }
 
+        protected void SetString(string? value, [CallerMemberName] string propertyName = "")
+        {
+            if (value is null)
+                return;
+
+            if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
+                return;
+
+            _rawService.SetString(value, value);
+        }
+
         protected void SetBoolean(bool value, [CallerMemberName] string propertyName = "")
         {
-            if (!_propertyNameRoute.TryGetValue(propertyName, out var route))
+            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
                 return;
 
             var floatValue = value ? 1.0f : 0.0f;
@@ -129,7 +146,7 @@ namespace Revelator.io24.Api.Models
 
         protected bool GetBoolean([CallerMemberName] string propertyName = "")
         {
-            if (!_propertyNameRoute.TryGetValue(propertyName, out var route))
+            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
                 return default;
 
             var value = _rawService.GetValue(route);
@@ -138,7 +155,7 @@ namespace Revelator.io24.Api.Models
 
         protected int GetVolume([CallerMemberName] string propertyName = "")
         {
-            if (!_propertyNameRoute.TryGetValue(propertyName, out var route))
+            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
                 return default;
 
             var floatValue = _rawService.GetValue(route);
@@ -147,7 +164,7 @@ namespace Revelator.io24.Api.Models
 
         protected void SetVolume(int value, [CallerMemberName] string propertyName = "")
         {
-            if (!_propertyNameRoute.TryGetValue(propertyName, out var route))
+            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
                 return;
 
             var floatValue = value / 100f;
