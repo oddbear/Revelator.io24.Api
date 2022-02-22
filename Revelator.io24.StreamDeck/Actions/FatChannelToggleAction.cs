@@ -34,6 +34,7 @@ namespace Revelator.io24.StreamDeck.Actions
             _channel = settings.Channel;
 
             await StateUpdated(settings.Channel);
+            await ChannelUpdated();
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
@@ -48,6 +49,7 @@ namespace Revelator.io24.StreamDeck.Actions
             _channel = settings.Channel;
 
             await StateUpdated(settings.Channel);
+            await ChannelUpdated();
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
@@ -55,6 +57,8 @@ namespace Revelator.io24.StreamDeck.Actions
             await base.OnWillDisappear(args);
             _device.MicrohoneLeft.PropertyChanged -= PropertyChanged;
             _device.MicrohoneRight.PropertyChanged -= PropertyChanged;
+
+            await ChannelUpdated();
         }
 
         protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
@@ -102,6 +106,17 @@ namespace Revelator.io24.StreamDeck.Actions
             var state = GetMicrophoneChannel(channel).BypassDSP ? 1 : 0;
 
             await SetStateAsync(state);
+        }
+
+        private async Task ChannelUpdated()
+        {
+            if (_channel is null)
+                return;
+
+            var title = _channel == MicrophoneChannel.Left
+                ? "Fat L" : "Fat R";
+
+            await SetTitleAsync(title);
         }
 
         private LineChannel GetMicrophoneChannel(MicrophoneChannel channel)

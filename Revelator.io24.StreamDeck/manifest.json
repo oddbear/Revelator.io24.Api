@@ -12,10 +12,12 @@
       "PropertyInspectorPath": "PropertyInspector/RouteChangeAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/routing_on",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/routing_off",
+          "TitleAlignment": "bottom"
         }
       ]
     },

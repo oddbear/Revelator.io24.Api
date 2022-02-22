@@ -2,6 +2,7 @@
 using Revelator.io24.Api.Enums;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
+using SharpDeck.Enums;
 using SharpDeck.Events.Received;
 using System.Diagnostics;
 
@@ -32,6 +33,7 @@ namespace Revelator.io24.StreamDeck.Actions
             _route = (settings.Input, settings.Output);
 
             await StateUpdated(settings.Input, settings.Output);
+            await ChannelUpdated();
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
@@ -45,6 +47,7 @@ namespace Revelator.io24.StreamDeck.Actions
             _route = (settings.Input, settings.Output);
 
             await StateUpdated(settings.Input, settings.Output);
+            await ChannelUpdated();
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
@@ -77,6 +80,67 @@ namespace Revelator.io24.StreamDeck.Actions
             catch (Exception exception)
             {
                 Trace.TraceError(exception.ToString());
+            }
+        }
+
+        private async Task ChannelUpdated()
+        {
+            var route = _route;
+            if (route is null)
+                return;
+
+            switch (route.Value.input)
+            {
+                case Input.Mic_L:
+                    await SetImageStates("mic_l_on", "mic_l_off");
+                    break;
+                case Input.Mic_R:
+                    await SetImageStates("mic_r_on", "mic_r_off");
+                    break;
+                case Input.Playback:
+                    await SetImageStates("playback_on", "playback_off");
+                    break;
+                case Input.Virtual_A:
+                    await SetImageStates("routing_a_on", "routing_a_off");
+                    break;
+                case Input.Virtual_B:
+                    await SetImageStates("routing_b_on", "routing_b_off");
+                    break;
+                default:
+                    await SetImageAsync(null);
+                    break;
+            }
+
+            switch (route.Value.output)
+            {
+                case Output.Mix_A:
+                    await SetTitleAsync("Mix A");
+                    break;
+                case Output.Mix_B:
+                    await SetTitleAsync("Mix B");
+                    break;
+                case Output.Main:
+                default:
+                    await SetTitleAsync("Main");
+                    break;
+            }
+        }
+
+        private async Task SetImageStates(string on, string off)
+        {
+            try
+            {
+                var onImageBytes = File.ReadAllBytes($"./Images/Plugin/{on}.png");
+                var onBase64 = Convert.ToBase64String(onImageBytes);
+                await SetImageAsync("data:image/png;base64," + onBase64, TargetType.Both, 0);
+
+                var offImageBytes = File.ReadAllBytes($"./Images/Plugin/{off}.png");
+                var offBase64 = Convert.ToBase64String(offImageBytes);
+                await SetImageAsync("data:image/png;base64," + offBase64, TargetType.Both, 1);
+            }
+            catch
+            {
+                await SetImageAsync(null);
             }
         }
 
