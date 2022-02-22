@@ -31,9 +31,10 @@ namespace Revelator.io24.StreamDeck.Actions
             var settings = args.Payload
                 .GetSettings<HeadphonesSourceSettings>();
 
-            _state = settings.Microphone;
+            _state = settings.Microphone; //TODO: Rename to headphone... not microphone :P
 
             await StateUpdated();
+            await SetTitleAsync(_state.ToString());
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
@@ -47,6 +48,7 @@ namespace Revelator.io24.StreamDeck.Actions
             _state = settings.Microphone;
 
             await StateUpdated();
+            await SetTitleAsync(_state.ToString());
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)

@@ -29,10 +29,12 @@
       "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/headphones_on",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/headphones_off",
+          "TitleAlignment": "bottom"
         }
       ]
     },
@@ -63,10 +65,12 @@
       "PropertyInspectorPath": "PropertyInspector/PresetChangeAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/preset_on",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/preset_off",
+          "TitleAlignment": "bottom"
         }
       ]
     }

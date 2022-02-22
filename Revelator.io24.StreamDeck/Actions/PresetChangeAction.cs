@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace Revelator.io24.StreamDeck.Actions
 {
     [StreamDeckAction("com.oddbear.revelator.io24.presetchange")]
-    public class PresetChangeAction : StreamDeckAction
+    public class PresetChangeAction : ActionBase
     {
         private readonly Device _device;
 
@@ -32,6 +32,7 @@ namespace Revelator.io24.StreamDeck.Actions
             await UpdateSettingsPresets();
 
             await StateUpdated();
+            //TODO: await SetTitleAsync(preset);
         }
 
         protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
@@ -46,6 +47,7 @@ namespace Revelator.io24.StreamDeck.Actions
             await UpdateSettingsPresets();
 
             await StateUpdated();
+            //TODO: await SetTitleAsync(preset);
         }
 
         protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)

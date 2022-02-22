@@ -2,14 +2,13 @@
 using Revelator.io24.Api.Enums;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
-using SharpDeck.Enums;
 using SharpDeck.Events.Received;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
     [StreamDeckAction("com.oddbear.revelator.io24.routechange")]
-    public class RouteChangeAction : StreamDeckAction
+    public class RouteChangeAction : ActionBase
     {
         private readonly RoutingTable _routingTable;
 
@@ -106,6 +105,9 @@ namespace Revelator.io24.StreamDeck.Actions
                 case Input.Virtual_B:
                     await SetImageStates("routing_b_on", "routing_b_off");
                     break;
+                case Input.Mix:
+                    await SetImageStates("output_on", "output_off");
+                    break;
                 default:
                     await SetImageAsync(null);
                     break;
@@ -123,24 +125,6 @@ namespace Revelator.io24.StreamDeck.Actions
                 default:
                     await SetTitleAsync("Main");
                     break;
-            }
-        }
-
-        private async Task SetImageStates(string on, string off)
-        {
-            try
-            {
-                var onImageBytes = File.ReadAllBytes($"./Images/Plugin/{on}.png");
-                var onBase64 = Convert.ToBase64String(onImageBytes);
-                await SetImageAsync("data:image/png;base64," + onBase64, TargetType.Both, 0);
-
-                var offImageBytes = File.ReadAllBytes($"./Images/Plugin/{off}.png");
-                var offBase64 = Convert.ToBase64String(offImageBytes);
-                await SetImageAsync("data:image/png;base64," + offBase64, TargetType.Both, 1);
-            }
-            catch
-            {
-                await SetImageAsync(null);
             }
         }
 
