@@ -9,12 +9,11 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
 - Stream Deck plugin: Fat Channel Toggle, Routing, presets and headphone sources, with status.
 - Touch Portal plugin: Volume control, Fat Channel Toggle, Routing, presets and headphone sources, with status.
 - Loupedeck plugin: not started.
-- Assets (icons and such): not started.
 
 ## How to test
 
 - Read the text on this page.
-- Go to the [Releases](https://github.com/oddbear/Revelator.io24.Api/releases/tag/v0.0.3-beta) page, or click on `Releases` to the right of this page.
+- Go to the [Releases](https://github.com/oddbear/Revelator.io24.Api/releases/tag/v0.0.4-beta) page, or click on `Releases` to the right of this page.
 - Read the text on the releases page.
 - Windows App:
   - Download zip file under Assets on the Releases page
