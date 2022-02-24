@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Revelator.io24.Api.Configuration;
-using Revelator.io24.Api.Services;
 using SharpDeck.Extensions.DependencyInjection;
 
 
@@ -22,7 +21,7 @@ serviceCollection.AddRevelatorAPI();
 serviceCollection.AddStreamDeck();
 
 var serviceProvicer = serviceCollection.BuildServiceProvider();
-serviceProvicer.UseRevelatorAPI();
+serviceProvicer.StartRevelatorAPI();
 
 var services = serviceProvicer.GetServices<IHostedService>();
 

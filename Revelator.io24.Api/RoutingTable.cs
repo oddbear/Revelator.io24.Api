@@ -14,13 +14,11 @@ namespace Revelator.io24.Api
 
         public event EventHandler<(Input, Output)>? RouteUpdated;
         public event EventHandler<(Input, Output)>? VolumeUpdated;
-        public event EventHandler<Headphones>? HeadphoneUpdated;
 
         public RoutingTable(RawService rawService)
         {
             _rawService = rawService;
-            _rawService.Syncronized += Syncronized;
-            _rawService.ValueStateUpdated += ValueStateUpdated;
+            SetupRoutes();
         }
 
         private Dictionary<(Input input, Output output), (string route, string volume)> _routes = new();
@@ -105,16 +103,6 @@ namespace Revelator.io24.Api
                 ? 1.0f
                 : 0.0f;
 
-        private void Register((Input input, Output output) key, string routeAssign, string routeVolume)
-        {
-            _routeToKey[routeAssign] = key;
-            _routeToKey[routeVolume] = key;
-            _routes[key] = (routeAssign, routeVolume);
-
-            RouteUpdated?.Invoke(this, key);
-            VolumeUpdated?.Invoke(this, key);
-        }
-
         private void ValueStateUpdated(string route, float value)
         {
             if (!_routeToKey.TryGetValue(route, out var key))
@@ -138,75 +126,94 @@ namespace Revelator.io24.Api
 
         private void Syncronized()
         {
-            Register((Input.Mic_L, Output.Main),
+            foreach (var key in _routes.Keys)
+            {
+                RouteUpdated?.Invoke(this, key);
+                VolumeUpdated?.Invoke(this, key);
+            }
+        }
+
+        private void SetupRoutes()
+        {
+            SetupRouting((Input.Mic_L, Output.Main),
                 "line/ch1/mute",
                 "line/ch1/volume");
-            Register((Input.Mic_L, Output.Mix_A),
+            SetupRouting((Input.Mic_L, Output.Mix_A),
                 "line/ch1/assign_aux1",
                 "line/ch1/aux1");
-            Register((Input.Mic_L, Output.Mix_B),
+            SetupRouting((Input.Mic_L, Output.Mix_B),
                 "line/ch1/assign_aux2",
                 "line/ch1/aux2");
 
-            Register((Input.Mic_R, Output.Main),
+            SetupRouting((Input.Mic_R, Output.Main),
                 "line/ch2/mute",
                 "line/ch2/volume");
-            Register((Input.Mic_R, Output.Mix_A),
+            SetupRouting((Input.Mic_R, Output.Mix_A),
                 "line/ch2/assign_aux1",
                 "line/ch2/aux1");
-            Register((Input.Mic_R, Output.Mix_B),
+            SetupRouting((Input.Mic_R, Output.Mix_B),
                 "line/ch2/assign_aux2",
                 "line/ch2/aux2");
 
-            Register((Input.Playback, Output.Main),
+            SetupRouting((Input.Playback, Output.Main),
                 "return/ch1/mute",
                 "return/ch1/volume");
-            Register((Input.Playback, Output.Mix_A),
+            SetupRouting((Input.Playback, Output.Mix_A),
                 "return/ch1/assign_aux1",
                 "return/ch1/aux1");
-            Register((Input.Playback, Output.Mix_B),
+            SetupRouting((Input.Playback, Output.Mix_B),
                 "return/ch1/assign_aux2",
                 "return/ch1/aux2");
 
-            Register((Input.Virtual_A, Output.Main),
+            SetupRouting((Input.Virtual_A, Output.Main),
                 "return/ch2/mute",
                 "return/ch2/volume");
-            Register((Input.Virtual_A, Output.Mix_A),
+            SetupRouting((Input.Virtual_A, Output.Mix_A),
                 "return/ch2/assign_aux1",
                 "return/ch2/aux1");
-            Register((Input.Virtual_A, Output.Mix_B),
+            SetupRouting((Input.Virtual_A, Output.Mix_B),
                 "return/ch2/assign_aux2",
                 "return/ch2/aux2");
 
-            Register((Input.Virtual_B, Output.Main),
+            SetupRouting((Input.Virtual_B, Output.Main),
                 "return/ch3/mute",
                 "return/ch3/volume");
-            Register((Input.Virtual_B, Output.Mix_A),
+            SetupRouting((Input.Virtual_B, Output.Mix_A),
                 "return/ch3/assign_aux1",
                 "return/ch3/aux1");
-            Register((Input.Virtual_B, Output.Mix_B),
+            SetupRouting((Input.Virtual_B, Output.Mix_B),
                 "return/ch3/assign_aux2",
                 "return/ch3/aux2");
 
-            Register((Input.Reverb, Output.Main),
+            SetupRouting((Input.Reverb, Output.Main),
                 "fxreturn/ch1/mute",
                 "fxreturn/ch1/volume");
-            Register((Input.Reverb, Output.Mix_A),
+            SetupRouting((Input.Reverb, Output.Mix_A),
                 "fxreturn/ch1/assign_aux1",
                 "fxreturn/ch1/aux1");
-            Register((Input.Reverb, Output.Mix_B),
+            SetupRouting((Input.Reverb, Output.Mix_B),
                 "fxreturn/ch1/assign_aux2",
                 "fxreturn/ch1/aux2");
 
-            Register((Input.Mix, Output.Main),
+            SetupRouting((Input.Mix, Output.Main),
                 "main/ch1/mute",
                 "main/ch1/volume");
-            Register((Input.Mix, Output.Mix_A),
+            SetupRouting((Input.Mix, Output.Mix_A),
                 "aux/ch1/mute",
                 "aux/ch1/volume");
-            Register((Input.Mix, Output.Mix_B),
+            SetupRouting((Input.Mix, Output.Mix_B),
                 "aux/ch2/mute",
                 "aux/ch2/volume");
+
+            _rawService.Syncronized += Syncronized;
+            _rawService.ValueStateUpdated += ValueStateUpdated;
+        }
+
+        private void SetupRouting((Input input, Output output) key, string routeAssign, string routeVolume)
+        {
+            _routeToKey[routeAssign] = key;
+            _routeToKey[routeVolume] = key;
+            _routes[key] = (routeAssign, routeVolume);
         }
     }
 }

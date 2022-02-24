@@ -7,69 +7,85 @@
     {
       "Name": "Route Change",
       "UUID": "com.oddbear.revelator.io24.routechange",
-      "Icon": "Images/Icons/Icon",
+      "Icon": "Images/Icons/routing",
       "Tooltip": "A route changing action",
       "PropertyInspectorPath": "PropertyInspector/RouteChangeAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/routing_on",
+          "Title": "Route On",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/routing_off",
+          "Title": "Route Off",
+          "TitleAlignment": "bottom"
         }
       ]
     },
     {
       "Name": "Headphone source",
       "UUID": "com.oddbear.revelator.io24.headphonesource",
-      "Icon": "Images/Icons/Icon",
+      "Icon": "Images/Icons/headphones",
       "Tooltip": "A headphones source set action",
       "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/headphones_on",
+          "Title": "Headphones On",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/headphones_off",
+          "Title": "Headphones Off",
+          "TitleAlignment": "bottom"
         }
       ]
     },
     {
       "Name": "Fat Channel Toggle",
       "UUID": "com.oddbear.revelator.io24.fatchanneltoggle",
-      "Icon": "Images/Icons/Icon",
+      "Icon": "Images/Icons/fat",
       "Tooltip": "A Fat Channel toggle action",
       "PropertyInspectorPath": "PropertyInspector/FatChannelToggleAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/fat_on",
+          "Title": "Fat On",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/fat_off",
+          "Title": "Fat Off",
+          "TitleAlignment": "bottom"
         }
       ]
     },
     {
       "Name": "Preset change",
       "UUID": "com.oddbear.revelator.io24.presetchange",
-      "Icon": "Images/Icons/Icon",
+      "Icon": "Images/Icons/presets",
       "Tooltip": "A preset change action",
       "PropertyInspectorPath": "PropertyInspector/PresetChangeAction.html",
       "States": [
         {
-          "Image": "Images/Plugin/On"
+          "Image": "Images/Plugin/preset_on",
+          "Title": "Preset On",
+          "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/Off"
+          "Image": "Images/Plugin/preset_off",
+          "Title": "Preset Off",
+          "TitleAlignment": "bottom"
         }
       ]
     }
   ],
   "Category": "Revelator io24",
-  "CategoryIcon": "Images/Plugin/CategoryIcon",
+  "CategoryIcon": "Images/Icons/category",
   "CodePath": "Revelator.io24.StreamDeck.exe",
   "Description": "A Revelator io24 plugin for the Stream Deck",
-  "Icon": "Images/Plugin/Icon",
+  "Icon": "Images/Icons/category",
   "SDKVersion": 2,
   "Software": {
     "MinimumVersion": "4.1"

@@ -3,20 +3,15 @@ using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Models.Global;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
-using SharpDeck.Events.Received;
 using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
     [StreamDeckAction("com.oddbear.revelator.io24.headphonesource")]
-    public class HeadphonesSourceAction : StreamDeckAction
+    public class HeadphonesSourceAction : ActionBase<HeadphonesSourceSettings>
     {
         private readonly Device _device;
-
-        //We need some how to know the state when Events are received.
-        //In other situations, use GetSettings.
-        private Headphones _state;
 
         public HeadphonesSourceAction(
             Device device)
@@ -24,47 +19,42 @@ namespace Revelator.io24.StreamDeck.Actions
             _device = device;
         }
 
-        protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
+        protected override void RegisterCallbacks()
         {
-            await base.OnDidReceiveSettings(args);
-
-            var settings = args.Payload
-                .GetSettings<HeadphonesSourceSettings>();
-
-            _state = settings.Microphone;
-
-            await StateUpdated();
-        }
-
-        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
-        {
-            await base.OnWillAppear(args);
             _device.Global.PropertyChanged += PropertyChanged;
-
-            var settings = args.Payload
-                .GetSettings<HeadphonesSourceSettings>();
-
-            _state = settings.Microphone;
-
-            await StateUpdated();
         }
 
-        protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
+        protected override void UnregisterCallbacks()
         {
-            await base.OnWillDisappear(args);
             _device.Global.PropertyChanged -= PropertyChanged;
         }
 
-        protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
+        protected override void OnButtonPress()
         {
-            await base.OnKeyUp(args);
+            _device.Global.HeadphonesSource = _settings.Headphone;
+        }
 
-            var settings = args.Payload
-                .GetSettings<HeadphonesSourceSettings>();
+        protected override bool GetButtonState()
+        {
+            var currentHeadphoneSource = _device.Global.HeadphonesSource;
+            return _settings.Headphone == currentHeadphoneSource;
+        }
 
-            _device.Global.HeadphonesSource = settings.Microphone;
-
-            await StateUpdated();
+        protected override async Task SettingsChanged()
+        {
+            switch(_settings.Headphone)
+            {
+                case Headphones.MixA:
+                    await SetTitleAsync("Mix A");
+                    break;
+                case Headphones.MixB:
+                    await SetTitleAsync("Mix B");
+                    break;
+                case Headphones.Main:
+                default:
+                    await SetTitleAsync("Main");
+                    break;
+            }
         }
 
         private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -74,20 +64,12 @@ namespace Revelator.io24.StreamDeck.Actions
                 if (e.PropertyName != nameof(Global.HeadphonesSource))
                     return;
 
-                await StateUpdated();
+                await RefreshState();
             }
             catch (Exception exception)
             {
                 Trace.TraceError(exception.ToString());
             }
-        }
-
-        private async Task StateUpdated()
-        {
-            var headphoneSource = _device.Global.HeadphonesSource;
-            var state = _state == headphoneSource ? 0 : 1;
-
-            await SetStateAsync(state);
         }
     }
 }

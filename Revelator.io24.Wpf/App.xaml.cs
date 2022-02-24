@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api.Configuration;
-using Revelator.io24.Api.Services;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Windows;
@@ -30,8 +29,7 @@ namespace Revelator.io24.Wpf
             serviceCollection.AddSingleton<MainViewModel>();
 
             var serviceProvider = serviceCollection.BuildServiceProvider();
-            var broadcastService = serviceProvider.GetRequiredService<BroadcastService>();
-            broadcastService.StartReceive();
+            serviceProvider.StartRevelatorAPI();
 
             //Run application:
             var mainWindow = serviceProvider.GetRequiredService<MainWindow>();

@@ -3,18 +3,15 @@ using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Models.Inputs;
 using Revelator.io24.StreamDeck.Settings;
 using SharpDeck;
-using SharpDeck.Events.Received;
 using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
     [StreamDeckAction("com.oddbear.revelator.io24.presetchange")]
-    public class PresetChangeAction : StreamDeckAction
+    public class PresetChangeAction : ActionBase<PresetChangeSettings>
     {
         private readonly Device _device;
-
-        private PresetChangeSettings? _settings;
 
         public PresetChangeAction(
             Device device)
@@ -22,73 +19,40 @@ namespace Revelator.io24.StreamDeck.Actions
             _device = device;
         }
 
-        protected override async Task OnDidReceiveSettings(ActionEventArgs<ActionPayload> args)
+        protected override void RegisterCallbacks()
         {
-            await base.OnDidReceiveSettings(args);
-
-            _settings = args.Payload
-                .GetSettings<PresetChangeSettings>();
-
-            await UpdateSettingsPresets();
-
-            await StateUpdated();
-        }
-
-        protected override async Task OnWillAppear(ActionEventArgs<AppearancePayload> args)
-        {
-            await base.OnWillAppear(args);
             _device.MicrohoneLeft.PropertyChanged += PropertyChanged;
             _device.MicrohoneRight.PropertyChanged += PropertyChanged;
-
-            _settings = args.Payload
-                .GetSettings<PresetChangeSettings>();
-
-            await UpdateSettingsPresets();
-
-            await StateUpdated();
         }
 
-        protected override async Task OnWillDisappear(ActionEventArgs<AppearancePayload> args)
+        protected override void UnregisterCallbacks()
         {
-            await base.OnWillDisappear(args);
             _device.MicrohoneLeft.PropertyChanged -= PropertyChanged;
             _device.MicrohoneRight.PropertyChanged -= PropertyChanged;
         }
 
-        protected override async Task OnKeyUp(ActionEventArgs<KeyPayload> args)
+        protected override void OnButtonPress()
         {
-            await base.OnKeyUp(args);
-
-            _settings = args.Payload
-                .GetSettings<PresetChangeSettings>();
-
             var presetIndex = _settings.Preset;
             var preset = _settings.Presets[presetIndex].Name;
 
             var lineChannel = GetMicrophoneChannel(_settings.Channel);
             lineChannel.Preset = preset;
-
-            await StateUpdated();
         }
 
-        private async Task UpdateSettingsPresets()
+        protected override bool GetButtonState()
         {
-            if (_settings is null)
-                return;
+            var presetIndex = _settings.Preset;
 
             var lineChannel = GetMicrophoneChannel(_settings.Channel);
-            var presets = lineChannel.Presets;
+            var linePresetIndex = Array.IndexOf(lineChannel.Presets, lineChannel.Preset);
+            return presetIndex == linePresetIndex;
+        }
 
-            var presetNames = _settings.Presets
-                .Select(preset => preset.Name);
-
-            if (presets.SequenceEqual(presetNames))
-                return;
-            
-            for (int i = 0; i < 14; i++)
-                _settings.Presets[i].Name = presets[i];
-
-            await SetSettingsAsync(_settings);
+        protected override async Task SettingsChanged()
+        {
+            await UpdateSettingsPresets();
+            await UpdatePresetNameTitle();
         }
 
         private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -97,7 +61,7 @@ namespace Revelator.io24.StreamDeck.Actions
             {
                 if (e.PropertyName == nameof(LineChannel.Preset))
                 {
-                    await StateUpdated();
+                    await RefreshState();
                     return;
                 }
 
@@ -113,19 +77,35 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        private async Task StateUpdated()
+        private async Task UpdateSettingsPresets()
         {
-            if (_settings?.Preset is null)
+            var lineChannel = GetMicrophoneChannel(_settings.Channel);
+            var presets = lineChannel.Presets;
+
+            var presetNames = _settings.Presets
+                .Select(preset => preset.Name);
+
+            //Don't do anything is all presets are equal (name and position):
+            if (presets.SequenceEqual(presetNames))
                 return;
 
-            var index = _settings.Preset;
+            for (int i = 0; i < 14; i++)
+                _settings.Presets[i].Name = presets[i];
 
-            var lineChannel = GetMicrophoneChannel(_settings.Channel);
-            var lineIndex = Array.IndexOf<string>(lineChannel.Presets, lineChannel.Preset);
-            var presetSelected = index == lineIndex;
-            var state = presetSelected ? 0 : 1;
+            //Replaces the settings in dropdown with new ones:
+            await SetSettingsAsync(_settings);
+        }
 
-            await SetStateAsync(state);
+        private async Task UpdatePresetNameTitle()
+        {
+            var preset = GetSelectedPresetName();
+            await SetTitleAsync(preset);
+        }
+
+        private string GetSelectedPresetName()
+        {
+            var presetIndex = _settings.Preset;
+            return _settings.Presets[presetIndex].Name;
         }
 
         private LineChannel GetMicrophoneChannel(MicrophoneChannel channel)
