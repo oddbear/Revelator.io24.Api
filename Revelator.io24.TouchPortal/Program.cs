@@ -18,9 +18,7 @@ serviceCollection.AddSingleton<RevelatorIo24Plugin>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
-serviceProvider
-    .GetRequiredService<BroadcastService>()
-    .StartReceive();
+serviceProvider.StartRevelatorAPI();
 
 //Init TouchPortal:
 var touchPortalClient = serviceProvider.GetRequiredService<RevelatorIo24Plugin>();
