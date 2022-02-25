@@ -174,74 +174,142 @@
                             </Style.Triggers>
                         </Style>
                     </GroupBox.Style>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="15" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                        <ProgressBar Grid.Column="0" Grid.RowSpan="2" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Microphone_R, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
+                        <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-50" Maximum="100" Orientation="Vertical" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Column="2" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.Main_MicR, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Column="2" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_MicR}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Column="3" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixA_MicR, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Column="3" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_MicR}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Column="4" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixB_MicR, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Column="4" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_MicR}"/>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
 
                 <GroupBox Header="{Binding Path=Device.Playback.UserDefinedName}" Width="90">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Playback_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Playback_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.Main_Playback, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_Playback}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8" Text="{Binding Path=VolumeMap.MixA_Playback, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="3" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_Playback}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8" Text="{Binding Path=VolumeMap.MixB_Playback, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="4" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_Playback}"/>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
 
                 <GroupBox Header="{Binding Path=Device.VirtualA.UserDefinedName}" Width="90">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.Main_VirtualA, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_VirtualA}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8" Text="{Binding Path=VolumeMap.MixA_VirtualA, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="3" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_VirtualA}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8" Text="{Binding Path=VolumeMap.MixB_VirtualA, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="4" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_VirtualA}"/>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
 
                 <GroupBox Header="{Binding Path=Device.VirtualB.UserDefinedName}" Width="90">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_R, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.Main_VirtualB, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_VirtualB}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8" Text="{Binding Path=VolumeMap.MixA_VirtualB, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="3" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_VirtualB}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8" Text="{Binding Path=VolumeMap.MixB_VirtualB, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="4" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_VirtualB}"/>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
 
                 <GroupBox Header="{Binding Path=Device.Reverb.UserDefinedName}" Width="90">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Maximum="100"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Text="{Binding Path=VolumeMap.Main_Reverb, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Maximum="100"
                                     Value="{Binding Path=VolumeMap.Main_Reverb}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="1" FontSize="8" Text="{Binding Path=VolumeMap.MixA_Reverb, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="1" Orientation="Vertical" Maximum="100"
                                     Value="{Binding Path=VolumeMap.MixA_Reverb}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.MixB_Reverb, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                     Value="{Binding Path=VolumeMap.MixB_Reverb}"/>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
 
                 <GroupBox Header="{Binding Path=Device.Main.UserDefinedName}" Width="90">
@@ -257,14 +325,24 @@
                             </Style.Triggers>
                         </Style>
                     </GroupBox.Style>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Margin="10" Maximum="100"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0" Text="{Binding Path=VolumeMap.Main_Mix, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_Mix}"/>
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Main_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Main_R, Converter={StaticResource decibelConverter}}" />
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
                 <GroupBox Header="{Binding Path=Device.StreamMixA.UserDefinedName}" Width="90">
                     <GroupBox.Style>
@@ -279,14 +357,24 @@
                             </Style.Triggers>
                         </Style>
                     </GroupBox.Style>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Margin="10" Maximum="100"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0" Text="{Binding Path=VolumeMap.MixA_Mix, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_Mix}"/>
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix1_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix1_R, Converter={StaticResource decibelConverter}}" />
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
                 <GroupBox Header="{Binding Path=Device.StreamMixB.UserDefinedName}" Width="90">
                     <GroupBox.Style>
@@ -301,14 +389,24 @@
                             </Style.Triggers>
                         </Style>
                     </GroupBox.Style>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Slider Orientation="Vertical" Margin="10" Maximum="100"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0" Text="{Binding Path=VolumeMap.MixB_Mix, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_Mix}"/>
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix2_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix2_R, Converter={StaticResource decibelConverter}}" />
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
             </StackPanel>
         </Grid>
