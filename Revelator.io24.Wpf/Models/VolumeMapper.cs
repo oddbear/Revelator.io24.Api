@@ -1,7 +1,5 @@
 ﻿using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Models;
-using Revelator.io24.Api.Services;
 namespace Revelator.io24.Wpf.Models
 {
     public class VolumeMapper

@@ -10,6 +10,7 @@
         Title="MainWindow" Height="500" Width="830">
     <Window.Resources>
         <converter:DecibelConverter x:Key="decibelConverter" />
+        <converter:DecibelConverter2 x:Key="decibelConverter2" />
         <converter:HeadphonesStateConverter x:Key="headphonesStateConverter" />
         <converter:BooleanInverterConverter x:Key="booleanInverterConverter" />
     </Window.Resources>
@@ -132,18 +133,32 @@
                             </Style.Triggers>
                         </Style>
                     </GroupBox.Style>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <ProgressBar Minimum="60" Maximum="100" Orientation="Vertical" Width="10"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="15" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ProgressBar Grid.Column="0" Grid.RowSpan="2" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Microphone_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Minimum="-50" Maximum="100" Orientation="Vertical" Width="10" Foreground="Gray" Background="Blue"
+                        <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-50" Maximum="100" Orientation="Vertical" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_L, Converter={StaticResource decibelConverter}}" />
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Column="2" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.Main_MicL, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Column="2" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_MicL}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Column="3" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixA_MicL, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Column="3" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_MicL}"/>
-                        <Slider Orientation="Vertical" Maximum="100"
+                        <TextBox Grid.Column="5" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixB_MicL, Converter={StaticResource decibelConverter2}}" />
+                        <Slider Grid.Column="4" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_MicL}"/>
-                    </StackPanel>
+                    </Grid>
                 </GroupBox>
 
                 <GroupBox Header="{Binding Path=Device.MicrohoneRight.UserDefinedName}" Width="90">
