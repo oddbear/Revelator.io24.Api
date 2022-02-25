@@ -149,13 +149,19 @@
                                      Value="{Binding Path=MonitorValues.Microphone_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-50" Maximum="100" Orientation="Vertical" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_L, Converter={StaticResource decibelConverter}}" />
-                        <TextBox Grid.Column="2" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.Main_MicL, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Column="2" Grid.Row="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.Main_MicL, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Column="2" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_MicL}"/>
-                        <TextBox Grid.Column="3" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixA_MicL, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Column="3" Grid.Row="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixA_MicL, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Column="3" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_MicL}"/>
-                        <TextBox Grid.Column="5" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixB_MicL, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Column="5" Grid.Row="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixB_MicL, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Column="4" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_MicL}"/>
                     </Grid>
@@ -190,13 +196,19 @@
                                      Value="{Binding Path=MonitorValues.Microphone_R, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-50" Maximum="100" Orientation="Vertical" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_R, Converter={StaticResource decibelConverter}}" />
-                        <TextBox Grid.Column="2" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.Main_MicR, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Column="2" Grid.Row="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.Main_MicR, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Column="2" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_MicR}"/>
-                        <TextBox Grid.Column="3" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixA_MicR, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Column="3" Grid.Row="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixA_MicR, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Column="3" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_MicR}"/>
-                        <TextBox Grid.Column="4" Grid.Row="0" FontSize="8" Text="{Binding Path=VolumeMap.MixB_MicR, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Column="4" Grid.Row="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixB_MicR, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Column="4" Grid.Row="1" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_MicR}"/>
                     </Grid>
@@ -219,13 +231,19 @@
                                      Value="{Binding Path=MonitorValues.Playback_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Playback_R, Converter={StaticResource decibelConverter}}" />
-                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.Main_Playback, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.Main_Playback, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_Playback}"/>
-                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8" Text="{Binding Path=VolumeMap.MixA_Playback, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixA_Playback, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="3" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_Playback}"/>
-                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8" Text="{Binding Path=VolumeMap.MixB_Playback, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixB_Playback, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="4" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_Playback}"/>
                     </Grid>
@@ -248,13 +266,19 @@
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_R, Converter={StaticResource decibelConverter}}" />
-                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.Main_VirtualA, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.Main_VirtualA, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_VirtualA}"/>
-                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8" Text="{Binding Path=VolumeMap.MixA_VirtualA, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixA_VirtualA, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="3" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_VirtualA}"/>
-                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8" Text="{Binding Path=VolumeMap.MixB_VirtualA, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixB_VirtualA, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="4" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_VirtualA}"/>
                     </Grid>
@@ -277,13 +301,19 @@
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_L, Converter={StaticResource decibelConverter}}" />
                         <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_R, Converter={StaticResource decibelConverter}}" />
-                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.Main_VirtualB, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.Main_VirtualB, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_VirtualB}"/>
-                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8" Text="{Binding Path=VolumeMap.MixA_VirtualB, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="3" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixA_VirtualB, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="3" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_VirtualB}"/>
-                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8" Text="{Binding Path=VolumeMap.MixB_VirtualB, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="4" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixB_VirtualB, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="4" Orientation="Vertical" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_VirtualB}"/>
                     </Grid>
@@ -300,13 +330,19 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Text="{Binding Path=VolumeMap.Main_Reverb, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.Main_Reverb, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Maximum="100"
                                     Value="{Binding Path=VolumeMap.Main_Reverb}"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" FontSize="8" Text="{Binding Path=VolumeMap.MixA_Reverb, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="1" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixA_Reverb, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="1" Orientation="Vertical" Maximum="100"
                                     Value="{Binding Path=VolumeMap.MixA_Reverb}"/>
-                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8" Text="{Binding Path=VolumeMap.MixB_Reverb, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
+                                 Text="{Binding Path=VolumeMap.MixB_Reverb, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="2" Orientation="Vertical" Maximum="100"
                                     Value="{Binding Path=VolumeMap.MixB_Reverb}"/>
                     </Grid>
@@ -335,7 +371,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0" Text="{Binding Path=VolumeMap.Main_Mix, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0"
+                                 Text="{Binding Path=VolumeMap.Main_Mix, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_Mix}"/>
                         <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
@@ -367,7 +405,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0" Text="{Binding Path=VolumeMap.MixA_Mix, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0"
+                                 Text="{Binding Path=VolumeMap.MixA_Mix, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_Mix}"/>
                         <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
@@ -399,7 +439,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0" Text="{Binding Path=VolumeMap.MixB_Mix, Converter={StaticResource decibelConverter2}}" />
+                        <TextBox Grid.Row="0" Grid.Column="0" FontSize="8" Margin="0 0 20 0"
+                                 Text="{Binding Path=VolumeMap.MixB_Mix, Converter={StaticResource decibelConverter2}}"
+                                 KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_Mix}"/>
                         <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"

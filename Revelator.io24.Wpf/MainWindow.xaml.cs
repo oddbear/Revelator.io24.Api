@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Revelator.io24.Wpf
 {
@@ -23,6 +25,16 @@ namespace Revelator.io24.Wpf
 #if DEBUG
             Environment.Exit(0);
 #endif
+        }
+
+        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && sender is TextBox textBox)
+            {
+                textBox
+                    .GetBindingExpression(TextBox.TextProperty)
+                    .UpdateSource();
+            }
         }
     }
 }
