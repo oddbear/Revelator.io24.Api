@@ -81,24 +81,24 @@ public double CalculateFloatToDb(float value)
     if (value >=  a)
     {
         var y = (value - a) / (1 - a);
-        return Math.Round(y * 20) - 10;
+        return Math.Round(y * 20, 2) - 10;
     }
 
     if (value >= b)
     {
         var y = value / (a - b);
-        return Math.Round(y * 30) - 47;
+        return Math.Round(y * 30, 2) - 47;
     }
 
     if (value >= c)
     {
         var y = value / (b - c);
-        return Math.Round(y * 20) - 61;
+        return Math.Round(y * 20, 2) - 61;
     }
 
     {
         var y = value / (c - 0.0001111f);
-        return Math.Round(y * 35) - 96;
+        return Math.Round(y * 35, 2) - 96;
     }
 }
 

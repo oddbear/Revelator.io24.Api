@@ -8,7 +8,7 @@ namespace Revelator.io24.Wpf.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int volume)
+            if (value is float volume)
             {
                 return CalculateFloatToDb(volume / 100f);
             }
@@ -19,18 +19,20 @@ namespace Revelator.io24.Wpf.Converters
         {
             if (value is string dbStr)
             {
-                if (!int.TryParse(dbStr, out var db))
-                    return 0;
+                var cultureInfo = (CultureInfo)culture.Clone();
+                cultureInfo.NumberFormat.CurrencyDecimalSeparator = ".";
 
-                var result = CalculateDbToFloat(db) * 100f;
+                if (!float.TryParse(dbStr, NumberStyles.Any, cultureInfo, out var db))
+                    return value;
 
-                return (int)Math.Round(result);
+                return CalculateDbToFloat(db) * 100f;
             }
             return value;
         }
 
-        public int CalculateFloatToDb(float value)
+        public float CalculateFloatToDb(float value)
         {
+            //We round to skip decimals (the UI is to tight):
             var a = 0.47f;
             var b = 0.09f;
             var c = 0.004f;
@@ -59,7 +61,7 @@ namespace Revelator.io24.Wpf.Converters
             }
         }
 
-        public float CalculateDbToFloat(int db)
+        public float CalculateDbToFloat(float db)
         {
             var a = 0.47f;
             var b = 0.09f;

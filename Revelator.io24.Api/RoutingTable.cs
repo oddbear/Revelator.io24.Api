@@ -59,18 +59,18 @@ namespace Revelator.io24.Api
             }
         }
 
-        public int GetVolume(Input input, Output output)
+        public float GetVolume(Input input, Output output)
         {
             if (!_routes.TryGetValue((input, output), out var routes))
                 return 0;
 
             var value = _rawService.GetValue(routes.volume);
-            var volume = (int)Math.Round(value * 100f);
+            var volume = (float)Math.Round(value * 100f);
 
             return EnsureVolumeRange(volume);
         }
 
-        public void SetVolume(Input input, Output output, int value)
+        public void SetVolume(Input input, Output output, float value)
         {
             if (!_routes.TryGetValue((input, output), out var routes))
                 return;
@@ -80,7 +80,7 @@ namespace Revelator.io24.Api
             _rawService.SetValue(routes.volume, floatValue);
         }
 
-        private int EnsureVolumeRange(int volume)
+        private float EnsureVolumeRange(float volume)
         {
             if (volume < 0) volume = 0;
             if (volume > 100) volume = 100;
