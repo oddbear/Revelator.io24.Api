@@ -109,8 +109,8 @@ namespace Revelator.io24.Api.Services
             if (data.Length == 101)
             {
                 //Gate meter:
-                var gateL_A = BitConverter.ToUInt16(data.Range(20, 22), 0);
-                var gateR_A = BitConverter.ToUInt16(data.Range(22, 24), 0);
+                var gateL_A = BitConverter.ToUInt16(data, 20);
+                var gateR_A = BitConverter.ToUInt16(data, 22);
 
                 var unknown1 = data.Range(24, 28);
                 var unknown1Val = BitConverter.ToString(unknown1).Replace("-", "");
@@ -139,8 +139,8 @@ namespace Revelator.io24.Api.Services
 
                 //One of the gain reduction meters are probarbly the Gate meter
                 //Gain Reduction Meter (0xFF, 0xFF is highest = no blue line):
-                _fatChannel.GainReductionMeter_L = BitConverter.ToUInt16(data.Range(44, 46), 0);
-                _fatChannel.GainReductionMeter_R = BitConverter.ToUInt16(data.Range(46, 48), 0);
+                _fatChannel.GainReductionMeter_L = BitConverter.ToUInt16(data, 44);
+                _fatChannel.GainReductionMeter_R = BitConverter.ToUInt16(data, 46);
 
                 var unknown4 = data.Range(48, 101);
                 var unknown4Val = BitConverter.ToString(unknown4).Replace("-", "");
@@ -166,8 +166,8 @@ namespace Revelator.io24.Api.Services
             else if (data.Length == 81)
             {
                 //Microphone:
-                _values.Microphone_L = BitConverter.ToUInt16(data.Range(20, 22), 0); //XLR Input left
-                _values.Microphone_R = BitConverter.ToUInt16(data.Range(22, 24), 0); //XLR Input Right
+                _values.Microphone_L = BitConverter.ToUInt16(data, 20); //XLR Input left
+                _values.Microphone_R = BitConverter.ToUInt16(data, 22); //XLR Input Right
 
                 //Unknown 1:
                 var unknown1 = data.Range(24, 32);
@@ -177,29 +177,29 @@ namespace Revelator.io24.Api.Services
 
                 //Outputs:
                 //Palyback L/R:
-                _values.Playback_L = BitConverter.ToUInt16(data.Range(32, 34), 0);
-                _values.Playback_R = BitConverter.ToUInt16(data.Range(34, 36), 0);
+                _values.Playback_L = BitConverter.ToUInt16(data, 32);
+                _values.Playback_R = BitConverter.ToUInt16(data, 34);
 
                 //Virtual Output A L/R:
-                _values.VirtualOutputA_L = BitConverter.ToUInt16(data.Range(36, 38), 0);
-                _values.VirtualOutputA_R = BitConverter.ToUInt16(data.Range(38, 40), 0);
+                _values.VirtualOutputA_L = BitConverter.ToUInt16(data, 36);
+                _values.VirtualOutputA_R = BitConverter.ToUInt16(data, 38);
 
                 //Virtual Output B L/R:
-                _values.VirtualOutputB_L = BitConverter.ToUInt16(data.Range(40, 42), 0);
-                _values.VirtualOutputB_R = BitConverter.ToUInt16(data.Range(42, 44), 0);
+                _values.VirtualOutputB_L = BitConverter.ToUInt16(data, 40);
+                _values.VirtualOutputB_R = BitConverter.ToUInt16(data, 42);
 
                 //Mixes:
                 //Stream Mix 1:
-                _values.StreamMix1_L = BitConverter.ToUInt16(data.Range(44, 46), 0);
-                _values.StreamMix1_R = BitConverter.ToUInt16(data.Range(46, 48), 0);
+                _values.StreamMix1_L = BitConverter.ToUInt16(data, 44);
+                _values.StreamMix1_R = BitConverter.ToUInt16(data, 46);
 
                 //Stream Mix 2:
-                _values.StreamMix2_L = BitConverter.ToUInt16(data.Range(48, 50), 0);
-                _values.StreamMix2_R = BitConverter.ToUInt16(data.Range(50, 52), 0);
+                _values.StreamMix2_L = BitConverter.ToUInt16(data, 48);
+                _values.StreamMix2_R = BitConverter.ToUInt16(data, 50);
 
                 //Main monitor:
-                _values.Main_L = BitConverter.ToUInt16(data.Range(52, 54), 0);
-                _values.Main_R = BitConverter.ToUInt16(data.Range(54, 56), 0);
+                _values.Main_L = BitConverter.ToUInt16(data, 52);
+                _values.Main_R = BitConverter.ToUInt16(data, 54);
 
                 //Unknown 2:
                 var unknown2 = data.Range(56);
@@ -213,12 +213,12 @@ namespace Revelator.io24.Api.Services
             else if (data.Length == 85)
             {
                 //Microphone L/R:
-                _values.Microphone_L = BitConverter.ToUInt16(data.Range(20, 22), 0); //XLR Input left
-                _values.Microphone_R = BitConverter.ToUInt16(data.Range(22, 24), 0); //XLR Input Right
+                _values.Microphone_L = BitConverter.ToUInt16(data, 20); //XLR Input left
+                _values.Microphone_R = BitConverter.ToUInt16(data, 22); //XLR Input Right
 
                 //Microphone L/R again?:
-                var somethingL = BitConverter.ToUInt16(data.Range(24, 26), 0); //Same as Microphone L
-                var somethingR = BitConverter.ToUInt16(data.Range(26, 28), 0); //Same as Microphone R
+                var somethingL = BitConverter.ToUInt16(data, 24); //Same as Microphone L
+                var somethingR = BitConverter.ToUInt16(data, 26); //Same as Microphone R
                 if (_values.Microphone_L != somethingL)
                     Log.Information("Mic L != Something L: {val1} {val2}", _values.Microphone_L, somethingL);
                 if (_values.Microphone_R != somethingR)
@@ -232,29 +232,29 @@ namespace Revelator.io24.Api.Services
 
                 //Outputs:
                 //Playback:
-                _values.Playback_L = BitConverter.ToUInt16(data.Range(36, 38), 0);
-                _values.Playback_R = BitConverter.ToUInt16(data.Range(38, 40), 0);
+                _values.Playback_L = BitConverter.ToUInt16(data, 36);
+                _values.Playback_R = BitConverter.ToUInt16(data, 38);
 
                 //Virtual Output A L/R:
-                _values.VirtualOutputA_L = BitConverter.ToUInt16(data.Range(40, 42), 0);
-                _values.VirtualOutputA_R = BitConverter.ToUInt16(data.Range(42, 44), 0);
+                _values.VirtualOutputA_L = BitConverter.ToUInt16(data, 40);
+                _values.VirtualOutputA_R = BitConverter.ToUInt16(data, 42);
 
                 //Virtual Output B L/R:
-                _values.VirtualOutputB_L = BitConverter.ToUInt16(data.Range(44, 46), 0);
-                _values.VirtualOutputB_R = BitConverter.ToUInt16(data.Range(46, 48), 0);
+                _values.VirtualOutputB_L = BitConverter.ToUInt16(data, 44);
+                _values.VirtualOutputB_R = BitConverter.ToUInt16(data, 46);
 
                 //Mixes:
                 //Stream Mix 1:
-                _values.StreamMix1_L = BitConverter.ToUInt16(data.Range(48, 50), 0);
-                _values.StreamMix1_R = BitConverter.ToUInt16(data.Range(50, 52), 0);
+                _values.StreamMix1_L = BitConverter.ToUInt16(data, 48);
+                _values.StreamMix1_R = BitConverter.ToUInt16(data, 50);
 
                 //Stream Mix 2:
-                _values.StreamMix2_L = BitConverter.ToUInt16(data.Range(52, 54), 0);
-                _values.StreamMix2_R = BitConverter.ToUInt16(data.Range(54, 56), 0);
+                _values.StreamMix2_L = BitConverter.ToUInt16(data, 52);
+                _values.StreamMix2_R = BitConverter.ToUInt16(data, 54);
 
                 //Main monitor:
-                _values.Main_L = BitConverter.ToUInt16(data.Range(56, 58), 0);
-                _values.Main_R = BitConverter.ToUInt16(data.Range(58, 60), 0);
+                _values.Main_L = BitConverter.ToUInt16(data, 56);
+                _values.Main_R = BitConverter.ToUInt16(data, 58);
 
                 //Unknown 2:
                 var unknown2 = data.Range(60);
