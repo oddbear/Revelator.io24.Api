@@ -6,7 +6,7 @@ namespace Revelator.io24.Api.Models.Effects
     [RoutePrefix("fx/ch1/reverb")]
     public class ReverbEffects : DeviceRoutingBase, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
             => PropertyChanged?.Invoke(this, eventArgs);

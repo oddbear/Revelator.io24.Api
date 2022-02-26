@@ -1,8 +1,10 @@
-﻿namespace Revelator.io24.Api.Models.Monitor
+﻿using System;
+
+namespace Revelator.io24.Api.Models.Monitor
 {
     public class ValuesMonitorModel
     {
-        public event EventHandler? ValuesUpdated;
+        public event EventHandler ValuesUpdated;
 
         public ushort Microphone_L { get; set; }
         public ushort Microphone_R { get; set; }

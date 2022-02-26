@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api.Models.Monitor;
 using Revelator.io24.Api.Services;
+using System;
 
 namespace Revelator.io24.Api.Configuration
 {

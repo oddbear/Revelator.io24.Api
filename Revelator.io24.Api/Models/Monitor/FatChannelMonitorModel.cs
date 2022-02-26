@@ -1,8 +1,10 @@
-﻿namespace Revelator.io24.Api.Models.Monitor
+﻿using System;
+
+namespace Revelator.io24.Api.Models.Monitor
 {
     public class FatChannelMonitorModel
     {
-        public event EventHandler? FatChannelUpdated;
+        public event EventHandler FatChannelUpdated;
 
         public ushort GainReductionMeter_L { get; set; }
         public ushort GainReductionMeter_R { get; set; }

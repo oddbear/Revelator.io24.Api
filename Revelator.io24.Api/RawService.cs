@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
 namespace Revelator.io24.Api
 {
@@ -9,17 +12,17 @@ namespace Revelator.io24.Api
         public delegate void StringStateEvent(string route, string value);
         public delegate void StringsStateEvent(string route, string[] value);
 
-        private Dictionary<string, float> _values = new();
-        private Dictionary<string, string> _string = new();
-        private Dictionary<string, string[]> _strings = new();
+        private Dictionary<string, float> _values = new Dictionary<string, float>();
+        private Dictionary<string, string> _string = new Dictionary<string, string>();
+        private Dictionary<string, string[]> _strings = new Dictionary<string, string[]>();
 
-        public event SyncronizeEvent? Syncronized;
-        public event ValueStateEvent? ValueStateUpdated;
-        public event StringStateEvent? StringStateUpdated;
-        public event StringsStateEvent? StringsStateUpdated;
+        public event SyncronizeEvent Syncronized;
+        public event ValueStateEvent ValueStateUpdated;
+        public event StringStateEvent StringStateUpdated;
+        public event StringsStateEvent StringsStateUpdated;
 
-        internal Action<string, string>? SetStringMethod;
-        internal Action<string, float>? SetValueMethod;
+        internal Action<string, string> SetStringMethod;
+        internal Action<string, float> SetValueMethod;
 
         public void SetString(string route, string value)
         {
@@ -46,7 +49,7 @@ namespace Revelator.io24.Api
             => _values.TryGetValue(route, out var value)
                 ? value : default;
 
-        public string? GetString(string route)
+        public string GetString(string route)
             => _string.TryGetValue(route, out var value)
                 ? value : default;
 
@@ -142,14 +145,14 @@ namespace Revelator.io24.Api
             }
         }
 
-        private string CreatePath(string path, string? propertyName = null)
+        private string CreatePath(string path, string propertyName = null)
         {
             //Path should never start with a '/'
             if (path is null || path.Length < 1)
                 return $"{path}{propertyName}";
 
             //Path already ends with '/', should not add another one
-            if (path[^1] == '/')
+            if (path.Last() == '/')
                 return $"{path}{propertyName}";
 
             //Add '/' to path:

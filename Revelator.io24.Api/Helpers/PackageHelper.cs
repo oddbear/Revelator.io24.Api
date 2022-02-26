@@ -1,4 +1,7 @@
-﻿using Revelator.io24.Api.Services;
+﻿using Revelator.io24.Api.Extensions;
+using Revelator.io24.Api.Services;
+using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Revelator.io24.Api.Helpers
@@ -43,7 +46,7 @@ namespace Revelator.io24.Api.Helpers
 
         public static string GetMessageType(byte[] data)
         {
-            return Encoding.ASCII.GetString(data[6..8]);
+            return Encoding.ASCII.GetString(data.Range(6, 8));
         }
 
         public static void ApplyBytes(byte[] message, byte[] data, int index, int? length = null)
@@ -74,7 +77,7 @@ namespace Revelator.io24.Api.Helpers
                 var startI = indexes[i - 1];
                 var stopI = indexes[i];
 
-                yield return data[startI..stopI];
+                yield return data.Range(startI, stopI);
             }
         }
     }

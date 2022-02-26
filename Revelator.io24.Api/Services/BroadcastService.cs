@@ -1,7 +1,10 @@
-﻿using Revelator.io24.Api.Helpers;
+﻿using Revelator.io24.Api.Extensions;
+using Revelator.io24.Api.Helpers;
 using Serilog;
+using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Revelator.io24.Api.Services
 {
@@ -39,7 +42,7 @@ namespace Revelator.io24.Api.Services
             {
                 try
                 {
-                    IPEndPoint? endPoint = null;
+                    IPEndPoint endPoint = null;
                     var data = _udpClient.Receive(ref endPoint);
 
                     var isUcNetPackage = PackageHelper.IsUcNetPackage(data);
@@ -65,8 +68,8 @@ namespace Revelator.io24.Api.Services
 
                     if (!_communicationService.IsConnected)
                     {
-                        var deviceId = BitConverter.ToUInt16(data[8..10]);
-                        var tcpPort = BitConverter.ToUInt16(data[4..6]);
+                        var deviceId = BitConverter.ToUInt16(data.Range(8, 10), 0);
+                        var tcpPort = BitConverter.ToUInt16(data.Range(4, 6), 0);
                         _communicationService.Connect(deviceId, tcpPort);
                     }
 

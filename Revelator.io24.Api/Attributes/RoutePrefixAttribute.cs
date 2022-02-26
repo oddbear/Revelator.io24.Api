@@ -1,4 +1,6 @@
-﻿namespace Revelator.io24.Api.Attributes
+﻿using System;
+
+namespace Revelator.io24.Api.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class RoutePrefixAttribute : Attribute

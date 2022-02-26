@@ -1,4 +1,6 @@
 ﻿using Revelator.io24.Api.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace Revelator.io24.Api
 {
@@ -12,8 +14,8 @@ namespace Revelator.io24.Api
     {
         private readonly RawService _rawService;
 
-        public event EventHandler<(Input, Output)>? RouteUpdated;
-        public event EventHandler<(Input, Output)>? VolumeUpdated;
+        public event EventHandler<(Input, Output)> RouteUpdated;
+        public event EventHandler<(Input, Output)> VolumeUpdated;
 
         public RoutingTable(RawService rawService)
         {
@@ -21,8 +23,8 @@ namespace Revelator.io24.Api
             SetupRoutes();
         }
 
-        private Dictionary<(Input input, Output output), (string route, string volume)> _routes = new();
-        private Dictionary<string, (Input input, Output output)> _routeToKey = new();
+        private Dictionary<(Input input, Output output), (string route, string volume)> _routes = new Dictionary<(Input input, Output output), (string route, string volume)>();
+        private Dictionary<string, (Input input, Output output)> _routeToKey = new Dictionary<string, (Input input, Output output)>();
 
         public bool GetRouting(Input input, Output output)
         {

@@ -9,7 +9,7 @@ namespace Revelator.io24.Api.Models.Global
     {
         private readonly RawService _rawService;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
             => PropertyChanged?.Invoke(this, eventArgs);
@@ -23,12 +23,15 @@ namespace Revelator.io24.Api.Models.Global
         private Headphones GetHeadphoneSource()
         {
             var value = _rawService.GetValue("global/phonesSrc");
-            return value switch
+            switch (value)
             {
-                1.0f => Headphones.MixB,
-                0.5f => Headphones.MixA,
-                _ => Headphones.Main,
-            };
+                case 1.0f:
+                    return Headphones.MixB;
+                case 0.5f:
+                    return Headphones.MixA;
+                default:
+                    return Headphones.Main;
+            }
         }
 
         private void SetHeadphoneSource(Headphones value)

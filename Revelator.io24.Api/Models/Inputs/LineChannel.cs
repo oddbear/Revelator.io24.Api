@@ -1,4 +1,5 @@
 ﻿using Revelator.io24.Api.Attributes;
+using System;
 
 namespace Revelator.io24.Api.Models.Inputs
 {
@@ -12,7 +13,7 @@ namespace Revelator.io24.Api.Models.Inputs
             _rawService = rawService;
         }
 
-        private string? GetPreset()
+        private string GetPreset()
         {
             if (Presets.Length == 0)
                 return null;

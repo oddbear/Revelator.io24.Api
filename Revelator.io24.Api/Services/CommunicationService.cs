@@ -1,11 +1,16 @@
-﻿using Revelator.io24.Api.Helpers;
+﻿using Revelator.io24.Api.Extensions;
+using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 
 namespace Revelator.io24.Api.Services
 {
@@ -14,9 +19,9 @@ namespace Revelator.io24.Api.Services
         private readonly MonitorService _monitorService;
         private readonly RawService _rawService;
 
-        private TcpClient? _tcpClient;
-        private Thread? _listeningThread;
-        private Thread? _writingThread;
+        private TcpClient _tcpClient;
+        private Thread _listeningThread;
+        private Thread _writingThread;
 
         private ushort _deviceId;
 
@@ -51,7 +56,7 @@ namespace Revelator.io24.Api.Services
             RequestCommunicationMessage();
         }
 
-        public NetworkStream? GetNetworkStream()
+        public NetworkStream GetNetworkStream()
         {
             return _tcpClient?.Connected is true
                 ? _tcpClient.GetStream()
@@ -65,7 +70,7 @@ namespace Revelator.io24.Api.Services
                 return;
 
             var welcomeMessage = CreateWelcomeMessage();
-            networkStream.Write(welcomeMessage);
+            networkStream.Write(welcomeMessage, 0, welcomeMessage.Length);
         }
 
         private byte[] CreateWelcomeMessage()
@@ -94,7 +99,7 @@ namespace Revelator.io24.Api.Services
 
                     var tcpMessageWriter = new TcpMessageWriter(_deviceId);
                     var keepAliveMessage = tcpMessageWriter.CreateKeepAliveMessage();
-                    networkStream.Write(keepAliveMessage);
+                    networkStream.Write(keepAliveMessage, 0, keepAliveMessage.Length);
                 }
                 catch (Exception exception)
                 {
@@ -121,8 +126,8 @@ namespace Revelator.io24.Api.Services
                         continue;
                     }
 
-                    var bytesReceived = networkStream.Read(receiveBytes);
-                    var data = receiveBytes[0..bytesReceived];
+                    var bytesReceived = networkStream.Read(receiveBytes, 0, receiveBytes.Length);
+                    var data = receiveBytes.Range(0, bytesReceived);
 
                     //Multiple messages can be in one package:
                     var chunks = PackageHelper.ChuncksByIndicator(data).ToArray();
@@ -209,25 +214,25 @@ namespace Revelator.io24.Api.Services
         /// <param name="data"></param>
         private void PL(byte[] data)
         {
-            var header = data[0..4];
-            var messageLength = data[4..6];
-            var messageType = data[6..8];
-            var from = data[8..10];
-            var to = data[10..12];
+            var header = data.Range(0, 4);
+            var messageLength = data.Range(4, 6);
+            var messageType = data.Range(6, 8);
+            var from = data.Range(8, 10);
+            var to = data.Range(10, 12);
 
             var i = Array.IndexOf<byte>(data, 0x00, 12);
-            var route = Encoding.ASCII.GetString(data[12..i]);
+            var route = Encoding.ASCII.GetString(data.Range(12, i));
             if (!route.EndsWith("/presets/preset"))
             {
                 Log.Warning("[{className}] PL unknown list on route {route}", nameof(CommunicationService), route);
                 return;
             }
 
-            var selectedPreset = BitConverter.ToSingle(data[(i + 3)..(i + 7)]);
+            var selectedPreset = BitConverter.ToSingle(data.Range((i + 3), (i + 7)), 0);
 
             //0x0A (\n): List delimiter
             //Last char is a 0x00 (\0)
-            var list = Encoding.ASCII.GetString(data[(i + 7)..^1]).Split('\n');
+            var list = Encoding.ASCII.GetString(data.Range((i + 7), -1)).Split('\n');
             _rawService.UpdateStringsState(route, list);
         }
 
@@ -237,15 +242,15 @@ namespace Revelator.io24.Api.Services
         /// </summary>
         private void PV(byte[] data)
         {
-            var header = data[0..4];
-            var messageLength = data[4..6];
-            var messageType = data[6..8];
-            var from = data[8..10];
-            var to = data[10..12];
+            var header = data.Range(0, 4);
+            var messageLength = data.Range(4, 6);
+            var messageType = data.Range(6, 8);
+            var from = data.Range(8, 10);
+            var to = data.Range(10, 12);
 
-            var route = Encoding.ASCII.GetString(data[12..^7]);
-            var emptyBytes = data[^7..^4];
-            var state = BitConverter.ToSingle(data[^4..^0]);
+            var route = Encoding.ASCII.GetString(data.Range(12, -7));
+            var emptyBytes = data.Range(-7, -4);
+            var state = BitConverter.ToSingle(data.Range(-4), 0);
 
             _rawService.UpdateValueState(route, state);
         }
@@ -256,14 +261,14 @@ namespace Revelator.io24.Api.Services
         /// </summary>
         private void PS(byte[] data)
         {
-            var header = data[0..4];
-            var messageLength = data[4..6];
-            var messageType = Encoding.ASCII.GetString(data[6..8]);
-            var from = data[8..10];
-            var to = data[10..12];
+            var header = data.Range(0, 4);
+            var messageLength = data.Range(4, 6);
+            var messageType = Encoding.ASCII.GetString(data.Range(6, 8));
+            var from = data.Range(8, 10);
+            var to = data.Range(10, 12);
 
             //Ex. "line/ch1/preset_name\0\0\0Slap Echo\0"
-            var str = Encoding.ASCII.GetString(data[12..]);
+            var str = Encoding.ASCII.GetString(data.Range(12));
             var split = str.Split('\0');
             var route = split[0];
             var value = split[3];
@@ -295,7 +300,7 @@ namespace Revelator.io24.Api.Services
                 if (networkStream is null)
                     return false;
 
-                networkStream.Write(message);
+                networkStream.Write(message, 0, message.Length);
                 return true;
             }
             catch
