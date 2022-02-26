@@ -59,17 +59,24 @@ namespace Revelator.io24.Api
             }
         }
 
+        /// <summary>
+        /// Get volume in range of 0% - 100%
+        /// </summary>
         public float GetVolume(Input input, Output output)
         {
             if (!_routes.TryGetValue((input, output), out var routes))
                 return 0;
 
             var value = _rawService.GetValue(routes.volume);
+
             var volume = (float)Math.Round(value * 100f);
 
             return EnsureVolumeRange(volume);
         }
 
+        /// <summary>
+        /// Set volume in range of 0% - 100%
+        /// </summary>
         public void SetVolume(Input input, Output output, float value)
         {
             if (!_routes.TryGetValue((input, output), out var routes))
@@ -78,6 +85,96 @@ namespace Revelator.io24.Api
             var floatValue = EnsureVolumeRange(value) / 100f;
 
             _rawService.SetValue(routes.volume, floatValue);
+        }
+
+        /// <summary>
+        /// Gets the volume in dB range -96dB to +10dB
+        /// WARNING: This is a little off when it comes do decimals.
+        /// </summary>
+        public float GetVolumeInDb(Input input, Output output)
+        {
+            if (!_routes.TryGetValue((input, output), out var routes))
+                return -96;
+
+            //We round to skip decimals (the UI is to tight):
+            var a = 0.47f;
+            var b = 0.09f;
+            var c = 0.004f;
+
+            var value = _rawService.GetValue(routes.volume);
+
+            if (value >= a)
+            {
+                var y = (value - a) / (1 - a);
+                return (float)Math.Round(y * 20) - 10;
+            }
+
+            if (value >= b)
+            {
+                var y = value / (a - b);
+                return (float)Math.Round(y * 30) - 47;
+            }
+
+            if (value >= c)
+            {
+                var y = value / (b - c);
+                return (float)Math.Round(y * 20) - 61;
+            }
+
+            {
+                var y = value / (c - 0.0001111f);
+                return (float)Math.Round(y * 35) - 96;
+            }
+        }
+
+        /// <summary>
+        /// Sets the volume in dB range -96dB to +10dB
+        /// WARNING: This is a little off when it comes do decimals.
+        /// </summary>
+        public void SetVolumeInDb(Input input, Output output, float dbValue)
+        {
+            if (!_routes.TryGetValue((input, output), out var routes))
+                return;
+
+            var a = 0.47f;
+            var b = 0.09f;
+            var c = 0.004f;
+
+            if (dbValue >= -10)
+            {
+                var x = (dbValue + 10) / 20f;
+                var y = x * (1 - a);
+                var floatValue = (y + a);
+
+                _rawService.SetValue(routes.volume, floatValue);
+                return;
+            }
+
+            if (dbValue >= -40)
+            {
+                var x = (dbValue + 47) / 30f;
+                var floatValue = x * (a - b);
+
+                _rawService.SetValue(routes.volume, floatValue);
+                return;
+            }
+
+            if (dbValue >= -60)
+            {
+                var x = (dbValue + 61) / 20f;
+                var floatValue = x * (b - c);
+
+                _rawService.SetValue(routes.volume, floatValue);
+                return;
+            }
+
+            {
+                var x = (dbValue + 96) / 35f;
+                var floatValue = x * (c - 0.0001111f);
+
+                _rawService.SetValue(routes.volume, floatValue);
+                return;
+            }
         }
 
         private float EnsureVolumeRange(float volume)

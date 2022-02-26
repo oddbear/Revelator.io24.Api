@@ -15,6 +15,7 @@ namespace Revelator.io24.Wpf
 
         public RoutingMapper RoutingMap { get; set; }
         public VolumeMapper VolumeMap { get; set; }
+        public VolumeDbMapper VolumeDbMap { get; set; }
 
         public MainViewModel(
             RoutingTable routingTable,
@@ -28,12 +29,16 @@ namespace Revelator.io24.Wpf
 
             RoutingMap = new RoutingMapper(routingTable);
             VolumeMap = new VolumeMapper(routingTable);
+            VolumeDbMap = new VolumeDbMapper(routingTable);
 
             valuesMonitorModel.ValuesUpdated += (sender, args) => OnPropertyChanged(nameof(MonitorValues));
             fatChannelMonitorModel.FatChannelUpdated += (sender, args) => OnPropertyChanged(nameof(FatChannelValues));
 
             routingTable.RouteUpdated += (sender, args) => OnPropertyChanged(nameof(RoutingMap));
-            routingTable.VolumeUpdated += (sender, args) => OnPropertyChanged(nameof(VolumeMap));
+            routingTable.VolumeUpdated += (sender, args) => {
+                OnPropertyChanged(nameof(VolumeMap));
+                OnPropertyChanged(nameof(VolumeDbMap));
+            };
         }
 
         protected void OnPropertyChanged(string? name = null)
