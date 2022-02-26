@@ -9,7 +9,7 @@
         d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
         Title="MainWindow" Height="500" Width="830">
     <Window.Resources>
-        <converter:DecibelConverter x:Key="decibelConverter" />
+        <converter:DecibelConverter2 x:Key="decibelConverter" />
         <converter:HeadphonesStateConverter x:Key="headphonesStateConverter" />
         <converter:BooleanInverterConverter x:Key="booleanInverterConverter" />
     </Window.Resources>
@@ -144,9 +144,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <ProgressBar Grid.Column="0" Grid.RowSpan="2" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Column="0" Grid.RowSpan="2" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Microphone_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-50" Maximum="100" Orientation="Vertical" Foreground="Gray" Background="Blue"
+                        <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-200" Maximum="0" Orientation="Vertical" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_L, Converter={StaticResource decibelConverter}}" />
                         <TextBox Grid.Column="2" Grid.Row="0" FontSize="8"
                                  Text="{Binding Path=VolumeDbMap.Main_MicL}"
@@ -191,9 +191,9 @@
                                 <RowDefinition Height="15" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                        <ProgressBar Grid.Column="0" Grid.RowSpan="2" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Column="0" Grid.RowSpan="2" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Microphone_R, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-50" Maximum="100" Orientation="Vertical" Foreground="Gray" Background="Blue"
+                        <ProgressBar Grid.Column="1" Grid.RowSpan="2" Minimum="-200" Maximum="0" Orientation="Vertical" Foreground="Gray" Background="Blue"
                                      Value="{Binding Path=FatChannelValues.GainReductionMeter_R, Converter={StaticResource decibelConverter}}" />
                         <TextBox Grid.Column="2" Grid.Row="0" FontSize="8"
                                  Text="{Binding Path=VolumeDbMap.Main_MicR}"
@@ -226,9 +226,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Playback_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Playback_R, Converter={StaticResource decibelConverter}}" />
                         <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
                                  Text="{Binding Path=VolumeDbMap.Main_Playback}"
@@ -261,9 +261,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputA_R, Converter={StaticResource decibelConverter}}" />
                         <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
                                  Text="{Binding Path=VolumeDbMap.Main_VirtualA}"
@@ -296,9 +296,9 @@
                             <RowDefinition Height="15" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.VirtualOutputB_R, Converter={StaticResource decibelConverter}}" />
                         <TextBox Grid.Row="0" Grid.Column="2" FontSize="8"
                                  Text="{Binding Path=VolumeDbMap.Main_VirtualB}"
@@ -375,9 +375,9 @@
                                  KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.Main_Mix}"/>
-                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Main_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.Main_R, Converter={StaticResource decibelConverter}}" />
                     </Grid>
                 </GroupBox>
@@ -409,9 +409,9 @@
                                  KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixA_Mix}"/>
-                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix1_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix1_R, Converter={StaticResource decibelConverter}}" />
                     </Grid>
                 </GroupBox>
@@ -443,9 +443,9 @@
                                  KeyUp="TextBox_KeyUp" />
                         <Slider Grid.Row="1" Grid.Column="0" Orientation="Vertical" Margin="10" Maximum="100"
                                 Value="{Binding Path=VolumeMap.MixB_Mix}"/>
-                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="1" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix2_L, Converter={StaticResource decibelConverter}}" />
-                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="60" Maximum="100" Orientation="Vertical"
+                        <ProgressBar Grid.RowSpan="2" Grid.Column="2" Minimum="-80" Maximum="0" Orientation="Vertical"
                                      Value="{Binding Path=MonitorValues.StreamMix2_R, Converter={StaticResource decibelConverter}}" />
                     </Grid>
                 </GroupBox>
