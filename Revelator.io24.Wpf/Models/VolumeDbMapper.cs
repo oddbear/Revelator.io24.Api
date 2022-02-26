@@ -1,8 +1,9 @@
 ﻿using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
+
 namespace Revelator.io24.Wpf.Models
 {
-    public class VolumeMapper
+    public class VolumeDbMapper
     {
         private readonly RoutingTable _routingTable;
 
@@ -132,15 +133,15 @@ namespace Revelator.io24.Wpf.Models
             set => SetValue(Input.Mix, Output.Mix_B, value);
         }
 
-        public VolumeMapper(RoutingTable routingTable)
+        public VolumeDbMapper(RoutingTable routingTable)
         {
             _routingTable = routingTable;
         }
 
         private float GetValue(Input input, Output output)
-            => _routingTable.GetVolume(input, output);
+            => _routingTable.GetVolumeInDb(input, output);
 
         private void SetValue(Input input, Output output, float value)
-            => _routingTable.SetVolume(input, output, value);
+            => _routingTable.SetVolumeInDb(input, output, value);
     }
 }

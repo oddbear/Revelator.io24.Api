@@ -71,7 +71,7 @@ namespace Revelator.io24.Api.Services
                     }
 
                     //1.19 -> 281:
-                    //1.21 -> 281: 
+                    //1.21 -> 289:
                     //Revelator IO 24/281 AUD <serialnr>
                     //Revelator IO 24/289 AUD <serialnr>
                 }
