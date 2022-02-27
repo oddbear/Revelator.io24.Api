@@ -60,7 +60,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
-                //bitmapBuilder.Clear(BitmapColor.Black);
+                bitmapBuilder.Clear(BitmapColor.Black);
 
                 var path = lineChannel.BypassDSP
                     ? $"Loupedeck.RevelatorIo24Plugin.Resources.Plugin.fat_off-80.png"
