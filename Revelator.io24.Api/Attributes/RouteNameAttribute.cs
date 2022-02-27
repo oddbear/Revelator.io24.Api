@@ -1,4 +1,5 @@
 ﻿using Revelator.io24.Api.Enums;
+using System;
 
 namespace Revelator.io24.Api.Attributes
 {

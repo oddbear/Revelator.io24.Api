@@ -1,5 +1,8 @@
 ﻿using Revelator.io24.Api.Attributes;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -9,9 +12,9 @@ namespace Revelator.io24.Api.Models
     {
         private readonly RawService _rawService;
 
-        private readonly Dictionary<string, string> _propertyValueNameRoute = new();
-        private readonly Dictionary<string, string> _propertyStringNameRoute = new();
-        private readonly Dictionary<string, string> _propertyStringsNameRoute = new();
+        private readonly Dictionary<string, string> _propertyValueNameRoute = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _propertyStringNameRoute = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _propertyStringsNameRoute = new Dictionary<string, string>();
 
         public DeviceRoutingBase(RawService rawService)
         {
@@ -27,7 +30,7 @@ namespace Revelator.io24.Api.Models
         protected abstract void OnPropertyChanged(PropertyChangedEventArgs eventArgs);
 
         //TODO: Add GetStringRoute and GetStringsRoute? Could be refactored to be isolated away from each other.
-        public string? GetValueRoute(string propertyName)
+        public string GetValueRoute(string propertyName)
             => _propertyValueNameRoute.TryGetValue(propertyName, out var route)
                 ? route
                 : default;
@@ -83,7 +86,7 @@ namespace Revelator.io24.Api.Models
                     continue;
 
                 var routeValue = property.GetCustomAttribute<RouteValueAttribute>();
-                if (routeValue is not null)
+                if (routeValue != null)
                 {
                     var route = $"{routePrefix.RoutePrefixName}/{routeValue.RouteValueName}";
                     _propertyValueNameRoute[property.Name] = route;
@@ -91,7 +94,7 @@ namespace Revelator.io24.Api.Models
                 }
 
                 var routeString = property.GetCustomAttribute<RouteStringAttribute>();
-                if (routeString is not null)
+                if (routeString != null)
                 {
                     var route = $"{routePrefix.RoutePrefixName}/{routeString.RouteStringName}";
                     _propertyStringNameRoute[property.Name] = route;
@@ -100,7 +103,7 @@ namespace Revelator.io24.Api.Models
 
 
                 var routeStrings = property.GetCustomAttribute<RouteStringsAttribute>();
-                if (routeStrings is not null)
+                if (routeStrings != null)
                 {
                     var route = $"{routePrefix.RoutePrefixName}/{routeStrings.RouteStringsName}";
                     _propertyStringsNameRoute[property.Name] = route;
@@ -117,7 +120,7 @@ namespace Revelator.io24.Api.Models
             return _rawService.GetStrings(route);
         }
 
-        protected string? GetString([CallerMemberName] string propertyName = "")
+        protected string GetString([CallerMemberName] string propertyName = "")
         {
             if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
                 return default;
@@ -125,7 +128,7 @@ namespace Revelator.io24.Api.Models
             return _rawService.GetString(route);
         }
 
-        protected void SetString(string? value, [CallerMemberName] string propertyName = "")
+        protected void SetString(string value, [CallerMemberName] string propertyName = "")
         {
             if (value is null)
                 return;

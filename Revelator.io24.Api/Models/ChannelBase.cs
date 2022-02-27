@@ -5,7 +5,7 @@ namespace Revelator.io24.Api.Models
 {
     public abstract class ChannelBase : DeviceRoutingBase, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs eventArgs)
             => PropertyChanged?.Invoke(this, eventArgs);
@@ -20,7 +20,7 @@ namespace Revelator.io24.Api.Models
         /// Real name, ex. Mic, Playback, Main, USB 1/2, USB 3/4
         /// </summary>
         [RouteString("chnum")]
-        public string? ChannelName
+        public string ChannelName
         {
             get => GetString();
         }
@@ -29,7 +29,7 @@ namespace Revelator.io24.Api.Models
         /// Name of channel, ex. Channel 1, Playback, Virtual A
         /// </summary>
         [RouteString("username")]
-        public string? UserDefinedName
+        public string UserDefinedName
         {
             get => GetString();
         }
