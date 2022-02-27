@@ -57,7 +57,9 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
         private void AddParameter(Input input)
         {
             var outputName = _output.ToString().Replace("_", " ");
-            base.AddParameter($"volume|{_output}|{input}", input.GetDescription(), $"{outputName}: Routing and Volume");
+            var actionParameter = GetActionParameterFromRouting(input, _output);
+            var inputDescription = input.GetDescription();
+            base.AddParameter(actionParameter, $"Volume: {inputDescription} - {outputName}", $"{outputName}: Volume");
         }
 
         protected override bool OnLoad()
@@ -65,6 +67,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             _plugin = (RevelatorIo24Plugin)base.Plugin;
 
             _plugin.RoutingTable.RouteUpdated += PropertyChanged;
+            _plugin.RoutingTable.VolumeUpdated += PropertyChanged;
 
             return true;
         }
@@ -81,7 +84,8 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             if (e.output != _output)
                 return;
 
-            base.ActionImageChanged();
+            var actionParameter = GetActionParameterFromRouting(e.input, e.output);
+            base.ActionImageChanged(actionParameter);
         }
 
         protected override void RunCommand(string actionParameter)
@@ -91,6 +95,8 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
 
             var (input, output) = GetRoutingActionParameter(actionParameter);
             _plugin.RoutingTable.SetRouting(input, output, Value.Toggle);
+
+            base.ActionImageChanged(actionParameter);
         }
 
         protected override void ApplyAdjustment(string actionParameter, int diff)
@@ -107,7 +113,8 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
                 return;
 
             _plugin.RoutingTable.SetVolumeInDb(input, output, volume);
-            base.ActionImageChanged(actionParameter);
+
+            base.AdjustmentValueChanged(actionParameter);
         }
 
         protected override string GetAdjustmentValue(string actionParameter)
@@ -175,8 +182,12 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
                 case Input.Mix:
                 default:
                     return "output";
-
             }
+        }
+
+        private string GetActionParameterFromRouting(Input input, Output output)
+        {
+            return $"volume|{output}|{input}";
         }
 
         private (Input input, Output output) GetRoutingActionParameter(string actionParameter)
