@@ -18,16 +18,26 @@ namespace Revelator.io24.Api.Models.Inputs
             if (Presets.Length == 0)
                 return null;
 
-            var route = base.GetValueRoute(nameof(Preset));
-            var floatValue = _rawService.GetValue(route);
-            var index = (int)Math.Round(floatValue * 13);
+            var index = GetPresetIndex();
             return Presets[index];
         }
 
         private void SetPreset(string value)
         {
-            var route = base.GetValueRoute(nameof(Preset));
             var index = Array.IndexOf(Presets, value);
+            SetPresetIndex(index);
+        }
+
+        public int GetPresetIndex()
+        {
+            var route = base.GetValueRoute(nameof(Preset));
+            var floatValue = _rawService.GetValue(route);
+            return (int)Math.Round(floatValue * 13);
+        }
+
+        public void SetPresetIndex(int index)
+        {
+            var route = base.GetValueRoute(nameof(Preset));
             var floatValue = index / 13f;
             _rawService.SetValue(route, floatValue);
         }
