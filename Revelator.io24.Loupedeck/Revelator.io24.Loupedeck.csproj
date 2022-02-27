@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adjustments\VolumeAdjustment.cs" />
     <Compile Include="Commands\FatChannelToggleCommand.cs" />
     <Compile Include="Commands\HeadphonesCommand.cs" />
     <Compile Include="Commands\PresetsCommand.cs" />

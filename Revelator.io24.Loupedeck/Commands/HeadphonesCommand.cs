@@ -1,11 +1,6 @@
 ﻿using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Models.Global;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Loupedeck.RevelatorIo24Plugin.Commands
 {
