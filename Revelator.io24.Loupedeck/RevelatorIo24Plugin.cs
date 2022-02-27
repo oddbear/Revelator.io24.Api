@@ -14,15 +14,19 @@ namespace Loupedeck.RevelatorIo24Plugin
         internal Device Device { get; private set; }
         internal RoutingTable RoutingTable { get; private set; }
 
-        public override void Load()
+        public RevelatorIo24Plugin()
         {
             var services = new ServiceCollection();
             services.AddRevelatorAPI();
             ServiceProvider = services.BuildServiceProvider();
-            ServiceProvider.StartRevelatorAPI();
 
             Device = ServiceProvider.GetService<Device>();
             RoutingTable = ServiceProvider.GetService<RoutingTable>();
+        }
+
+        public override void Load()
+        {
+            ServiceProvider.StartRevelatorAPI();
 
             LoadPluginIcons();
         }
