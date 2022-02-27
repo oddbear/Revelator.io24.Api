@@ -8,19 +8,26 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
         private RevelatorIo24Plugin _plugin;
 
         public FatChannelToggleCommand()
-            : base(
-                  "Toggles FatChannel",
-                  "Toggles fat channel on or off",
-                  "Microphone")
         {
-            //
+            this.AddParameter("fatChannelToggleLeft", $"Toggles Left FatChannel", "Microphone");
+            this.AddParameter("fatChannelToggleRight", $"Toggles Right FatChannel", "Microphone");
         }
 
         protected override bool OnLoad()
         {
             _plugin = (RevelatorIo24Plugin)base.Plugin;
+
             _plugin.Device.MicrohoneLeft.PropertyChanged += PropertyChanged;
             _plugin.Device.MicrohoneRight.PropertyChanged += PropertyChanged;
+
+            return true;
+        }
+
+        protected override bool OnUnload()
+        {
+            _plugin.Device.MicrohoneLeft.PropertyChanged -= PropertyChanged;
+            _plugin.Device.MicrohoneRight.PropertyChanged -= PropertyChanged;
+
             return true;
         }
 
@@ -34,16 +41,22 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
 
         protected override void RunCommand(string actionParameter)
         {
-            var lineChannel = _plugin.Device.MicrohoneLeft;
+            if (actionParameter is null)
+                return;
+
+            var lineChannel = GetLineChannel(actionParameter);
             lineChannel.BypassDSP = !lineChannel.BypassDSP;
         }
 
         protected override BitmapImage GetCommandImage(string actionParameter, PluginImageSize imageSize)
         {
+            if (actionParameter is null)
+                return base.GetCommandImage(actionParameter, imageSize);
+
             if (_plugin.Device is null)
                 return base.GetCommandImage(actionParameter, imageSize);
 
-            var lineChannel = _plugin.Device.MicrohoneLeft;
+            var lineChannel = GetLineChannel(actionParameter);
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
@@ -55,10 +68,20 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
                 
                 var background = EmbeddedResources.ReadImage(path);
                 bitmapBuilder.SetBackgroundImage(background);
-                bitmapBuilder.DrawText("Fat L", 0, 60, 80, 0);
+
+                var text = actionParameter == "fatChannelToggleLeft"
+                    ? "Fat L"
+                    : "Fat R";
+
+                bitmapBuilder.DrawText(text, 0, 60, 80, 0);
 
                 return bitmapBuilder.ToImage();
             }
         }
+
+        private LineChannel GetLineChannel(string actionParameter)
+            => actionParameter == "fatChannelToggleLeft"
+                ? (LineChannel)_plugin.Device.MicrohoneLeft
+                : (LineChannel)_plugin.Device.MicrohoneRight;
     }
 }
