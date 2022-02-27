@@ -1,65 +1,73 @@
 ﻿using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Loupedeck.RevelatorIo24Plugin.Adjustments
+namespace Loupedeck.RevelatorIo24Plugin.Commands
 {
-    class VolumeMainAdjustment : VolumeAdjustment
+    class RoutingMainAdjustment : RoutingCommand
     {
-        public VolumeMainAdjustment()
+        public RoutingMainAdjustment()
             : base(Output.Main)
         {
             //
         }
     }
 
-    class VolumeMixAAdjustment : VolumeAdjustment
+    class RoutingMixAAdjustment : RoutingCommand
     {
-        public VolumeMixAAdjustment()
+        public RoutingMixAAdjustment()
             : base(Output.Mix_A)
         {
             //
         }
     }
 
-    class VolumeMixBAdjustment : VolumeAdjustment
+    class RoutingMixBAdjustment : RoutingCommand
     {
-        public VolumeMixBAdjustment()
+        public RoutingMixBAdjustment()
             : base(Output.Mix_B)
         {
             //
         }
     }
 
-    abstract class VolumeAdjustment : PluginDynamicAdjustment
+    class RoutingCommand : PluginDynamicCommand
     {
         private RevelatorIo24Plugin _plugin;
-
         private readonly Output _output;
 
-        public VolumeAdjustment(Output output)
-            : base(true)
+        public RoutingCommand(Output output)
         {
             _output = output;
 
-            AddParameter(Input.Mic_L);
-            AddParameter(Input.Mic_R);
-            AddParameter(Input.Playback);
-            AddParameter(Input.Virtual_A);
-            AddParameter(Input.Virtual_B);
-            AddParameter(Input.Mix);
+            AddParameter(Input.Mic_L, Value.On);
+            AddParameter(Input.Mic_R, Value.On);
+            AddParameter(Input.Playback, Value.On);
+            AddParameter(Input.Virtual_A, Value.On);
+            AddParameter(Input.Virtual_B, Value.On);
+            AddParameter(Input.Mix, Value.On);
+
+            AddParameter(Input.Mic_L, Value.Off);
+            AddParameter(Input.Mic_R, Value.Off);
+            AddParameter(Input.Playback, Value.Off);
+            AddParameter(Input.Virtual_A, Value.Off);
+            AddParameter(Input.Virtual_B, Value.Off);
+            AddParameter(Input.Mix, Value.Off);
+
+            AddParameter(Input.Mic_L, Value.Toggle);
+            AddParameter(Input.Mic_R, Value.Toggle);
+            AddParameter(Input.Playback, Value.Toggle);
+            AddParameter(Input.Virtual_A, Value.Toggle);
+            AddParameter(Input.Virtual_B, Value.Toggle);
+            AddParameter(Input.Mix, Value.Toggle);
         }
 
-        private void AddParameter(Input input)
+        private void AddParameter(Input input, Value value)
         {
             var outputName = _output.ToString().Replace("_", " ");
-            var actionParameter = GetActionParameterFromRouting(_output, input);
+            var actionParameter = GetActionParameterFromRouting(_output, input, value);
             var inputDescription = input.GetDescription();
-            base.AddParameter(actionParameter, $"Volume: {inputDescription} - {outputName}", $"{outputName}: Volume");
+            base.AddParameter(actionParameter, $"Routing: {inputDescription} - {outputName} - {value}", $"{outputName}: Routing");
         }
 
         protected override bool OnLoad()
@@ -85,8 +93,13 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             if (e.output != _output)
                 return;
 
-            var actionParameter = GetActionParameterFromRouting(e.output, e.input);
-            base.ActionImageChanged(actionParameter);
+            var actionParameterOn = GetActionParameterFromRouting(e.output, e.input, Value.On);
+            var actionParameterOff = GetActionParameterFromRouting(e.output, e.input, Value.Off);
+            var actionParameterToggle = GetActionParameterFromRouting(e.output, e.input, Value.Toggle);
+
+            base.ActionImageChanged(actionParameterOn);
+            base.ActionImageChanged(actionParameterOff);
+            base.ActionImageChanged(actionParameterToggle);
         }
 
         protected override void RunCommand(string actionParameter)
@@ -94,39 +107,10 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             if (actionParameter is null)
                 return;
 
-            var (input, output) = GetRoutingActionParameter(actionParameter);
-            _plugin.RoutingTable.SetRouting(input, output, Value.Toggle);
+            var (output, input, value) = GetRoutingActionParameter(actionParameter);
+            _plugin.RoutingTable.SetRouting(input, output, value);
 
             base.ActionImageChanged(actionParameter);
-        }
-
-        protected override void ApplyAdjustment(string actionParameter, int diff)
-        {
-            if (actionParameter is null)
-                return;
-
-            var (input, output) = GetRoutingActionParameter(actionParameter);
-            var volume = _plugin.RoutingTable.GetVolumeInDb(input, output);
-
-            volume += diff;
-
-            if (volume < -96 || volume > +10)
-                return;
-
-            _plugin.RoutingTable.SetVolumeInDb(input, output, volume);
-
-            base.AdjustmentValueChanged(actionParameter);
-        }
-
-        protected override string GetAdjustmentValue(string actionParameter)
-        {
-            if (actionParameter is null)
-                return base.GetAdjustmentValue(actionParameter);
-
-            var (input, output) = GetRoutingActionParameter(actionParameter);
-            var volume = _plugin.RoutingTable.GetVolumeInDb(input, output);
-
-            return $"{volume}dB";
         }
 
         protected override BitmapImage GetCommandImage(string actionParameter, PluginImageSize imageSize)
@@ -137,7 +121,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             if (_plugin.RoutingTable is null)
                 return base.GetCommandImage(actionParameter, imageSize);
 
-            var (input, output) = GetRoutingActionParameter(actionParameter);
+            var (output, input, _) = GetRoutingActionParameter(actionParameter);
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
@@ -186,24 +170,26 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             }
         }
 
-        private string GetActionParameterFromRouting(Output output, Input input)
+        private string GetActionParameterFromRouting(Output output, Input input, Value value)
         {
-            return $"volume|{output}|{input}";
+            return $"routing|{output}|{input}|{value}";
         }
 
-        private (Input input, Output output) GetRoutingActionParameter(string actionParameter)
+        private (Output output, Input input, Value value) GetRoutingActionParameter(string actionParameter)
         {
             var routeId = actionParameter.Split('|');
-            if (routeId[0] != "volume")
+            if (routeId[0] != "routing")
                 return default;
 
             var outputString = routeId[1];
             var inputString = routeId[2];
+            var valueString = routeId[3];
 
             var output = (Output)Enum.Parse(typeof(Output), outputString);
             var input = (Input)Enum.Parse(typeof(Input), inputString);
+            var value = (Value)Enum.Parse(typeof(Value), valueString);
 
-            return (input, output);
+            return (output, input, value);
         }
     }
 }

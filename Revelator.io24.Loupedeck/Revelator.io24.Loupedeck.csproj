@@ -66,9 +66,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adjustments\VolumeAdjustment.cs" />
-    <Compile Include="Commands\FatChannelToggleCommand.cs" />
+    <Compile Include="Commands\FatChannelCommand.cs" />
     <Compile Include="Commands\HeadphonesCommand.cs" />
     <Compile Include="Commands\PresetsCommand.cs" />
+    <Compile Include="Commands\RoutingCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RevelatorIo24Application.cs" />
     <Compile Include="RevelatorIo24Plugin.cs" />

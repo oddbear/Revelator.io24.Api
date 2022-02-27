@@ -1,6 +1,6 @@
-# Revelator io24 API (Unofficial)
+# PreSonus Revelator io24 API (Unofficial)
 
-This project is to be able to control a Revelator io24 interface through an API.
+This project is to be able to control a PreSonus Revelator io24 interface through an API.
 This way we can have **automations** and **plugins** for Stream Deck, Touch Portal, Loupedeck, and more.
 
 ## Progress
@@ -9,11 +9,12 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
 - Stream Deck plugin: Fat Channel Toggle, Routing, presets and headphone sources, with status.
 - Touch Portal plugin: Volume control, Fat Channel Toggle, Routing, presets and headphone sources, with status.
 - Loupedeck plugin: Volume control, Fat Channel Toggle, Routing, presets and headphone sources, with status.
+
 ## How to test
 
 - Read the text on this page.
 - Go to the [Releases](https://github.com/oddbear/Revelator.io24.Api/releases/tag/v0.0.4-beta) page, or click on `Releases` to the right of this page.
-- Read the text on the releases page.
+- Also read the text on the releases page.
 - Windows App:
   - Download zip file under Assets on the Releases page
   - Unzip
@@ -25,11 +26,15 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
   - Download `Revelator.io24.TouchPortal.tpp` under Assets on the Releases page
   - Open Touch Portal, click on settings menu and select Import plug-in... <br /> _(or unzip to plugin directory, and restart Touch Portal)_
   - Thrust the plugin, or it wont start
+- Loupedeck plugin:
+ - Download `Revelator.io24.Loupedeck.lplug4` under Assets on the Releases page
+ - Install plugin
+ - Activate plugin through the `manage plugins` in the Loupedeck UI
 
 ## Warnings
 
-- This API is **unofficial**, at any time, a update to the Revelator io24 **can break this API**. 
-- This project is in the **early stages**, and a **proof-of-concept only**, don't expect it to be stable at this point.
+- This API is **unofficial**, at any time, a update to the PreSonus Revelator io24 **can break this API**. 
+- This project is in the **early stages**, expect some bugs.
 - There will be **breaking changes** between updates.
 
 ## About the API

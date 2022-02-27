@@ -10,9 +10,9 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
 
         public HeadphonesCommand()
         {
-            this.AddParameter("headphonesSetMain", $"Set Headphones Main", "Headphones");
-            this.AddParameter("headphonesSetMixA", $"Set Headphones Mix A", "Headphones");
-            this.AddParameter("headphonesSetMixB", $"Set Headphones Mix B", "Headphones");
+            this.AddParameter("headphonesSetMain", $"Headphones: Main - Set", "Actions");
+            this.AddParameter("headphonesSetMixA", $"Headphones: Mix A - Set", "Actions");
+            this.AddParameter("headphonesSetMixB", $"Headphones: Mix B - Set", "Actions");
         }
 
         protected override bool OnLoad()
