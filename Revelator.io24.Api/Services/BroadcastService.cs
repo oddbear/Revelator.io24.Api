@@ -68,8 +68,8 @@ namespace Revelator.io24.Api.Services
 
                     if (!_communicationService.IsConnected)
                     {
-                        var deviceId = BitConverter.ToUInt16(data.Range(8, 10), 0);
-                        var tcpPort = BitConverter.ToUInt16(data.Range(4, 6), 0);
+                        var deviceId = BitConverter.ToUInt16(data, 8);
+                        var tcpPort = BitConverter.ToUInt16(data, 4);
                         _communicationService.Connect(deviceId, tcpPort);
                     }
 

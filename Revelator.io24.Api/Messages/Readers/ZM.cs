@@ -19,7 +19,7 @@ namespace Revelator.io24.Api.Messages.Readers
             var from = data.Range(8, 10);
             var to = data.Range(10, 12);
 
-            var size = BitConverter.ToInt32(data.Range(12, 16), 0);
+            var size = BitConverter.ToInt32(data, 12);
 
             //ZLib Message:
             using (var compressedStream = new MemoryStream(data.Range(16)))

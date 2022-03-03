@@ -86,7 +86,7 @@ namespace Revelator.io24.Api.Services
             //return;
 
             var header = Encoding.ASCII.GetString(data.Range(0, 4)); //UC01
-            var unknownValue = BitConverter.ToUInt16(data.Range(4, 6), 0); //always: 0x6C, 0xDB : 108, 219: 56172 (27867 inversed)
+            var unknownValue = BitConverter.ToUInt16(data, 4); //always: 0x6C, 0xDB : 108, 219: 56172 (27867 inversed)
             var type = Encoding.ASCII.GetString(data.Range(6, 8)); //MS: Monitor Status?
             var from = data.Range(8, 10);
             var to = data.Range(10, 12);

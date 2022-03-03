@@ -228,7 +228,7 @@ namespace Revelator.io24.Api.Services
                 return;
             }
 
-            var selectedPreset = BitConverter.ToSingle(data.Range((i + 3), (i + 7)), 0);
+            var selectedPreset = BitConverter.ToSingle(data, i + 3);
 
             //0x0A (\n): List delimiter
             //Last char is a 0x00 (\0)
