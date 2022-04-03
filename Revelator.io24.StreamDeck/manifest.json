@@ -84,6 +84,7 @@
   "Category": "Revelator io24",
   "CategoryIcon": "Images/Icons/category",
   "CodePath": "Revelator.io24.StreamDeck.exe",
+  "CodePathMac": "Revelator.io24.StreamDeck",
   "Description": "A Revelator io24 plugin for the Stream Deck",
   "Icon": "Images/Icons/category",
   "SDKVersion": 2,
@@ -91,6 +92,10 @@
     "MinimumVersion": "4.1"
   },
   "OS": [
+    {
+      "MinimumVersion": "10.11",
+      "Platform": "mac"
+    },
     {
       "MinimumVersion": "10",
       "Platform": "windows"
