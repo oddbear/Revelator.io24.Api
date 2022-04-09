@@ -26,7 +26,9 @@ namespace Revelator.io24.Api.Services
 
             _udpClient = new UdpClient();
             _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpClient.Client.Bind(new IPEndPoint(IPAddress.Loopback, 47809)); //IPAddress.Any
+            _udpClient.Client.Bind(Environment.OSVersion.Platform == PlatformID.MacOSX
+                ? new IPEndPoint(IPAddress.Any, 47809)
+                : new IPEndPoint(IPAddress.Loopback, 47809));
 
             _thread = new Thread(Listener) { IsBackground = true };
         }
