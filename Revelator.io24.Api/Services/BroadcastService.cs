@@ -26,11 +26,30 @@ namespace Revelator.io24.Api.Services
 
             _udpClient = new UdpClient();
             _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            _udpClient.Client.Bind(Environment.OSVersion.Platform == PlatformID.MacOSX
-                ? new IPEndPoint(IPAddress.Any, 47809)
-                : new IPEndPoint(IPAddress.Loopback, 47809));
+            _udpClient.Client.Bind(GetIpEndpoint());
 
             _thread = new Thread(Listener) { IsBackground = true };
+        }
+
+        private IPEndPoint GetIpEndpoint()
+        {
+            var platform = Environment.OSVersion.Platform;
+            switch (platform)
+            {
+                //Mac OS X:
+                case PlatformID.MacOSX:
+                case PlatformID.Unix:
+                    return new IPEndPoint(IPAddress.Any, 47809);
+
+                //Windows:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.Win32NT:
+                case PlatformID.WinCE:
+                case PlatformID.Xbox:
+                default:
+                    return new IPEndPoint(IPAddress.Loopback, 47809);
+            }
         }
 
         public void StartReceive()
