@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath Condition=" '$(OS)' == 'Windows_NT' ">..\..\..\..\AppData\Local\Loupedeck\Plugins\Revelator.io24.Loupedeck\</OutputPath>
-    <OutputPath Condition=" '$(OS)' != 'Windows_NT' ">/Users/oddbjorn.bakke/.local/share/Loupedeck/Plugins</OutputPath>
+    <OutputPath Condition=" '$(OS)' != 'Windows_NT' ">/Users/oddbjorn.bakke/.local/share/Loupedeck/Plugins/Revelator io24</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
