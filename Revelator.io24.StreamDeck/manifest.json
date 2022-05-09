@@ -79,6 +79,18 @@
           "TitleAlignment": "bottom"
         }
       ]
+    },
+    {
+      "Name": "Volume change",
+      "UUID": "com.oddbear.revelator.io24.volumelevel",
+      "Tooltip": "A volume change action",
+      "PropertyInspectorPath": "PropertyInspector/VolumeLevelAction.html",
+      "States": [
+        {
+          "Title": "Volume",
+          "TitleAlignment": "bottom"
+        }
+      ]
     }
   ],
   "Category": "Revelator io24",
