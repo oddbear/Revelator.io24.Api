@@ -3,6 +3,8 @@
 This project is to be able to control a PreSonus Revelator io24 interface through an API.
 This way we can have **automations** and **plugins** for Stream Deck, Touch Portal, Loupedeck, and more.
 
+This API might also work for other Revelator models (currently only tested with a io44), but limited.
+
 ## Progress
 
 - API: Still early, but many features are implemented. Try the Windows App to see what is possible.
