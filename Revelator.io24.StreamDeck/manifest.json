@@ -79,11 +79,45 @@
           "TitleAlignment": "bottom"
         }
       ]
+    },
+    {
+      "Name": "Volume change",
+      "UUID": "com.oddbear.revelator.io24.volumelevel",
+      "Icon": "Images/Icons/category",
+      "Tooltip": "A volume change action",
+      "PropertyInspectorPath": "PropertyInspector/VolumeLevelAction.html",
+      "States": [
+        {
+          "Image": "Images/Icons/Image",
+          "Title": "Volume",
+          "TitleAlignment": "bottom"
+        }
+      ]
+    },
+    {
+      "Name": "Toggle monitor",
+      "UUID": "com.oddbear.revelator.io24.togglemonitor",
+      "Icon": "Images/Icons/category",
+      "Tooltip": "A toggle monitor out action",
+      "PropertyInspectorPath": "PropertyInspector/ToggleMonitorAction.html",
+      "States": [
+        {
+          "Image": "Images/Plugin/fat_on",
+          "Title": "Monitor On",
+          "TitleAlignment": "bottom"
+        },
+        {
+          "Image": "Images/Plugin/fat_off",
+          "Title": "Monitor Off",
+          "TitleAlignment": "bottom"
+        }
+      ]
     }
   ],
   "Category": "Revelator io24",
   "CategoryIcon": "Images/Icons/category",
   "CodePath": "Revelator.io24.StreamDeck.exe",
+  "CodePathMac": "Revelator.io24.StreamDeck",
   "Description": "A Revelator io24 plugin for the Stream Deck",
   "Icon": "Images/Icons/category",
   "SDKVersion": 2,
@@ -91,6 +125,10 @@
     "MinimumVersion": "4.1"
   },
   "OS": [
+    {
+      "MinimumVersion": "10.11",
+      "Platform": "mac"
+    },
     {
       "MinimumVersion": "10",
       "Platform": "windows"

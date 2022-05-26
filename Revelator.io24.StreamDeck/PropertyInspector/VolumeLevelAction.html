@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Volume Change Action</title>
+    <link rel="stylesheet" href="css/sdpi.css">
+</head>
+<body>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Input</div>
+        <select id="inputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+            <option value="Mic_L">Mic L</option>
+            <option value="Mic_R">Mic R</option>
+            <option value="Playback">Playback</option>
+            <option value="Virtual_A">Virtual A</option>
+            <option value="Virtual_B">Virtual B</option>
+            <option value="Mix">Mix</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Output</div>
+        <select id="outputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+            <option value="Main">Main</option>
+            <option value="Mix_A">Stream Mix A</option>
+            <option value="Mix_B">Stream Mix B</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Change type</div>
+        <select id="changeType" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+            <option value="Absolute">Absolute</option>
+            <option value="Increment">Increment</option>
+            <option value="Decrement">Decrement</option>
+        </select>
+    </div>
+    <div class="sdpi-item" id="select_single">
+        <div class="sdpi-item-label">Value (dB)</div>
+        <input class="sdProperty" id="value" oninput="setSettings()" value="0" />
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi@latest/src/sdtools.common.js"></script>
+</body>
+</html>
