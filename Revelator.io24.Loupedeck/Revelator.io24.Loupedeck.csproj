@@ -69,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adjustments\BlendOutAdjustment.cs" />
+    <Compile Include="Adjustments\PhonesOutAdjustment .cs" />
+    <Compile Include="Adjustments\MainOutAdjustment.cs" />
     <Compile Include="Adjustments\VolumeAdjustment.cs" />
     <Compile Include="Commands\FatChannelCommand.cs" />
     <Compile Include="Commands\HeadphonesCommand.cs" />
@@ -160,6 +163,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Plugin\virtual_b_on-80.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Plugin\blend-80.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
