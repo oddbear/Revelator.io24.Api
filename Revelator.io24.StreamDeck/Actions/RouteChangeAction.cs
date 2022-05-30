@@ -29,12 +29,12 @@ namespace Revelator.io24.StreamDeck.Actions
 
         protected override void OnButtonPress()
         {
-            _routingTable.SetRouting(_settings.Input, _settings.Output, _settings.Action);
+            _routingTable.SetRouting(_settings.Input, _settings.MixOut, _settings.Action);
         }
 
         protected override bool GetButtonState()
         {
-            return _routingTable.GetRouting(_settings.Input, _settings.Output);
+            return _routingTable.GetRouting(_settings.Input, _settings.MixOut);
         }
 
         protected override async Task SettingsChanged()
@@ -43,11 +43,11 @@ namespace Revelator.io24.StreamDeck.Actions
             await UpdateOutputTitle();
         }
 
-        private async void RouteUpdated(object? sender, (Input input, Output output) e)
+        private async void RouteUpdated(object? sender, (Input input, MixOut output) e)
         {
             try
             {
-                var route = (_settings.Input, _settings.Output);
+                var route = (_settings.Input, Output: _settings.MixOut);
                 if (e != route)
                     return;
 
@@ -89,15 +89,15 @@ namespace Revelator.io24.StreamDeck.Actions
 
         private async Task UpdateOutputTitle()
         {
-            switch (_settings.Output)
+            switch (_settings.MixOut)
             {
-                case Output.Mix_A:
+                case MixOut.Mix_A:
                     await SetTitleAsync("Mix A");
                     break;
-                case Output.Mix_B:
+                case MixOut.Mix_B:
                     await SetTitleAsync("Mix B");
                     break;
-                case Output.Main:
+                case MixOut.Main:
                 default:
                     await SetTitleAsync("Main");
                     break;

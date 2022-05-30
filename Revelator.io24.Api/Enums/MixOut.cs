@@ -2,7 +2,7 @@
 
 namespace Revelator.io24.Api.Enums
 {
-    public enum Output
+    public enum MixOut
     {
         [Description("Main")]
         Main,

@@ -75,7 +75,7 @@ namespace Revelator.io24.TouchPortal
             }
         }
 
-        private void VolumeUpdated(object? sender, (Input input, Output output) e)
+        private void VolumeUpdated(object? sender, (Input input, MixOut output) e)
         {
             var value = _routingTable.GetVolume(e.input, e.output);
 
@@ -92,7 +92,7 @@ namespace Revelator.io24.TouchPortal
             _client.SendMessage(message);
         }
 
-        private void RouteUpdated(object? sender, (Input input, Output output) e)
+        private void RouteUpdated(object? sender, (Input input, MixOut output) e)
         {
             var value = _routingTable.GetRouting(e.input, e.output);
             _client.StateUpdate($"{PluginId}.states.{e.input}|{e.output}", value ? "On" : "Off");
@@ -233,7 +233,7 @@ namespace Revelator.io24.TouchPortal
                 var inputDesc = message.Data.Single(d => d.Id == "tp_io24_volume_input").Value;
                 var outputDesc = message.Data.Single(d => d.Id == "tp_io24_volume_output").Value;
                 var input = EnumExtensions.ParseDescription<Input>(inputDesc);
-                var output = EnumExtensions.ParseDescription<Output>(outputDesc);
+                var output = EnumExtensions.ParseDescription<MixOut>(outputDesc);
 
                 _routingTable.SetVolume(input, output, message.Value);
             }

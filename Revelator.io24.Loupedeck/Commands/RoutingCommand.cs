@@ -7,7 +7,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
     class RoutingMainAdjustment : RoutingCommand
     {
         public RoutingMainAdjustment()
-            : base(Output.Main)
+            : base(MixOut.Main)
         {
             //
         }
@@ -16,7 +16,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
     class RoutingMixAAdjustment : RoutingCommand
     {
         public RoutingMixAAdjustment()
-            : base(Output.Mix_A)
+            : base(MixOut.Mix_A)
         {
             //
         }
@@ -25,7 +25,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
     class RoutingMixBAdjustment : RoutingCommand
     {
         public RoutingMixBAdjustment()
-            : base(Output.Mix_B)
+            : base(MixOut.Mix_B)
         {
             //
         }
@@ -34,11 +34,11 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
     class RoutingCommand : PluginDynamicCommand
     {
         private RevelatorIo24Plugin _plugin;
-        private readonly Output _output;
+        private readonly MixOut _mixOut;
 
-        public RoutingCommand(Output output)
+        public RoutingCommand(MixOut mixOut)
         {
-            _output = output;
+            _mixOut = mixOut;
 
             AddParameter(Input.Mic_L, Value.On);
             AddParameter(Input.Mic_R, Value.On);
@@ -64,8 +64,8 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
 
         private void AddParameter(Input input, Value value)
         {
-            var outputName = _output.ToString().Replace("_", " ");
-            var actionParameter = GetActionParameterFromRouting(_output, input, value);
+            var outputName = _mixOut.ToString().Replace("_", " ");
+            var actionParameter = GetActionParameterFromRouting(_mixOut, input, value);
             var inputDescription = input.GetDescription();
             base.AddParameter(actionParameter, $"Routing: {inputDescription} - {outputName} - {value}", $"{outputName}: Routing");
         }
@@ -88,9 +88,9 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
             return true;
         }
 
-        private void PropertyChanged(object sender, (Input input, Output output) e)
+        private void PropertyChanged(object sender, (Input input, MixOut output) e)
         {
-            if (e.output != _output)
+            if (e.output != _mixOut)
                 return;
 
             var actionParameterOn = GetActionParameterFromRouting(e.output, e.input, Value.On);
@@ -133,7 +133,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
                     : $"Loupedeck.RevelatorIo24Plugin.Resources.Plugin.{imageName}_off-80.png";
 
                 var background = EmbeddedResources.ReadImage(path);
-                var outputName = _output.ToString().Replace("_", " ");
+                var outputName = _mixOut.ToString().Replace("_", " ");
                 if (imageSize == PluginImageSize.Width60)
                 {
                     background.Resize(50, 50);
@@ -170,12 +170,12 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
             }
         }
 
-        private string GetActionParameterFromRouting(Output output, Input input, Value value)
+        private string GetActionParameterFromRouting(MixOut mixOut, Input input, Value value)
         {
-            return $"routing|{output}|{input}|{value}";
+            return $"routing|{mixOut}|{input}|{value}";
         }
 
-        private (Output output, Input input, Value value) GetRoutingActionParameter(string actionParameter)
+        private (MixOut output, Input input, Value value) GetRoutingActionParameter(string actionParameter)
         {
             var routeId = actionParameter.Split('|');
             if (routeId[0] != "routing")
@@ -185,7 +185,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Commands
             var inputString = routeId[2];
             var valueString = routeId[3];
 
-            var output = (Output)Enum.Parse(typeof(Output), outputString);
+            var output = (MixOut)Enum.Parse(typeof(MixOut), outputString);
             var input = (Input)Enum.Parse(typeof(Input), inputString);
             var value = (Value)Enum.Parse(typeof(Value), valueString);
 

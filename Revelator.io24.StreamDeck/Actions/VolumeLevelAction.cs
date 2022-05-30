@@ -28,21 +28,21 @@ namespace Revelator.io24.StreamDeck.Actions
 
         protected override void OnButtonPress()
         {
-            var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.Output);
+            var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
             switch (_settings.ChangeType)
             {
                 case VolumeType.Increment:
                     value += _settings.Value;
-                    _routingTable.SetVolumeInDb(_settings.Input, _settings.Output, value);
+                    _routingTable.SetVolumeInDb(_settings.Input, _settings.MixOut, value);
                     break;
                 case VolumeType.Decrement:
                     value -= _settings.Value;
-                    _routingTable.SetVolumeInDb(_settings.Input, _settings.Output, value);
+                    _routingTable.SetVolumeInDb(_settings.Input, _settings.MixOut, value);
                     break;
                 case VolumeType.Absolute:
                 default:
                     value = _settings.Value;
-                    _routingTable.SetVolumeInDb(_settings.Input, _settings.Output, value);
+                    _routingTable.SetVolumeInDb(_settings.Input, _settings.MixOut, value);
                     break;
             }
         }
@@ -55,19 +55,19 @@ namespace Revelator.io24.StreamDeck.Actions
 
         protected override async Task SettingsChanged()
         {
-            var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.Output);
+            var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
             await SetTitleAsync($"{value} dB");
         }
 
-        private async void VolumeUpdated(object? sender, (Input input, Output output) e)
+        private async void VolumeUpdated(object? sender, (Input input, MixOut output) e)
         {
             try
             {
-                var route = (_settings.Input, _settings.Output);
+                var route = (_settings.Input, Output: _settings.MixOut);
                 if (e != route)
                     return;
 
-                var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.Output);
+                var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
                 await SetTitleAsync($"{value} dB");
             }
             catch (Exception exception)

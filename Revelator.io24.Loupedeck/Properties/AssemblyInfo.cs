@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Revelator")]
+[assembly: AssemblyTitle("Revelator io24")]
 [assembly: AssemblyDescription("A plugin for the Revelator io24 audio interface.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("oddbear")]

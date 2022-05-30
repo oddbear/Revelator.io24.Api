@@ -4,6 +4,7 @@ using Serilog;
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Revelator.io24.Api.Services
@@ -85,7 +86,22 @@ namespace Revelator.io24.Api.Services
                         continue;
                     }
 
-                    //TODO: What if... multiple devices?
+                    //try
+                    //{
+                    //    var deviceString = Encoding.UTF8.GetString(data.Range(32));
+                    //    var segments = deviceString.Split('\0');
+                    //    var deviceName = segments[0].Split('/')[0]; //"Revelator IO 24" or "Revelator IO 44"
+                    //    var firmware = segments[0].Split('/')[1]; //289
+                    //    var deviceType = segments[1]; //AUD
+                    //    var serialNumber = segments[2]; //AB1234567890
+
+                    //    if (deviceName != "Revelator IO 44")
+                    //        continue;
+                    //}
+                    //catch (Exception)
+                    //{
+                    //    continue;
+                    //}
 
                     if (!_communicationService.IsConnected)
                     {

@@ -5,18 +5,18 @@ using System.Linq;
 
 namespace Loupedeck.RevelatorIo24Plugin.Commands
 {
-    class PresetsLeftComamnd : PresetsCommand
+    class PresetsLeftCommand : PresetsCommand
     {
-        public PresetsLeftComamnd()
+        public PresetsLeftCommand()
             : base(MicrophoneChannel.Left)
         {
 
         }
     }
 
-    class PresetsRightComamnd : PresetsCommand
+    class PresetsRightCommand : PresetsCommand
     {
-        public PresetsRightComamnd()
+        public PresetsRightCommand()
             : base(MicrophoneChannel.Right)
         {
 
