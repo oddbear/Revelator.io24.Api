@@ -14,8 +14,8 @@ namespace Revelator.io24.Api
     {
         private readonly RawService _rawService;
 
-        public event EventHandler<(Input, Output)> RouteUpdated;
-        public event EventHandler<(Input, Output)> VolumeUpdated;
+        public event EventHandler<(Input, MixOut)> RouteUpdated;
+        public event EventHandler<(Input, MixOut)> VolumeUpdated;
 
         public RoutingTable(RawService rawService)
         {
@@ -23,21 +23,21 @@ namespace Revelator.io24.Api
             SetupRoutes();
         }
 
-        private Dictionary<(Input input, Output output), (string route, string volume)> _routes = new Dictionary<(Input input, Output output), (string route, string volume)>();
-        private Dictionary<string, (Input input, Output output)> _routeToKey = new Dictionary<string, (Input input, Output output)>();
+        private Dictionary<(Input input, MixOut output), (string route, string volume)> _routes = new Dictionary<(Input input, MixOut output), (string route, string volume)>();
+        private Dictionary<string, (Input input, MixOut output)> _routeToKey = new Dictionary<string, (Input input, MixOut output)>();
 
-        public bool GetRouting(Input input, Output output)
+        public bool GetRouting(Input input, MixOut mixOut)
         {
-            if (!_routes.TryGetValue((input, output), out var routes))
+            if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return false;
 
             var value = _rawService.GetValue(routes.route);
             return IsRouted(routes.route, value);
         }
 
-        public void SetRouting(Input input, Output output, Value value)
+        public void SetRouting(Input input, MixOut mixOut, Value value)
         {
-            if (!_routes.TryGetValue((input, output), out var routes))
+            if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
 
             var on = GetOnState(routes.route);
@@ -64,9 +64,9 @@ namespace Revelator.io24.Api
         /// <summary>
         /// Get volume in range of 0% - 100%
         /// </summary>
-        public float GetVolume(Input input, Output output)
+        public float GetVolume(Input input, MixOut mixOut)
         {
-            if (!_routes.TryGetValue((input, output), out var routes))
+            if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return 0;
 
             var value = _rawService.GetValue(routes.volume);
@@ -79,9 +79,9 @@ namespace Revelator.io24.Api
         /// <summary>
         /// Set volume in range of 0% - 100%
         /// </summary>
-        public void SetVolume(Input input, Output output, float value)
+        public void SetVolume(Input input, MixOut mixOut, float value)
         {
-            if (!_routes.TryGetValue((input, output), out var routes))
+            if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
 
             var floatValue = EnsureVolumeRange(value) / 100f;
@@ -93,9 +93,9 @@ namespace Revelator.io24.Api
         /// Gets the volume in dB range -96dB to +10dB
         /// WARNING: This is a little off when it comes do decimals.
         /// </summary>
-        public float GetVolumeInDb(Input input, Output output)
+        public float GetVolumeInDb(Input input, MixOut mixOut)
         {
-            if (!_routes.TryGetValue((input, output), out var routes))
+            if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return -96;
 
             //We round to skip decimals (the UI is to tight):
@@ -133,9 +133,9 @@ namespace Revelator.io24.Api
         /// Sets the volume in dB range -96dB to +10dB
         /// WARNING: This is a little off when it comes do decimals.
         /// </summary>
-        public void SetVolumeInDb(Input input, Output output, float dbValue)
+        public void SetVolumeInDb(Input input, MixOut mixOut, float dbValue)
         {
-            if (!_routes.TryGetValue((input, output), out var routes))
+            if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
 
             var a = 0.47f;
@@ -234,73 +234,73 @@ namespace Revelator.io24.Api
 
         private void SetupRoutes()
         {
-            SetupRouting((Input.Mic_L, Output.Main),
+            SetupRouting((Input.Mic_L, MixOut.Main),
                 "line/ch1/mute",
                 "line/ch1/volume");
-            SetupRouting((Input.Mic_L, Output.Mix_A),
+            SetupRouting((Input.Mic_L, MixOut.Mix_A),
                 "line/ch1/assign_aux1",
                 "line/ch1/aux1");
-            SetupRouting((Input.Mic_L, Output.Mix_B),
+            SetupRouting((Input.Mic_L, MixOut.Mix_B),
                 "line/ch1/assign_aux2",
                 "line/ch1/aux2");
 
-            SetupRouting((Input.Mic_R, Output.Main),
+            SetupRouting((Input.Mic_R, MixOut.Main),
                 "line/ch2/mute",
                 "line/ch2/volume");
-            SetupRouting((Input.Mic_R, Output.Mix_A),
+            SetupRouting((Input.Mic_R, MixOut.Mix_A),
                 "line/ch2/assign_aux1",
                 "line/ch2/aux1");
-            SetupRouting((Input.Mic_R, Output.Mix_B),
+            SetupRouting((Input.Mic_R, MixOut.Mix_B),
                 "line/ch2/assign_aux2",
                 "line/ch2/aux2");
 
-            SetupRouting((Input.Playback, Output.Main),
+            SetupRouting((Input.Playback, MixOut.Main),
                 "return/ch1/mute",
                 "return/ch1/volume");
-            SetupRouting((Input.Playback, Output.Mix_A),
+            SetupRouting((Input.Playback, MixOut.Mix_A),
                 "return/ch1/assign_aux1",
                 "return/ch1/aux1");
-            SetupRouting((Input.Playback, Output.Mix_B),
+            SetupRouting((Input.Playback, MixOut.Mix_B),
                 "return/ch1/assign_aux2",
                 "return/ch1/aux2");
 
-            SetupRouting((Input.Virtual_A, Output.Main),
+            SetupRouting((Input.Virtual_A, MixOut.Main),
                 "return/ch2/mute",
                 "return/ch2/volume");
-            SetupRouting((Input.Virtual_A, Output.Mix_A),
+            SetupRouting((Input.Virtual_A, MixOut.Mix_A),
                 "return/ch2/assign_aux1",
                 "return/ch2/aux1");
-            SetupRouting((Input.Virtual_A, Output.Mix_B),
+            SetupRouting((Input.Virtual_A, MixOut.Mix_B),
                 "return/ch2/assign_aux2",
                 "return/ch2/aux2");
 
-            SetupRouting((Input.Virtual_B, Output.Main),
+            SetupRouting((Input.Virtual_B, MixOut.Main),
                 "return/ch3/mute",
                 "return/ch3/volume");
-            SetupRouting((Input.Virtual_B, Output.Mix_A),
+            SetupRouting((Input.Virtual_B, MixOut.Mix_A),
                 "return/ch3/assign_aux1",
                 "return/ch3/aux1");
-            SetupRouting((Input.Virtual_B, Output.Mix_B),
+            SetupRouting((Input.Virtual_B, MixOut.Mix_B),
                 "return/ch3/assign_aux2",
                 "return/ch3/aux2");
 
-            SetupRouting((Input.Reverb, Output.Main),
+            SetupRouting((Input.Reverb, MixOut.Main),
                 "fxreturn/ch1/mute",
                 "fxreturn/ch1/volume");
-            SetupRouting((Input.Reverb, Output.Mix_A),
+            SetupRouting((Input.Reverb, MixOut.Mix_A),
                 "fxreturn/ch1/assign_aux1",
                 "fxreturn/ch1/aux1");
-            SetupRouting((Input.Reverb, Output.Mix_B),
+            SetupRouting((Input.Reverb, MixOut.Mix_B),
                 "fxreturn/ch1/assign_aux2",
                 "fxreturn/ch1/aux2");
 
-            SetupRouting((Input.Mix, Output.Main),
+            SetupRouting((Input.Mix, MixOut.Main),
                 "main/ch1/mute",
                 "main/ch1/volume");
-            SetupRouting((Input.Mix, Output.Mix_A),
+            SetupRouting((Input.Mix, MixOut.Mix_A),
                 "aux/ch1/mute",
                 "aux/ch1/volume");
-            SetupRouting((Input.Mix, Output.Mix_B),
+            SetupRouting((Input.Mix, MixOut.Mix_B),
                 "aux/ch2/mute",
                 "aux/ch2/volume");
 
@@ -308,7 +308,7 @@ namespace Revelator.io24.Api
             _rawService.ValueStateUpdated += ValueStateUpdated;
         }
 
-        private void SetupRouting((Input input, Output output) key, string routeAssign, string routeVolume)
+        private void SetupRouting((Input input, MixOut output) key, string routeAssign, string routeVolume)
         {
             _routeToKey[routeAssign] = key;
             _routeToKey[routeVolume] = key;

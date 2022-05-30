@@ -12,7 +12,7 @@ namespace Revelator.io24.StreamDeck.Actions
 
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "outputValue")]
-        public Output Output { get; set; } = Output.Main;
+        public MixOut MixOut { get; set; } = MixOut.Main;
 
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "changeType")]
