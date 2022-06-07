@@ -200,7 +200,7 @@ namespace Revelator.io24.Api.Services
                     //We now have communication.
                     return;
                 case "SubscriptionLost":
-                    RequestCommunicationMessage();
+                    _tcpClient?.Close();
                     return;
                 default:
                     Log.Warning("[{className}] Unknown json id {messageType}", nameof(CommunicationService), id);
