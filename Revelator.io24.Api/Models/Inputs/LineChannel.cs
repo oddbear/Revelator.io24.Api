@@ -13,6 +13,14 @@ namespace Revelator.io24.Api.Models.Inputs
             _rawService = rawService;
         }
 
+        private float GetPresetsLength()
+        {
+            var presetsLength = (float?)Presets?.Length - 1;
+            return presetsLength > 0
+                ? presetsLength.Value
+                : 13f; //Unknown: Use io24 default
+        }
+
         private string GetPreset()
         {
             if (Presets.Length == 0)
@@ -30,15 +38,19 @@ namespace Revelator.io24.Api.Models.Inputs
 
         public int GetPresetIndex()
         {
+            var presetsLength = GetPresetsLength();
+
             var route = base.GetValueRoute(nameof(Preset));
             var floatValue = _rawService.GetValue(route);
-            return (int)Math.Round(floatValue * 13);
+            return (int)Math.Round(floatValue * presetsLength);
         }
 
         public void SetPresetIndex(int index)
         {
+            var presetsLength = GetPresetsLength();
+
             var route = base.GetValueRoute(nameof(Preset));
-            var floatValue = index / 13f;
+            var floatValue = index / presetsLength;
             _rawService.SetValue(route, floatValue);
         }
 
