@@ -192,7 +192,7 @@ namespace Revelator.io24.Api.Services
                     //Fatchannel is bound to "both", ex. toggle toggles both to same state.
                     return;
                 case "Synchronize":
-                    _rawService.Syncronize(json);
+                    _rawService.Synchronize(json);
                     return;
                 case "SubscriptionReply":
                     //We now have communication.

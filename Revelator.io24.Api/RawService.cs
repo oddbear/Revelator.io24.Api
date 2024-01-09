@@ -75,7 +75,7 @@ namespace Revelator.io24.Api
             StringsStateUpdated?.Invoke(route, values);
         }
 
-        internal void Syncronize(string json)
+        internal void Synchronize(string json)
         {
             var doc = JsonSerializer.Deserialize<JsonDocument>(json);
             if (doc is null)

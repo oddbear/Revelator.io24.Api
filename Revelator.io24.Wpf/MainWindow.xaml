@@ -12,6 +12,7 @@
         <converter:DecibelConverter2 x:Key="decibelConverter" />
         <converter:HeadphonesStateConverter x:Key="headphonesStateConverter" />
         <converter:BooleanInverterConverter x:Key="booleanInverterConverter" />
+        <converter:MonitorBlendConverter x:Key="monitorBlendConverter" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -47,6 +48,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -72,6 +74,15 @@
                     </Slider>
                     <Slider Grid.Row="1" Grid.Column="1" Value="{Binding Path=Device.Global.HeadphonesVolume, Mode=TwoWay}" Maximum="100" Width="100" />
                     <Slider Grid.Row="2" Grid.Column="1" Value="{Binding Path=Device.Global.MonitorBlend, Mode=TwoWay}" Maximum="1" Width="100" />
+                    <TextBox Grid.Column="2" Grid.Row="0" FontSize="8" Width="20"
+                             Text=""
+                             KeyUp="TextBox_KeyUp" />
+                    <TextBox Grid.Column="2" Grid.Row="1" FontSize="8" Width="20"
+                             Text=""
+                             KeyUp="TextBox_KeyUp" />
+                    <TextBox Grid.Column="2" Grid.Row="2" FontSize="8" Width="20"
+                             Text="{Binding Path=Device.Global.MonitorBlend, Mode=TwoWay, Converter={StaticResource monitorBlendConverter}}"
+                             KeyUp="TextBox_KeyUp" />
                 </Grid>
             </GroupBox>
             <GroupBox Header="Outputs">
