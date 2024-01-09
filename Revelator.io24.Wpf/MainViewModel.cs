@@ -5,6 +5,15 @@ using System.ComponentModel;
 
 namespace Revelator.io24.Wpf
 {
+    public class DesignTimeMainViewModel : MainViewModel
+    {
+        public DesignTimeMainViewModel()
+            : base(null, null, null, null)
+        {
+            
+        }
+    }
+
     public class MainViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;

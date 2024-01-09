@@ -137,8 +137,7 @@ namespace Revelator.io24.Api.Services
                         switch (messageType)
                         {
                             case "PL":
-                                //PL List:
-                                PL(chunck);
+                                SetList(chunck);
                                 break;
                             case "PR":
                                 //Happens when lining and unlinking mic channels.
@@ -147,22 +146,21 @@ namespace Revelator.io24.Api.Services
                                 //Fatchannel is bound to "both", ex. toggle toggles both to same state.
                                 break;
                             case "PV":
-                                //PV Settings packet
-                                PV(chunck);
+                                SetFloatValue(chunck);
                                 Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
                             case "JM":
                                 var jm = JM.GetJsonMessage(chunck);
-                                Json(jm);
-                                Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                SetJsonMessage(jm);
+                                Log.Debug("[{className}] {messageType} -> {Json}", nameof(CommunicationService), messageType, jm);
                                 break;
                             case "ZM":
                                 var zm = ZM.GetJsonMessage(chunck);
-                                Json(zm);
-                                Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
+                                SetJsonMessage(zm);
+                                Log.Debug("[{className}] {messageType} -> {Json}", nameof(CommunicationService), messageType, zm);
                                 break;
                             case "PS":
-                                PS(chunck);
+                                SetStringValue(chunck);
                                 Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                                 break;
                             default:
@@ -178,7 +176,7 @@ namespace Revelator.io24.Api.Services
             }
         }
 
-        private void Json(string json)
+        private void SetJsonMessage(string json)
         {
             var jsonElement = JsonSerializer.Deserialize<JsonElement>(json);
             if (!jsonElement.TryGetProperty("id", out var idProperty))
@@ -212,7 +210,7 @@ namespace Revelator.io24.Api.Services
         /// Updates list value
         /// </summary>
         /// <param name="data"></param>
-        private void PL(byte[] data)
+        private void SetList(byte[] data)
         {
             var header = data.Range(0, 4);
             var messageLength = data.Range(4, 6);
@@ -240,7 +238,7 @@ namespace Revelator.io24.Api.Services
         /// Updates float value.
         /// Happens ex. on turning thing on and of, ex. EQ
         /// </summary>
-        private void PV(byte[] data)
+        private void SetFloatValue(byte[] data)
         {
             var header = data.Range(0, 4);
             var messageLength = data.Range(4, 6);
@@ -252,6 +250,7 @@ namespace Revelator.io24.Api.Services
             var emptyBytes = data.Range(-7, -4);
             var state = BitConverter.ToSingle(data.Range(-4), 0);
 
+            Log.Debug("Updated {Route} -> {State}", route, state);
             _rawService.UpdateValueState(route, state);
         }
 
@@ -259,7 +258,7 @@ namespace Revelator.io24.Api.Services
         /// Updates string value.
         /// Changing profile, changing names...
         /// </summary>
-        private void PS(byte[] data)
+        private void SetStringValue(byte[] data)
         {
             var header = data.Range(0, 4);
             var messageLength = data.Range(4, 6);

@@ -74,35 +74,46 @@ namespace Revelator.io24.Api.Services
                     var messageType = PackageHelper.GetMessageType(data);
                     Log.Debug("[{className}] {messageType}", nameof(BroadcastService), messageType);
 
-                    //DA is udp broadcast message from PreSonusHardwareAccessService.exe
-                    //NO is udp broadcast message sent from the UC Surface App
+                    // DA is udp broadcast message from PreSonusHardwareAccessService.exe
+                    // NO is udp broadcast message sent from the UC Surface App
                     if (messageType != "DA")
                     {
-                        //Known type:
+                        // Known type:
                         if (messageType != "NO")
                         {
                             Log.Information("[{className}] {messageType} not DA", nameof(BroadcastService), messageType);
                         }
                         continue;
                     }
+                    
+                    var deviceString = Encoding.UTF8.GetString(data.Range(32));
+                    var segments = deviceString.Split('\0');
 
-                    //try
-                    //{
-                    //    var deviceString = Encoding.UTF8.GetString(data.Range(32));
-                    //    var segments = deviceString.Split('\0');
-                    //    var deviceName = segments[0].Split('/')[0]; //"Revelator IO 24" or "Revelator IO 44"
-                    //    var firmware = segments[0].Split('/')[1]; //289
-                    //    var deviceType = segments[1]; //AUD
-                    //    var serialNumber = segments[2]; //AB1234567890
+                    // Format DeviceName/firmwareNumber, ex. Revelator IO 24/123
+                    // - "Revelator IO 24" -> Revelator io 24
+                    // - "Revelator IO 44" -> Revelator io 44
+                    // - "Revelator" -> Revelator USB
+                    // - ??? -> Revelator Dynamic (unknown at this point, I don't have a device to test with).
+                    // - "OBSRemoteAdapter" -> OBSRemoteAdapter
+                    var deviceNameVersion = segments[0].Split('/');
+                    if (deviceNameVersion.Length != 2 || deviceNameVersion[0].StartsWith("Revelator") is false)
+                        continue;
 
-                    //    if (deviceName != "Revelator IO 44")
-                    //        continue;
-                    //}
-                    //catch (Exception)
-                    //{
-                    //    continue;
-                    //}
+                    // "DAW" -> OBSRemoteAdapter
+                    // "AUD" -> Revelator mics
+                    if (segments[1] != "AUD")
+                        continue;
 
+                    // AB1234567890
+                    if (segments[2] == string.Empty)
+                        continue;
+
+                    var deviceName = deviceNameVersion[0];
+                    var firmwareNumber = deviceNameVersion[1];
+                    var firmwareVersion = GetFirmwareVersion(firmwareNumber);
+                    var deviceType = segments[1];
+                    var serialNumber = segments[2];
+                    
                     if (!_communicationService.IsConnected)
                     {
                         var deviceId = BitConverter.ToUInt16(data.Range(8, 10), 0);
@@ -110,16 +121,30 @@ namespace Revelator.io24.Api.Services
                         _communicationService.Connect(deviceId, tcpPort);
                     }
 
-                    //1.19 -> 281:
-                    //1.21 -> 289:
-                    //Revelator IO 24/281 AUD <serialnr>
-                    //Revelator IO 24/289 AUD <serialnr>
                 }
                 catch (Exception exception)
                 {
                     Log.Error("[{className}] {exception}", nameof(BroadcastService), exception);
                 }
             }
+        }
+
+        private string GetFirmwareVersion(string firmware)
+        {
+            // 1.19 -> 281
+            // 1.21 -> 289
+            // 1.22 -> 290
+            var value = ushort.Parse(firmware);
+
+            var a = (byte)((value & 0b1111_0000_0000_0000) >> 12);
+            var b = (byte)((value & 0b0000_1111_0000_0000) >> 8);
+            var c = (byte)((value & 0b0000_0000_1111_0000) >> 4);
+            var d = (byte)((value & 0b0000_0000_0000_1111));
+
+            var major = (a * 10 + b);
+            var minor = (c * 10 + d);
+
+            return $"{major}.{minor}";
         }
 
         public void Dispose()

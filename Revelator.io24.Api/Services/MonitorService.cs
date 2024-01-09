@@ -56,16 +56,16 @@ namespace Revelator.io24.Api.Services
                     if (!isUcNetPackage)
                         continue;
 
-                    var messageType = PackageHelper.GetMessageType(data);
-                    Log.Debug("[{className}] {messageType}", nameof(MonitorService), messageType);
+                    //var messageType = PackageHelper.GetMessageType(data);
+                    //Log.Debug("[{className}] {messageType}", nameof(MonitorService), messageType);
 
-                    if (messageType != "MS")
-                    {
-                        Log.Information("[{className}] {messageType} not MS", nameof(MonitorService), messageType);
-                        continue;
-                    }
+                    //if (messageType != "MS")
+                    //{
+                    //    Log.Information("[{className}] {messageType} not MS", nameof(MonitorService), messageType);
+                    //    continue;
+                    //}
 
-                    Analyze(data);
+                    // TODO: Turn monitoring back, just get communication working for now: Analyze(data);
                 }
                 catch (Exception exception)
                 {

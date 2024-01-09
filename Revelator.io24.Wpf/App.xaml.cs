@@ -18,6 +18,7 @@ namespace Revelator.io24.Wpf
 #if DEBUG
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console(theme: ConsoleTheme.None)
+                .MinimumLevel.Debug()
                 .CreateLogger();
 
             AllocConsole();

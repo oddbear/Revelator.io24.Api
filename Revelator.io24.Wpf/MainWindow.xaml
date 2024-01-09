@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Revelator.io24.Wpf"
         xmlns:converter="clr-namespace:Revelator.io24.Wpf.Converters"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=local:MainViewModel, IsDesignTimeCreatable=True}"
+        d:DataContext="{d:DesignInstance Type=local:DesignTimeMainViewModel, IsDesignTimeCreatable=True}"
         Title="MainWindow" Height="500" Width="830">
     <Window.Resources>
         <converter:DecibelConverter2 x:Key="decibelConverter" />
