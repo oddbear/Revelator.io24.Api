@@ -166,7 +166,7 @@ namespace Revelator.io24.Api.Models
             return (int)Math.Round(floatValue * 100f);
         }
 
-        protected void SetVolume(int value, [CallerMemberName] string propertyName = "")
+        protected void SetVolume(float value, [CallerMemberName] string propertyName = "")
         {
             if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
                 return;

@@ -13,6 +13,7 @@ namespace Revelator.io24.Api
         public MicrohoneLeft MicrohoneLeft { get; }
         public MicrohoneRight MicrohoneRight { get; }
 
+        // There are tree of them.
         public Playback Playback { get; }
         public VirtualA VirtualA { get; }
         public VirtualB VirtualB { get; }

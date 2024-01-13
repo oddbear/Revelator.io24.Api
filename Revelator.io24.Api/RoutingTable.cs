@@ -1,6 +1,7 @@
 ﻿using Revelator.io24.Api.Enums;
 using System;
 using System.Collections.Generic;
+using Revelator.io24.Api.Converters;
 
 namespace Revelator.io24.Api
 {
@@ -105,28 +106,7 @@ namespace Revelator.io24.Api
 
             var value = _rawService.GetValue(routes.volume);
 
-            if (value >= a)
-            {
-                var y = (value - a) / (1 - a);
-                return (float)Math.Round(y * 20) - 10;
-            }
-
-            if (value >= b)
-            {
-                var y = value / (a - b);
-                return (float)Math.Round(y * 30) - 47;
-            }
-
-            if (value >= c)
-            {
-                var y = value / (b - c);
-                return (float)Math.Round(y * 20) - 61;
-            }
-
-            {
-                var y = value / (c - 0.0001111f);
-                return (float)Math.Round(y * 35) - 96;
-            }
+            return MonitorDecibelConverter.ToDecibel(value);
         }
 
         /// <summary>
@@ -138,45 +118,8 @@ namespace Revelator.io24.Api
             if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
 
-            var a = 0.47f;
-            var b = 0.09f;
-            var c = 0.004f;
-
-            if (dbValue >= -10)
-            {
-                var x = (dbValue + 10) / 20f;
-                var y = x * (1 - a);
-                var floatValue = (y + a);
-
-                _rawService.SetValue(routes.volume, floatValue);
-                return;
-            }
-
-            if (dbValue >= -40)
-            {
-                var x = (dbValue + 47) / 30f;
-                var floatValue = x * (a - b);
-
-                _rawService.SetValue(routes.volume, floatValue);
-                return;
-            }
-
-            if (dbValue >= -60)
-            {
-                var x = (dbValue + 61) / 20f;
-                var floatValue = x * (b - c);
-
-                _rawService.SetValue(routes.volume, floatValue);
-                return;
-            }
-
-            {
-                var x = (dbValue + 96) / 35f;
-                var floatValue = x * (c - 0.0001111f);
-
-                _rawService.SetValue(routes.volume, floatValue);
-                return;
-            }
+            var floatValue = MonitorDecibelConverter.FromDecibel(dbValue);
+            _rawService.SetValue(routes.volume, floatValue);
         }
 
         private float EnsureVolumeRange(float volume)
