@@ -18,7 +18,7 @@ description: A plugin for the Revelator (io24) audio interfaces.
 pluginFileName: RevelatorIo24Plugin.dll
 
 # Plugin version.
-version: 1.0.1
+version: 1.0.2
 
 # Author of the plugin. The author can be a company or an individual developer.
 author: oddbear

@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api;
 using Revelator.io24.Api.Configuration;
