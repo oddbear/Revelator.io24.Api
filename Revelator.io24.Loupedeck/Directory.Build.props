@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <BaseIntermediateOutputPath>$(SolutionDir)\Revelator.io24.Loupedeck\..\obj\</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(SolutionDir)\Revelator.io24.Loupedeck\..\bin\</BaseOutputPath>
+    </PropertyGroup>
+</Project>

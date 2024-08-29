@@ -1,6 +1,5 @@
 ﻿using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Extensions;
-using System;
 
 namespace Loupedeck.RevelatorIo24Plugin.Adjustments
 {

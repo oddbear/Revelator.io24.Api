@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api.Configuration;
-using Revelator.io24.Api.Services;
 using Revelator.io24.TouchPortal;
 using TouchPortalSDK.Configuration;
 

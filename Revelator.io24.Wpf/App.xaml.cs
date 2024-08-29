@@ -3,6 +3,7 @@ using Revelator.io24.Api.Configuration;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Windows;
+using Revelator.io24.Api.Settings;
 
 namespace Revelator.io24.Wpf
 {
@@ -24,7 +25,7 @@ namespace Revelator.io24.Wpf
 #endif
 
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddRevelatorAPI();
+            serviceCollection.AddRevelatorAPI(new RevelatorApiSettings { SupportMonitoring = true });
             serviceCollection.AddSingleton<MainWindow>();
             serviceCollection.AddSingleton<MainViewModel>();
 

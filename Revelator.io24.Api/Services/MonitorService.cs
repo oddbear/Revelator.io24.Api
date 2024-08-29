@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Revelator.io24.Api.Settings;
 
 namespace Revelator.io24.Api.Services
 {
@@ -22,13 +23,18 @@ namespace Revelator.io24.Api.Services
         private readonly Thread _thread;
         private readonly FatChannelMonitorModel _fatChannel;
         private readonly ValuesMonitorModel _values;
+        private readonly RevelatorApiSettings _settings;
 
         public ushort Port { get; }
 
         public MonitorService(
             FatChannelMonitorModel fatChannelMonitorModel,
-            ValuesMonitorModel valuesMonitorModel)
+            ValuesMonitorModel valuesMonitorModel,
+            RevelatorApiSettings settings)
         {
+            if (!settings.SupportMonitoring)
+                return;
+
             _udpClient = new UdpClient(0);
             var ipEndpoint = _udpClient.Client.LocalEndPoint as IPEndPoint;
             if (ipEndpoint is null)
