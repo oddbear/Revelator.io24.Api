@@ -1,46 +1,84 @@
-﻿using Revelator.io24.Api;
+﻿using BarRaider.SdTools;
+using BarRaider.SdTools.Events;
+using BarRaider.SdTools.Wrappers;
+using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
 using Revelator.io24.StreamDeck.Settings;
-using SharpDeck;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
-    [StreamDeckAction("com.oddbear.revelator.io24.routechange")]
-    public class RouteChangeAction : ActionBase<RouteChangeSettings>
+    [PluginActionId("com.oddbear.revelator.io24.routechange")]
+    public class RouteChangeAction : KeypadBase
     {
+        private readonly RouteChangeSettings _settings;
+
         private readonly RoutingTable _routingTable;
 
         public RouteChangeAction(
-            RoutingTable routingTable)
+            ISDConnection connection,
+            InitialPayload payload)
+            : base(connection, payload)
         {
-            _routingTable = routingTable;
+            if (payload.Settings == null || payload.Settings.Count == 0)
+            {
+                _settings = new RouteChangeSettings();
+            }
+            else
+            {
+                _settings = payload.Settings.ToObject<RouteChangeSettings>()!;
+            }
+
+            _routingTable = Program.RoutingTable;
+
+            Connection.OnPropertyInspectorDidAppear += Connection_OnPropertyInspectorDidAppear;
+            Connection.OnPropertyInspectorDidDisappear += Connection_OnPropertyInspectorDidDisappear;
         }
 
-        protected override void RegisterCallbacks()
+        private void Connection_OnPropertyInspectorDidAppear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidAppear> e)
         {
             _routingTable.RouteUpdated += RouteUpdated;
         }
 
-        protected override void UnregisterCallbacks()
+        private void Connection_OnPropertyInspectorDidDisappear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidDisappear> e)
         {
             _routingTable.RouteUpdated -= RouteUpdated;
         }
 
-        protected override void OnButtonPress()
+        public override void KeyPressed(KeyPayload payload)
         {
             _routingTable.SetRouting(_settings.Input, _settings.MixOut, _settings.Action);
         }
 
-        protected override bool GetButtonState()
+        public override void KeyReleased(KeyPayload payload)
+        {
+            //
+        }
+
+        protected bool GetButtonState()
         {
             return _routingTable.GetRouting(_settings.Input, _settings.MixOut);
         }
 
-        protected override async Task SettingsChanged()
+        public async override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
             await UpdateInputImage();
             await UpdateOutputTitle();
+        }
+
+        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
+        {
+            //
+        }
+
+        public override void OnTick()
+        {
+            //
+        }
+
+        public override void Dispose()
+        {
+            //
         }
 
         private async void RouteUpdated(object? sender, (Input input, MixOut output) e)
@@ -82,7 +120,7 @@ namespace Revelator.io24.StreamDeck.Actions
                     await SetImageStates("output_on", "output_off");
                     break;
                 default:
-                    await SetImageAsync(null);
+                    //await SetImageStates(null); // TODO: What was that?
                     break;
             }
         }
@@ -92,15 +130,39 @@ namespace Revelator.io24.StreamDeck.Actions
             switch (_settings.MixOut)
             {
                 case MixOut.Mix_A:
-                    await SetTitleAsync("Mix A");
+                    await Connection.SetTitleAsync("Mix A");
                     break;
                 case MixOut.Mix_B:
-                    await SetTitleAsync("Mix B");
+                    await Connection.SetTitleAsync("Mix B");
                     break;
                 case MixOut.Main:
                 default:
-                    await SetTitleAsync("Main");
+                    await Connection.SetTitleAsync("Main");
                     break;
+            }
+        }
+
+        private async Task RefreshState()
+        {
+            var state = GetButtonState() ? 0u : 1u;
+            await Connection.SetStateAsync(state);
+        }
+
+        protected async Task SetImageStates(string on, string off)
+        {
+            try
+            {
+                var onImageBytes = File.ReadAllBytes($"./Images/Plugin/{on}.png");
+                var onBase64 = Convert.ToBase64String(onImageBytes);
+                await Connection.SetImageAsync("data:image/png;base64," + onBase64); //, TargetType.Both, 0);
+
+                var offImageBytes = File.ReadAllBytes($"./Images/Plugin/{off}.png");
+                var offBase64 = Convert.ToBase64String(offImageBytes);
+                await Connection.SetImageAsync("data:image/png;base64," + offBase64); //, TargetType.Both, 1);
+            }
+            catch
+            {
+                //await Connection.SetImageAsync(null); // TODO: What was that?
             }
         }
     }

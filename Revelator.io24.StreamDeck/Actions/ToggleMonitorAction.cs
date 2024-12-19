@@ -1,33 +1,51 @@
-﻿using Revelator.io24.Api;
+﻿using BarRaider.SdTools;
+using BarRaider.SdTools.Events;
+using BarRaider.SdTools.Wrappers;
+using Revelator.io24.Api;
 using Revelator.io24.Api.Models.Global;
-using SharpDeck;
 using System.ComponentModel;
 using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
-    [StreamDeckAction("com.oddbear.revelator.io24.togglemonitor")]
-    public class ToggleMonitorAction : ActionBase<ToggleMonitorSettings>
+    [PluginActionId("com.oddbear.revelator.io24.togglemonitor")]
+    public class ToggleMonitorAction : KeypadBase
     {
+        private readonly ToggleMonitorSettings _settings;
+
         private readonly Device _device;
 
         public ToggleMonitorAction(
-            Device device)
+            ISDConnection connection,
+            InitialPayload payload)
+            : base(connection, payload)
         {
-            _device = device;
+            if (payload.Settings == null || payload.Settings.Count == 0)
+            {
+                _settings = new ToggleMonitorSettings();
+            }
+            else
+            {
+                _settings = payload.Settings.ToObject<ToggleMonitorSettings>()!;
+            }
+
+            _device = Program.Device;
+
+            Connection.OnPropertyInspectorDidAppear += Connection_OnPropertyInspectorDidAppear;
+            Connection.OnPropertyInspectorDidDisappear += Connection_OnPropertyInspectorDidDisappear;
         }
 
-        protected override void RegisterCallbacks()
+        private void Connection_OnPropertyInspectorDidAppear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidAppear> e)
         {
             _device.Global.PropertyChanged += PropertyChanged;
         }
 
-        protected override void UnregisterCallbacks()
+        private void Connection_OnPropertyInspectorDidDisappear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidDisappear> e)
         {
             _device.Global.PropertyChanged -= PropertyChanged;
         }
 
-        protected override void OnButtonPress()
+        public override void KeyPressed(KeyPayload payload)
         {
             _device.Global.MainOutVolume = GetButtonState()
                 ? 0
@@ -35,16 +53,35 @@ namespace Revelator.io24.StreamDeck.Actions
 
         }
 
-        protected override bool GetButtonState()
+        public override void KeyReleased(KeyPayload payload)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected bool GetButtonState()
         {
             var value = _device.Global.MainOutVolume;
             return value == (int)_settings.Value;
         }
 
-        protected override Task SettingsChanged()
+        public override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
             //Ignore...
-            return Task.CompletedTask;
+        }
+
+        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
+        {
+            //
+        }
+
+        public override void OnTick()
+        {
+            //
+        }
+
+        public override void Dispose()
+        {
+            //
         }
 
         private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -60,6 +97,12 @@ namespace Revelator.io24.StreamDeck.Actions
             {
                 Trace.TraceError(exception.ToString());
             }
+        }
+
+        private async Task RefreshState()
+        {
+            var state = GetButtonState() ? 0u : 1u;
+            await Connection.SetStateAsync(state);
         }
     }
 }

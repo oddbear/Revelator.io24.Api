@@ -1,43 +1,35 @@
 ﻿// register actions and connect to the Stream Deck
+using BarRaider.SdTools;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Revelator.io24.Api;
 using Revelator.io24.Api.Configuration;
-using SharpDeck.Extensions.DependencyInjection;
 
-
-#if DEBUG
-//I am using Entrian Attach to auto attach... but we do want to wait for the Debugger:
-while (!System.Diagnostics.Debugger.IsAttached)
+public class Program
 {
-    Thread.Sleep(100);
-}
-//System.Diagnostics.Debugger.Launch();
+    public static RoutingTable RoutingTable;
+    public static Device Device;
+
+    static void Main(string[] args)
+    {
+#if DEBUG
+        //I am using Entrian Attach to auto attach... but we do want to wait for the Debugger:
+        // Settings for Entrian: 'Revelator.io24.Api.exe', 'CoreCLR', 'Always', 'Continue', 'None'
+        while (!System.Diagnostics.Debugger.IsAttached)
+        {
+            Thread.Sleep(100);
+        }
+        //System.Diagnostics.Debugger.Launch();
 #endif
 
-var serviceCollection = new ServiceCollection();
+        var serviceCollection = new ServiceCollection();
 
-serviceCollection.AddRevelatorAPI();
+        serviceCollection.AddRevelatorAPI();
 
-serviceCollection.AddStreamDeck();
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        serviceProvider.StartRevelatorAPI();
 
-var serviceProvicer = serviceCollection.BuildServiceProvider();
-serviceProvicer.StartRevelatorAPI();
+        RoutingTable = serviceProvider.GetRequiredService<RoutingTable>();
 
-var services = serviceProvicer.GetServices<IHostedService>();
-
-var tasks = services
-    .Select(s => s.StartAsync(CancellationToken.None));
-
-await Task.WhenAll(tasks);
-
-/*
-new HostBuilder()
-    .UseStreamDeck()
-    .ConfigureServices(services =>
-    {
-        services
-            .AddSingleton<Counter>()
-            .AddSingleton<IHostedService>(provider => provider.GetRequiredService<Counter>());
-    })
-    .Start();
- */
+        SDWrapper.Run(args);
+    }
+}
