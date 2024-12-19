@@ -1,32 +1,73 @@
-﻿using Revelator.io24.Api;
+﻿using System.Diagnostics;
+using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
-using SharpDeck;
-using System.Diagnostics;
+using BarRaider.SdTools;
+using BarRaider.SdTools.Events;
+using BarRaider.SdTools.Wrappers;
 
 namespace Revelator.io24.StreamDeck.Actions
 {
-    [StreamDeckAction("com.oddbear.revelator.io24.volumelevel")]
-    public class VolumeLevelAction : ActionBase<VolumeLevelSettings>
+    [PluginActionId("com.oddbear.revelator.io24.volumelevel")]
+    public class VolumeLevelAction : KeypadBase
     {
+        private readonly VolumeLevelSettings _settings;
+
         private readonly RoutingTable _routingTable;
 
         public VolumeLevelAction(
-            RoutingTable routingTable)
+            ISDConnection connection,
+            InitialPayload payload)
+                : base(connection, payload)
         {
-            _routingTable = routingTable;
+            if (payload.Settings == null || payload.Settings.Count == 0)
+            {
+                _settings = new VolumeLevelSettings();
+            }
+            else
+            {
+                _settings = payload.Settings.ToObject<VolumeLevelSettings>()!;
+            }
+
+            _routingTable = Program.RoutingTable;
+
+            Connection.OnPropertyInspectorDidAppear += Connection_OnPropertyInspectorDidAppear;
+            Connection.OnPropertyInspectorDidDisappear += Connection_OnPropertyInspectorDidDisappear;
         }
 
-        protected override void RegisterCallbacks()
+        private void Connection_OnPropertyInspectorDidAppear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidAppear> e)
         {
             _routingTable.VolumeUpdated += VolumeUpdated;
         }
 
-        protected override void UnregisterCallbacks()
+        private void Connection_OnPropertyInspectorDidDisappear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidDisappear> e)
         {
             _routingTable.VolumeUpdated -= VolumeUpdated;
         }
+        
+        //protected override bool GetButtonState()
+        //{
+        //    //There is only one state:
+        //    return true;
+        //}
+        
+        private async void VolumeUpdated(object? sender, (Input input, MixOut output) e)
+        {
+            try
+            {
+                var route = (_settings.Input, Output: _settings.MixOut);
+                if (e != route)
+                    return;
 
-        protected override void OnButtonPress()
+                var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
+                await Connection.SetTitleAsync($"{value} dB");
+            }
+            catch (Exception exception)
+            {
+                Trace.TraceError(exception.ToString());
+            }
+        }
+
+        public override void KeyPressed(KeyPayload payload)
         {
             var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
             switch (_settings.ChangeType)
@@ -47,33 +88,30 @@ namespace Revelator.io24.StreamDeck.Actions
             }
         }
 
-        protected override bool GetButtonState()
+        public override void KeyReleased(KeyPayload payload)
         {
-            //There is only one state:
-            return true;
+            //
         }
 
-        protected override async Task SettingsChanged()
+        public async override void ReceivedSettings(ReceivedSettingsPayload payload)
         {
             var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
-            await SetTitleAsync($"{value} dB");
+            await Connection.SetTitleAsync($"{value} dB");
         }
 
-        private async void VolumeUpdated(object? sender, (Input input, MixOut output) e)
+        public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
         {
-            try
-            {
-                var route = (_settings.Input, Output: _settings.MixOut);
-                if (e != route)
-                    return;
+            //
+        }
 
-                var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
-                await SetTitleAsync($"{value} dB");
-            }
-            catch (Exception exception)
-            {
-                Trace.TraceError(exception.ToString());
-            }
+        public override void OnTick()
+        {
+            //
+        }
+
+        public override void Dispose()
+        {
+            //
         }
     }
 }
