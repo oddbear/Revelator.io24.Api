@@ -3,6 +3,7 @@
   "Name": "Revelator io24",
   "Version": "0.0.2",
   "Author": "oddbear",
+  "UUID": "com.oddbear.revelator.io24",
   "Actions": [
     {
       "Name": "Route Change",
@@ -179,7 +180,7 @@
   "Icon": "Images/Icons/category",
   "SDKVersion": 2,
   "Software": {
-    "MinimumVersion": "4.1"
+    "MinimumVersion": "6.4"
   },
   "OS": [
     {
