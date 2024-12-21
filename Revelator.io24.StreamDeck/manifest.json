@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/GeekyEggo/SharpDeck/master/src/SharpDeck.PropertyInspector/manifest-schema.json",
   "Name": "Revelator io24",
-  "Version": "0.0.1",
+  "Version": "0.0.2",
   "Author": "oddbear",
   "Actions": [
     {
@@ -95,6 +95,20 @@
       ]
     },
     {
+      "Name": "Output Volume change",
+      "UUID": "com.oddbear.revelator.io24.outputratio",
+      "Icon": "Images/Icons/category",
+      "Tooltip": "A output volume change action",
+      "PropertyInspectorPath": "PropertyInspector/OutputLevelAction.html",
+      "States": [
+        {
+          "Image": "Images/Plugin/output_on",
+          "Title": "Output Volume",
+          "TitleAlignment": "bottom"
+        }
+      ]
+    },
+    {
       "Name": "Toggle monitor",
       "UUID": "com.oddbear.revelator.io24.togglemonitor",
       "Icon": "Images/Icons/category",
@@ -137,7 +151,7 @@
     },
     {
       "Name": "Output Volume change",
-      "UUID": "com.oddbear.revelator.io24.outputratio",
+      "UUID": "com.oddbear.revelator.io24.outputratiodial",
       "Icon": "Images/Icons/category",
       "Tooltip": "A output volume change dial",
       "PropertyInspectorPath": "PropertyInspector/OutputLevelDial.html",
