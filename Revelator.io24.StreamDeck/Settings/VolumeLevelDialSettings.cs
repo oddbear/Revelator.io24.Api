@@ -4,7 +4,7 @@ using Revelator.io24.Api.Enums;
 
 namespace Revelator.io24.StreamDeck.Settings;
 
-public class VolumeLevelSettings
+public class VolumeLevelDialSettings
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty(PropertyName = "inputValue")]
@@ -13,18 +13,4 @@ public class VolumeLevelSettings
     [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty(PropertyName = "outputValue")]
     public MixOut MixOut { get; set; } = MixOut.Main;
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    [JsonProperty(PropertyName = "changeType")]
-    public VolumeType ChangeType { get; set; } = VolumeType.Absolute;
-
-    [JsonProperty(PropertyName = "value")]
-    public int Value { get; set; } = 0;
-}
-
-public enum VolumeType
-{
-    Absolute,
-    Increment,
-    Decrement
 }

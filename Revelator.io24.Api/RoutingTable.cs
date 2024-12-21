@@ -234,6 +234,7 @@ namespace Revelator.io24.Api
 
         private void SetupRoutes()
         {
+            // IO 24, IO 44:
             SetupRouting((Input.Mic_L, MixOut.Main),
                 "line/ch1/mute",
                 "line/ch1/volume");
@@ -244,6 +245,7 @@ namespace Revelator.io24.Api
                 "line/ch1/assign_aux2",
                 "line/ch1/aux2");
 
+            // IO 24:
             SetupRouting((Input.Mic_R, MixOut.Main),
                 "line/ch2/mute",
                 "line/ch2/volume");
@@ -254,6 +256,29 @@ namespace Revelator.io24.Api
                 "line/ch2/assign_aux2",
                 "line/ch2/aux2");
 
+            // IO 44:
+            SetupRouting((Input.Headset_Mic, MixOut.Main),
+                "line/ch2/mute",
+                "line/ch2/volume");
+            SetupRouting((Input.Headset_Mic, MixOut.Mix_A),
+                "line/ch2/assign_aux1",
+                "line/ch2/aux1");
+            SetupRouting((Input.Headset_Mic, MixOut.Mix_B),
+                "line/ch2/assign_aux2",
+                "line/ch2/aux2");
+
+            // IO 44:
+            SetupRouting((Input.Line_In, MixOut.Main),
+                "line/ch3/mute",
+                "line/ch3/volume");
+            SetupRouting((Input.Line_In, MixOut.Mix_A),
+                "line/ch3/assign_aux1",
+                "line/ch3/aux1");
+            SetupRouting((Input.Line_In, MixOut.Mix_B),
+                "line/ch3/assign_aux2",
+                "line/ch3/aux2");
+
+            // IO 24, IO 44:
             SetupRouting((Input.Playback, MixOut.Main),
                 "return/ch1/mute",
                 "return/ch1/volume");
@@ -264,6 +289,7 @@ namespace Revelator.io24.Api
                 "return/ch1/assign_aux2",
                 "return/ch1/aux2");
 
+            // IO 24, IO 44:
             SetupRouting((Input.Virtual_A, MixOut.Main),
                 "return/ch2/mute",
                 "return/ch2/volume");
@@ -274,6 +300,7 @@ namespace Revelator.io24.Api
                 "return/ch2/assign_aux2",
                 "return/ch2/aux2");
 
+            // IO 24, IO 44:
             SetupRouting((Input.Virtual_B, MixOut.Main),
                 "return/ch3/mute",
                 "return/ch3/volume");
@@ -284,6 +311,7 @@ namespace Revelator.io24.Api
                 "return/ch3/assign_aux2",
                 "return/ch3/aux2");
 
+            // IO 24, IO 44:
             SetupRouting((Input.Reverb, MixOut.Main),
                 "fxreturn/ch1/mute",
                 "fxreturn/ch1/volume");
@@ -294,6 +322,7 @@ namespace Revelator.io24.Api
                 "fxreturn/ch1/assign_aux2",
                 "fxreturn/ch1/aux2");
 
+            // IO 24, IO 44:
             SetupRouting((Input.Mix, MixOut.Main),
                 "main/ch1/mute",
                 "main/ch1/volume");
