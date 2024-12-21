@@ -1,28 +1,28 @@
-﻿using BarRaider.SdTools;
-using BarRaider.SdTools.Payloads;
+﻿using System.Diagnostics;
 using Revelator.io24.Api;
-using Revelator.io24.StreamDeck.Settings;
-using System.Diagnostics;
-using System.Globalization;
 using Revelator.io24.Api.Enums;
+using BarRaider.SdTools;
 using Newtonsoft.Json.Linq;
+using Revelator.io24.StreamDeck.Settings;
 using System.ComponentModel;
 using Revelator.io24.Api.Models.Global;
 
-namespace Revelator.io24.StreamDeck.Encoders;
+namespace Revelator.io24.StreamDeck.Actions;
 
-[PluginActionId("com.oddbear.revelator.io24.outputratiodial")]
-public class OutputLevelEncoder : EncoderBase
+[PluginActionId("com.oddbear.revelator.io24.outputratio")]
+public class OutputLevelAction : KeypadBase
 {
-    private OutputLevelDialSettings _settings;
+    private OutputLevelSettings _settings;
 
     private readonly Device _device;
 
-    public OutputLevelEncoder(ISDConnection connection, InitialPayload payload)
+    public OutputLevelAction(
+        ISDConnection connection,
+        InitialPayload payload)
         : base(connection, payload)
     {
         _device = Program.Device;
-        _settings ??= new OutputLevelDialSettings();
+        _settings ??= new OutputLevelSettings();
 
         if (payload.Settings?.Count > 0)
         {
@@ -37,31 +37,30 @@ public class OutputLevelEncoder : EncoderBase
         _device.Global.PropertyChanged -= PropertyChanged;
     }
 
-    public override void DialRotate(DialRotatePayload payload)
+    public override void KeyPressed(KeyPayload payload)
     {
         var value = GetVolumeOrRatio();
-
-        value += payload.Ticks;
-
-        if (value is < 0 or > 100)
-            return;
-
-        SetVolumeOrRatio(value);
+        switch (_settings.ChangeType)
+        {
+            case VolumeType.Increment:
+                value += _settings.Value;
+                SetVolumeOrRatio(value);
+                break;
+            case VolumeType.Decrement:
+                value -= _settings.Value;
+                SetVolumeOrRatio(value);
+                break;
+            case VolumeType.Absolute:
+            default:
+                value = _settings.Value;
+                SetVolumeOrRatio(value);
+                break;
+        }
     }
 
-    public override void DialDown(DialPayload payload)
+    public override void KeyReleased(KeyPayload payload)
     {
-        // Press Down
-    }
-
-    public override void DialUp(DialPayload payload)
-    {
-        // Press Up
-    }
-
-    public override void TouchPress(TouchpadPressPayload payload)
-    {
-        // Touch Screen
+        //
     }
 
     public override void ReceivedSettings(ReceivedSettingsPayload payload)
@@ -74,9 +73,9 @@ public class OutputLevelEncoder : EncoderBase
         RefreshSettings(payload.Settings);
     }
 
-    public override void OnTick()
+    public override async void OnTick()
     {
-
+        //
     }
 
     private int GetVolumeOrRatio()
@@ -109,11 +108,10 @@ public class OutputLevelEncoder : EncoderBase
     {
         try
         {
-            _settings = settings.ToObject<OutputLevelDialSettings>()!;
+            _settings = settings.ToObject<OutputLevelSettings>()!;
 
             await UpdateOutputImage(_settings.DeviceOut);
             await UpdateOutputTitle(_settings.DeviceOut);
-            await UpdateOutputFeedback(_settings.DeviceOut);
         }
         catch (Exception exception)
         {
@@ -150,7 +148,6 @@ public class OutputLevelEncoder : EncoderBase
     {
         try
         {
-            await UpdateOutputFeedback(deviceOut);
             await UpdateOutputTitle(deviceOut);
         }
         catch (Exception exception)
@@ -163,23 +160,6 @@ public class OutputLevelEncoder : EncoderBase
     {
         var outputImageName = GetImageNameFromInput(deviceOut);
         await SetImageStates($"{outputImageName}_on");
-    }
-
-    private async Task UpdateOutputFeedback(DeviceOut deviceOut)
-    {
-        var volumeInPercentage = GetVolumeOrRatio();
-
-        var dkv = new Dictionary<string, string>
-        {
-            // Output Source:
-            ["title"] = deviceOut.ToString(),
-            // Volume Title in percentage:
-            ["value"] = $"{volumeInPercentage} %",
-            // Volume bar in percentage 0-100:
-            ["indicator"] = volumeInPercentage.ToString(CultureInfo.InvariantCulture)
-        };
-
-        await Connection.SetFeedbackAsync(dkv);
     }
 
     private async Task UpdateOutputTitle(DeviceOut deviceOut)
