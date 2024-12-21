@@ -95,28 +95,6 @@
       ]
     },
     {
-      "Name": "Volume change",
-      "UUID": "com.oddbear.revelator.io24.volumeleveldial",
-      "Icon": "Images/Icons/category",
-      "Tooltip": "A volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/VolumeLevelActionDial.html",
-      "States": [
-        {
-          "Image": "Images/Icons/Image",
-          "Title": "Volume",
-          "TitleAlignment": "bottom"
-        }
-      ],
-      "Controllers": [ "Encoder" ],
-      "Encoder": {
-        "layout": "$B1",
-        "TriggerDescription": {
-          "Rotate": "Increase/Decrease",
-          "Push": "Toggle mute"
-        }
-      }
-    },
-    {
       "Name": "Toggle monitor",
       "UUID": "com.oddbear.revelator.io24.togglemonitor",
       "Icon": "Images/Icons/category",
@@ -134,6 +112,49 @@
           "TitleAlignment": "bottom"
         }
       ]
+    },
+    {
+      "Name": "Volume change",
+      "UUID": "com.oddbear.revelator.io24.volumeleveldial",
+      "Icon": "Images/Icons/category",
+      "Tooltip": "A volume change dial",
+      "PropertyInspectorPath": "PropertyInspector/VolumeLevelDial.html",
+      "States": [
+        {
+          "Image": "Images/Icons/Image",
+          "Title": "Volume",
+          "TitleAlignment": "bottom"
+        }
+      ],
+      "Controllers": [ "Encoder" ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Increase/Decrease",
+          "Push": "Toggle mute"
+        }
+      }
+    },
+    {
+      "Name": "Output Volume change",
+      "UUID": "com.oddbear.revelator.io24.outputratio",
+      "Icon": "Images/Icons/category",
+      "Tooltip": "A output volume change dial",
+      "PropertyInspectorPath": "PropertyInspector/OutputLevelDial.html",
+      "States": [
+        {
+          "Image": "Images/Plugin/output_on",
+          "Title": "Volume",
+          "TitleAlignment": "bottom"
+        }
+      ],
+      "Controllers": [ "Encoder" ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Increase/Decrease"
+        }
+      }
     }
   ],
   "Category": "Revelator io24",

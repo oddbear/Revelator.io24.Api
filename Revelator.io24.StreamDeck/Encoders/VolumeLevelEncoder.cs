@@ -96,6 +96,7 @@ public class VolumeLevelEncoder : EncoderBase
             // A setting change might have a changed route:
             await UpdateInputImage();
             await UpdateMixTitle();
+            await UpdateMixFeedback();
         }
         catch (Exception exception)
         {
@@ -112,9 +113,9 @@ public class VolumeLevelEncoder : EncoderBase
             if (e != route)
                 return;
 
-            await UpdateMixFeedback();
             await UpdateInputImage();
             await UpdateMixTitle();
+            await UpdateMixFeedback();
         }
         catch (Exception exception)
         {
