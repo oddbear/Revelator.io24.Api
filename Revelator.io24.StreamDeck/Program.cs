@@ -1,8 +1,11 @@
 ﻿// register actions and connect to the Stream Deck
+
 using BarRaider.SdTools;
 using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api;
 using Revelator.io24.Api.Configuration;
+
+namespace Revelator.io24.StreamDeck;
 
 public class Program
 {
@@ -29,6 +32,7 @@ public class Program
         serviceProvider.StartRevelatorAPI();
 
         RoutingTable = serviceProvider.GetRequiredService<RoutingTable>();
+        Device = serviceProvider.GetRequiredService<Device>();
 
         SDWrapper.Run(args);
     }

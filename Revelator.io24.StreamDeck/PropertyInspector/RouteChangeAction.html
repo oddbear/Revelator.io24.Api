@@ -10,20 +10,22 @@
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Input</div>
         <select id="inputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
-            <option value="Mic_L">Mic L</option>
-            <option value="Mic_R">Mic R</option>
-            <option value="Playback">Playback</option>
-            <option value="Virtual_A">Virtual A</option>
-            <option value="Virtual_B">Virtual B</option>
-            <option value="Mix">Mix</option>
+            <option value="Mic_L">Mic L [io24, io44]</option>
+            <option value="Mic_R">Mic R [io24]</option>
+            <option value="Headset_Mic">Headset Mic [io44]</option>
+            <option value="Line_In">Line In [io44]</option>
+            <option value="Playback">Playback [io24, io44]</option>
+            <option value="Virtual_A">Virtual A [io24, io44]</option>
+            <option value="Virtual_B">Virtual B [io24, io44]</option>
+            <option value="Mix">Mix [io24, io44]</option>
         </select>
     </div>
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">Output</div>
         <select id="outputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
-            <option value="Main">Main</option>
-            <option value="Mix_A">Stream Mix A</option>
-            <option value="Mix_B">Stream Mix B</option>
+            <option value="Main">Main [io24, io44]</option>
+            <option value="Mix_A">Stream Mix A [io24, io44]</option>
+            <option value="Mix_B">Stream Mix B [io24, io44]</option>
         </select>
     </div>
     <div class="sdpi-item" id="select_single">

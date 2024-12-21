@@ -1,48 +1,68 @@
 ﻿using BarRaider.SdTools;
-using Newtonsoft.Json.Linq;
+using BarRaider.SdTools.Payloads;
 using Revelator.io24.Api;
-using Revelator.io24.Api.Enums;
 using Revelator.io24.StreamDeck.Settings;
 using System.Diagnostics;
+using System.Globalization;
+using Revelator.io24.Api.Enums;
+using Newtonsoft.Json.Linq;
 
-namespace Revelator.io24.StreamDeck.Actions;
+namespace Revelator.io24.StreamDeck.Encoders;
 
-[PluginActionId("com.oddbear.revelator.io24.routechange")]
-public class RouteChangeAction : KeypadBase
+[PluginActionId("com.oddbear.revelator.io24.volumeleveldial")]
+public class VolumeLevelEncoder : EncoderBase
 {
-    private RouteChangeSettings _settings;
+    private VolumeLevelDialSettings _settings;
 
     private readonly RoutingTable _routingTable;
 
-    public RouteChangeAction(
-        ISDConnection connection,
-        InitialPayload payload)
+    public VolumeLevelEncoder(ISDConnection connection, InitialPayload payload)
         : base(connection, payload)
     {
         _routingTable = Program.RoutingTable;
-        _settings ??= new RouteChangeSettings();
+        _settings ??= new VolumeLevelDialSettings();
 
         if (payload.Settings?.Count > 0)
         {
-            _settings = payload.Settings.ToObject<RouteChangeSettings>()!;
+            RefreshSettings(payload.Settings);
         }
 
+        _routingTable.VolumeUpdated += VolumeUpdated;
         _routingTable.RouteUpdated += RouteUpdated;
     }
 
     public override void Dispose()
     {
+        _routingTable.VolumeUpdated -= VolumeUpdated;
         _routingTable.RouteUpdated -= RouteUpdated;
     }
 
-    public override void KeyPressed(KeyPayload payload)
+    public override void DialRotate(DialRotatePayload payload)
     {
-        _routingTable.SetRouting(_settings.Input, _settings.MixOut, _settings.Action);
+        var volume = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
+
+        volume += payload.Ticks;
+
+        if (volume is < -96 or > +10)
+            return;
+
+        _routingTable.SetVolumeInDb(_settings.Input, _settings.MixOut, volume);
     }
 
-    public override void KeyReleased(KeyPayload payload)
+    public override void DialDown(DialPayload payload)
     {
-        //
+        // Press Down
+        // Could be used for ex. Routing change?
+    }
+
+    public override void DialUp(DialPayload payload)
+    {
+        // Press Up
+    }
+
+    public override void TouchPress(TouchpadPressPayload payload)
+    {
+        // Touch Screen
     }
 
     public override void ReceivedSettings(ReceivedSettingsPayload payload)
@@ -57,7 +77,7 @@ public class RouteChangeAction : KeypadBase
 
     public override void OnTick()
     {
-        //
+
     }
 
     private async void RefreshSettings(JObject settings)
@@ -65,7 +85,7 @@ public class RouteChangeAction : KeypadBase
         try
         {
             var oldRoute = (_settings.Input, _settings.MixOut);
-            _settings = settings.ToObject<RouteChangeSettings>()!;
+            _settings = settings.ToObject<VolumeLevelDialSettings>()!;
 
             var newRoute = (_settings.Input, Output: _settings.MixOut);
 
@@ -75,7 +95,7 @@ public class RouteChangeAction : KeypadBase
 
             // A setting change might have a changed route:
             await UpdateInputImage();
-            await UpdateOutputTitle();
+            await UpdateMixTitle();
         }
         catch (Exception exception)
         {
@@ -83,7 +103,26 @@ public class RouteChangeAction : KeypadBase
         }
     }
 
-    private async void RouteUpdated(object? sender, (Input input, MixOut output) e)
+    private async void RouteUpdated(object? sender, (Input, MixOut) e)
+    {
+        try
+        {
+            // Ignore if event is from another route:
+            var route = (_settings.Input, Output: _settings.MixOut);
+            if (e != route)
+                return;
+
+            await UpdateMixFeedback();
+            await UpdateInputImage();
+            await UpdateMixTitle();
+        }
+        catch (Exception exception)
+        {
+            Trace.TraceError(exception.ToString());
+        }
+    }
+
+    private async void VolumeUpdated(object? sender, (Input input, MixOut output) e)
     {
         try
         {
@@ -91,7 +130,8 @@ public class RouteChangeAction : KeypadBase
             if (e != route)
                 return;
 
-            await UpdateOutputTitle();
+            await UpdateMixFeedback();
+            await UpdateMixTitle();
         }
         catch (Exception exception)
         {
@@ -106,21 +146,26 @@ public class RouteChangeAction : KeypadBase
         await SetImageStates(mixState ? $"{inputImageName}_on" : $"{inputImageName}_off");
     }
 
-    private async Task UpdateOutputTitle()
+    private async Task UpdateMixFeedback()
     {
-        switch (_settings.MixOut)
+        var volumeInDb = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
+        var volumeInPercentage = _routingTable.GetVolume(_settings.Input, _settings.MixOut);
+
+        var dkv = new Dictionary<string, string>
         {
-            case MixOut.Mix_A:
-                await Connection.SetTitleAsync("Mix A");
-                break;
-            case MixOut.Mix_B:
-                await Connection.SetTitleAsync("Mix B");
-                break;
-            case MixOut.Main:
-            default:
-                await Connection.SetTitleAsync("Main");
-                break;
-        }
+            // Volume Title in dB:
+            ["value"] = $"{volumeInDb} dB",
+            // Volume bar in percentage 0-100:
+            ["indicator"] = volumeInPercentage.ToString(CultureInfo.InvariantCulture)
+        };
+
+        await Connection.SetFeedbackAsync(dkv);
+    }
+
+    private async Task UpdateMixTitle()
+    {
+        var value = _routingTable.GetVolumeInDb(_settings.Input, _settings.MixOut);
+        await Connection.SetTitleAsync($"{value} dB");
     }
 
     private async Task SetImageStates(string imageName)

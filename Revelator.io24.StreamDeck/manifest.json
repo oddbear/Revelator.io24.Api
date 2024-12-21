@@ -95,6 +95,28 @@
       ]
     },
     {
+      "Name": "Volume change",
+      "UUID": "com.oddbear.revelator.io24.volumeleveldial",
+      "Icon": "Images/Icons/category",
+      "Tooltip": "A volume change dial",
+      "PropertyInspectorPath": "PropertyInspector/VolumeLevelActionDial.html",
+      "States": [
+        {
+          "Image": "Images/Icons/Image",
+          "Title": "Volume",
+          "TitleAlignment": "bottom"
+        }
+      ],
+      "Controllers": [ "Encoder" ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Increase/Decrease",
+          "Push": "Toggle mute"
+        }
+      }
+    },
+    {
       "Name": "Toggle monitor",
       "UUID": "com.oddbear.revelator.io24.togglemonitor",
       "Icon": "Images/Icons/category",
