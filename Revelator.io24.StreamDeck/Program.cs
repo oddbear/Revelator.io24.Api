@@ -11,6 +11,7 @@ public class Program
 {
     public static RoutingTable RoutingTable;
     public static Device Device;
+    public static RawService RawService;
 
     static void Main(string[] args)
     {
@@ -33,6 +34,7 @@ public class Program
 
         RoutingTable = serviceProvider.GetRequiredService<RoutingTable>();
         Device = serviceProvider.GetRequiredService<Device>();
+        RawService = serviceProvider.GetRequiredService<RawService>();
 
         SDWrapper.Run(args);
     }
