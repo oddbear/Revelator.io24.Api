@@ -154,6 +154,8 @@ public class VolumeLevelEncoder : EncoderBase
 
         var dkv = new Dictionary<string, string>
         {
+            // Output Source:
+            ["title"] = $"{_settings.Input} to {_settings.MixOut}",
             // Volume Title in dB:
             ["value"] = $"{volumeInDb} dB",
             // Volume bar in percentage 0-100:

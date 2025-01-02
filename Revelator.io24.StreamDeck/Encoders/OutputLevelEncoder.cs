@@ -24,10 +24,8 @@ public class OutputLevelEncoder : EncoderBase
         _device = Program.Device;
         _settings ??= new OutputLevelDialSettings();
 
-        if (payload.Settings?.Count > 0)
-        {
-            RefreshSettings(payload.Settings);
-        }
+        // Empty if no settings are changed (default settings not picked up)
+        RefreshSettings(payload.Settings);
 
         _device.Global.PropertyChanged += PropertyChanged;
     }
@@ -41,8 +39,9 @@ public class OutputLevelEncoder : EncoderBase
     {
         var value = GetVolumeOrRatio();
 
-        value += payload.Ticks;
-
+        // Feels smoother to double the ticks
+        value += payload.Ticks * 2;
+        
         if (value is < 0 or > 100)
             return;
 
@@ -88,7 +87,7 @@ public class OutputLevelEncoder : EncoderBase
             _ => _device.Global.MainOutVolume
         };
     }
-
+    
     private void SetVolumeOrRatio(int value)
     {
         switch (_settings.DeviceOut)
@@ -121,19 +120,19 @@ public class OutputLevelEncoder : EncoderBase
         }
     }
 
-    private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         try
         {
             switch (e.PropertyName)
             {
-                case nameof(Global.MainOutVolume):
+                case nameof(Global.MainOutVolume) when _settings.DeviceOut == DeviceOut.MainOut:
                     VolumeUpdated(DeviceOut.MainOut);
                     break;
-                case nameof(Global.HeadphonesVolume):
+                case nameof(Global.HeadphonesVolume) when _settings.DeviceOut == DeviceOut.Phones:
                     VolumeUpdated(DeviceOut.Phones);
                     break;
-                case nameof(Global.MonitorBlend):
+                case nameof(Global.MonitorBlend) when _settings.DeviceOut == DeviceOut.Blend:
                     VolumeUpdated(DeviceOut.Blend);
                     break;
                 default:
@@ -169,12 +168,18 @@ public class OutputLevelEncoder : EncoderBase
     {
         var volumeInPercentage = GetVolumeOrRatio();
 
+        var volumeValue = deviceOut switch
+        {
+            DeviceOut.Blend => $"{volumeInPercentage / 50f - 1f:0.00}",
+            _ => $"{LookupTable.OutputFloatToDb(volumeInPercentage / 100f):0.0} dB"
+        };
+
         var dkv = new Dictionary<string, string>
         {
             // Output Source:
             ["title"] = deviceOut.ToString(),
             // Volume Title in percentage:
-            ["value"] = $"{volumeInPercentage} %",
+            ["value"] = volumeValue,
             // Volume bar in percentage 0-100:
             ["indicator"] = volumeInPercentage.ToString(CultureInfo.InvariantCulture)
         };

@@ -24,10 +24,8 @@ public class OutputLevelAction : KeypadBase
         _device = Program.Device;
         _settings ??= new OutputLevelSettings();
 
-        if (payload.Settings?.Count > 0)
-        {
-            RefreshSettings(payload.Settings);
-        }
+        // Empty if no settings are changed (default settings not picked up)
+        RefreshSettings(payload.Settings);
 
         _device.Global.PropertyChanged += PropertyChanged;
     }
@@ -73,7 +71,7 @@ public class OutputLevelAction : KeypadBase
         RefreshSettings(payload.Settings);
     }
 
-    public override async void OnTick()
+    public override void OnTick()
     {
         //
     }
@@ -119,19 +117,19 @@ public class OutputLevelAction : KeypadBase
         }
     }
 
-    private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         try
         {
             switch (e.PropertyName)
             {
-                case nameof(Global.MainOutVolume):
+                case nameof(Global.MainOutVolume) when _settings.DeviceOut == DeviceOut.MainOut:
                     VolumeUpdated(DeviceOut.MainOut);
                     break;
-                case nameof(Global.HeadphonesVolume):
+                case nameof(Global.HeadphonesVolume) when _settings.DeviceOut == DeviceOut.Phones:
                     VolumeUpdated(DeviceOut.Phones);
                     break;
-                case nameof(Global.MonitorBlend):
+                case nameof(Global.MonitorBlend) when _settings.DeviceOut == DeviceOut.Blend:
                     VolumeUpdated(DeviceOut.Blend);
                     break;
                 default:
@@ -165,7 +163,8 @@ public class OutputLevelAction : KeypadBase
     private async Task UpdateOutputTitle(DeviceOut deviceOut)
     {
         var volumeInPercentage = GetVolumeOrRatio();
-        await Connection.SetTitleAsync($"{deviceOut}: {volumeInPercentage} %");
+        var title = GetTitleFromInput(deviceOut);
+        await Connection.SetTitleAsync($"{title}: {volumeInPercentage} %");
     }
 
     private async Task SetImageStates(string imageName)
@@ -179,6 +178,20 @@ public class OutputLevelAction : KeypadBase
         catch (Exception exception)
         {
             Trace.TraceError(exception.ToString());
+        }
+    }
+
+    private string GetTitleFromInput(DeviceOut input)
+    {
+        switch (input)
+        {
+            case DeviceOut.Phones:
+                return "Phones";
+            case DeviceOut.Blend:
+                return "Blend";
+            case DeviceOut.MainOut:
+            default:
+                return "Main";
         }
     }
 
