@@ -1,34 +1,21 @@
 ﻿using BarRaider.SdTools;
 using Newtonsoft.Json.Linq;
-using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
 using Revelator.io24.Api.Models.Inputs;
-using Revelator.io24.StreamDeck.Settings;
+using Revelator.io24.StreamDeck.Actions.Keypads.Settings;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace Revelator.io24.StreamDeck.Actions;
+namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
 [PluginActionId("com.oddbear.revelator.io24.presetchange")]
-public class PresetChangeAction : KeypadBase
+public class PresetChangeKeypad : KeypadSharedBase<PresetChangeSettings>
 {
-    private readonly PresetChangeSettings _settings;
-
-    private readonly Device _device;
-
-    public PresetChangeAction(
+    public PresetChangeKeypad(
         ISDConnection connection,
         InitialPayload payload)
         : base(connection, payload)
     {
-        _device = Program.Device;
-        _settings ??= new PresetChangeSettings();
-
-        if (payload.Settings?.Count > 0)
-        {
-            _settings = payload.Settings.ToObject<PresetChangeSettings>()!;
-        }
-
         _device.MicrohoneLeft.PropertyChanged += PropertyChanged;
         _device.MicrohoneRight.PropertyChanged += PropertyChanged;
     }
@@ -41,57 +28,36 @@ public class PresetChangeAction : KeypadBase
 
     public override void KeyPressed(KeyPayload payload)
     {
-        var presetIndex = _settings.Preset;
+        var presetIndex = _settings.PresetIndex;
         var preset = _settings.Presets[presetIndex].Name;
 
         var lineChannel = GetMicrophoneChannel(_settings.Channel);
         lineChannel.Preset = preset;
     }
 
-    public override void KeyReleased(KeyPayload payload)
+    protected override async Task SettingsUpdated()
     {
-        //
-    }
-
-    protected bool GetButtonState()
-    {
-        var presetIndex = _settings.Preset;
-
-        var lineChannel = GetMicrophoneChannel(_settings.Channel);
-        var linePresetIndex = Array.IndexOf(lineChannel.Presets, lineChannel.Preset);
-        return presetIndex == linePresetIndex;
-    }
-
-    public async override void ReceivedSettings(ReceivedSettingsPayload payload)
-    {
-        await UpdateSettingsPresets();
-        await UpdatePresetNameTitle();
-    }
-
-    public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-    {
-        //
-    }
-
-    public override void OnTick()
-    {
-        //
+        await RefreshState();
     }
 
     private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         try
         {
-            if (e.PropertyName == nameof(LineChannel.Preset))
-            {
-                await RefreshState();
+            // Channel3 does not have presets:
+            if (sender is Channel3)
                 return;
-            }
 
-            if (e.PropertyName == nameof(LineChannel.Presets))
+            switch (e.PropertyName)
             {
-                await UpdateSettingsPresets();
-                return;
+                // If the selected preset is changed, we need to change the state:
+                case nameof(LineChannel.Preset):
+                    await RefreshState();
+                    return;
+                // Presets name are dynamic and might change for the custom 1 to 6:
+                case nameof(LineChannel.Presets):
+                    await UpdateSettingsPresets();
+                    return;
             }
         }
         catch (Exception exception)
@@ -108,37 +74,35 @@ public class PresetChangeAction : KeypadBase
         var presetNames = _settings.Presets
             .Select(preset => preset.Name);
 
-        //Don't do anything is all presets are equal (name and position):
+        // Don't do anything is all presets are equal (name and position):
         if (presets.SequenceEqual(presetNames))
             return;
 
         for (int i = 0; i < 14; i++)
             _settings.Presets[i].Name = presets[i];
 
-        //Replaces the settings in dropdown with new ones:
+        // Replaces the settings in dropdown with new ones:
         await Connection.SetSettingsAsync(JObject.FromObject(_settings));
     }
 
-    private async Task UpdatePresetNameTitle()
-    {
-        var preset = GetSelectedPresetName();
-        await Connection.SetTitleAsync(preset);
-    }
-
-    private string GetSelectedPresetName()
-    {
-        var presetIndex = _settings.Preset;
-        return _settings.Presets[presetIndex].Name;
-    }
-
+    // There is no preset on Line In [io44]:
     private LineChannel GetMicrophoneChannel(MicrophoneChannel channel)
         => channel == MicrophoneChannel.Left
             ? _device.MicrohoneLeft
             : _device.MicrohoneRight;
 
-    private async Task RefreshState()
+    protected override async Task RefreshState()
     {
         var state = GetButtonState() ? 0u : 1u;
         await Connection.SetStateAsync(state);
+    }
+
+    private bool GetButtonState()
+    {
+        var presetIndex = _settings.PresetIndex;
+
+        var lineChannel = GetMicrophoneChannel(_settings.Channel);
+        var linePresetIndex = Array.IndexOf(lineChannel.Presets, lineChannel.Preset);
+        return presetIndex == linePresetIndex;
     }
 }

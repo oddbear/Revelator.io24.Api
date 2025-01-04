@@ -10,5 +10,7 @@ namespace Revelator.io24.Api.Models.Inputs
         {
             //
         }
+
+        // TODO: Why is there a 'line/ch1/hardwareMute' (0) message?
     }
 }

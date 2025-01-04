@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using Revelator.io24.Api.Enums;
 
-namespace Revelator.io24.StreamDeck.Settings;
+namespace Revelator.io24.StreamDeck.Actions.Keypads.Settings;
 
 public class FatChannelToggleSettings
 {

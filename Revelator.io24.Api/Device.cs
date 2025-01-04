@@ -13,6 +13,9 @@ namespace Revelator.io24.Api
         public MicrohoneLeft MicrohoneLeft { get; }
         public MicrohoneRight MicrohoneRight { get; }
 
+        // TODO: Need to find a better way to structure this for io44 (Line In):
+        public Channel3 Channel3 { get; }
+
         public Playback Playback { get; }
         public VirtualA VirtualA { get; }
         public VirtualB VirtualB { get; }
@@ -31,6 +34,7 @@ namespace Revelator.io24.Api
 
             MicrohoneLeft = new MicrohoneLeft(rawService);
             MicrohoneRight = new MicrohoneRight(rawService);
+            Channel3 = new Channel3(rawService);
 
             Playback = new Playback(rawService);
             VirtualA = new VirtualA(rawService);

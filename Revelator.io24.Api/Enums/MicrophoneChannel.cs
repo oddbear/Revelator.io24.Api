@@ -3,6 +3,7 @@
     public enum MicrophoneChannel
     {
         Left,
-        Right
+        Right,
+        Channel3
     }
 }

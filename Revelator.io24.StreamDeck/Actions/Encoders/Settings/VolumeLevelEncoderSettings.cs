@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Converters;
 using Revelator.io24.Api.Enums;
 
-namespace Revelator.io24.StreamDeck.Settings;
+namespace Revelator.io24.StreamDeck.Actions.Encoders.Settings;
 
-public class VolumeLevelDialSettings
+public class VolumeLevelEncoderSettings
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty(PropertyName = "inputValue")]
