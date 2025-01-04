@@ -11,6 +11,12 @@ namespace Revelator.io24.Api.Models.Inputs
             //
         }
 
-        // TODO: Why is there a 'line/ch1/hardwareMute' (0) message?
+        // There a 'line/ch1/hardwareMute' (0) message, but how can we use it in UC or on the Interface Device?
+        [RouteValue("hardwareMute")]
+        public bool ExperimentalHardwareMute
+        {
+            get => GetBoolean();
+            set => SetBoolean(value);
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace Revelator.io24.Api.Models.Outputs
             //
         }
 
+        // HardwareMute is not set able, only readable as of UC 4.3.3
         [RouteValue("hardwareMute")]
         public bool HardwareMute
         {
