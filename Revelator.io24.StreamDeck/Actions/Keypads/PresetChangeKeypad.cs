@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
-[PluginActionId("com.oddbear.revelator.io24.presetchange")]
+[PluginActionId("com.oddbear.revelator.io24.keypad.preset-change")]
 public class PresetChangeKeypad : KeypadSharedBase<PresetChangeSettings>
 {
     public PresetChangeKeypad(

@@ -10,7 +10,7 @@ using Revelator.io24.StreamDeck.Actions.Encoders.Settings;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders;
 
-[PluginActionId("com.oddbear.revelator.io24.outputratiodial")]
+[PluginActionId("com.oddbear.revelator.io24.encoder.output-level")]
 public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
 {
     public OutputLevelEncoder(ISDConnection connection, InitialPayload payload)
