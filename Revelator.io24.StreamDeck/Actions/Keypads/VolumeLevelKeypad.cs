@@ -5,7 +5,7 @@ using Revelator.io24.StreamDeck.Actions.Keypads.Settings;
 
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
-[PluginActionId("com.oddbear.revelator.io24.volumelevel")]
+[PluginActionId("com.oddbear.revelator.io24.keypad.volume-level")]
 public class VolumeLevelKeypad : KeypadSharedBase<VolumeLevelSettings>
 {
     public VolumeLevelKeypad(

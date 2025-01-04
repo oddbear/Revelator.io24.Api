@@ -7,7 +7,7 @@
   "Actions": [
     {
       "Name": "Experimental Hardware Mute Left Mic",
-      "UUID": "com.oddbear.revelator.io24.microphone-hardware-mute",
+      "UUID": "com.oddbear.revelator.io24.keypad.microphone-hardware-mute",
       "Icon": "Images/Icons/Icon",
       "States": [
         {
@@ -24,10 +24,10 @@
     },
     {
       "Name": "Route Change",
-      "UUID": "com.oddbear.revelator.io24.routechange",
+      "UUID": "com.oddbear.revelator.io24.keypad.route-change",
       "Icon": "Images/Icons/routing",
       "Tooltip": "A route changing action",
-      "PropertyInspectorPath": "PropertyInspector/RouteChangeKeypad.html",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/RouteChangeKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/routing_on",
@@ -43,10 +43,10 @@
     },
     {
       "Name": "Headphone source",
-      "UUID": "com.oddbear.revelator.io24.headphonesource",
+      "UUID": "com.oddbear.revelator.io24.keypad.headphone-source",
       "Icon": "Images/Icons/headphones",
       "Tooltip": "A headphones source set action",
-      "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceKeypad.html",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/HeadphonesSourceKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/headphones_on",
@@ -62,10 +62,10 @@
     },
     {
       "Name": "Fat Channel Toggle",
-      "UUID": "com.oddbear.revelator.io24.fatchanneltoggle",
+      "UUID": "com.oddbear.revelator.io24.keypad.fatchannel-toggle",
       "Icon": "Images/Icons/fat",
       "Tooltip": "A Fat Channel toggle action",
-      "PropertyInspectorPath": "PropertyInspector/FatChannelToggleKeypad.html",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/FatChannelToggleKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/fat_on",
@@ -81,10 +81,10 @@
     },
     {
       "Name": "Preset change",
-      "UUID": "com.oddbear.revelator.io24.presetchange",
+      "UUID": "com.oddbear.revelator.io24.keypad.preset-change",
       "Icon": "Images/Icons/presets",
       "Tooltip": "A preset change action",
-      "PropertyInspectorPath": "PropertyInspector/PresetChangeKeypad.html",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/PresetChangeKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/preset_on",
@@ -99,11 +99,11 @@
       ]
     },
     {
-      "Name": "Volume change",
-      "UUID": "com.oddbear.revelator.io24.volumelevel",
+      "Name": "Input Volume Level",
+      "UUID": "com.oddbear.revelator.io24.keypad.volume-level",
       "Icon": "Images/Icons/category",
       "Tooltip": "A volume change action",
-      "PropertyInspectorPath": "PropertyInspector/VolumeLevelKeypad.html",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/VolumeLevelKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/volume_on",
@@ -118,11 +118,11 @@
       ]
     },
     {
-      "Name": "Output Volume change",
-      "UUID": "com.oddbear.revelator.io24.outputratio",
+      "Name": "Output Volume Level",
+      "UUID": "com.oddbear.revelator.io24.keypad.output-level",
       "Icon": "Images/Icons/category",
       "Tooltip": "A output volume change action",
-      "PropertyInspectorPath": "PropertyInspector/OutputLevelKeypad.html",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/OutputLevelKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/output_on",
@@ -137,11 +137,11 @@
       ]
     },
     {
-      "Name": "Volume change",
-      "UUID": "com.oddbear.revelator.io24.volumeleveldial",
+      "Name": "Input Volume Level",
+      "UUID": "com.oddbear.revelator.io24.encoder.volume-level",
       "Icon": "Images/Icons/category",
       "Tooltip": "A volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/VolumeLevelEncoder.html",
+      "PropertyInspectorPath": "PropertyInspector/Encoders/VolumeLevelEncoder.html",
       "Controllers": [ "Encoder" ],
       "Encoder": {
         "layout": "$B1",
@@ -157,11 +157,11 @@
       ]
     },
     {
-      "Name": "Output Volume change",
-      "UUID": "com.oddbear.revelator.io24.outputratiodial",
+      "Name": "Output Volume Level",
+      "UUID": "com.oddbear.revelator.io24.encoder.output-level",
       "Icon": "Images/Icons/category",
       "Tooltip": "A output volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/OutputLevelEncoder.html",
+      "PropertyInspectorPath": "PropertyInspector/Encoders/OutputLevelEncoder.html",
       "Controllers": [ "Encoder" ],
       "Encoder": {
         "layout": "$B1",

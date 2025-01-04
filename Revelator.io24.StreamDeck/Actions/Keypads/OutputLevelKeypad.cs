@@ -9,7 +9,7 @@ using Revelator.io24.StreamDeck.Helper;
 
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
-[PluginActionId("com.oddbear.revelator.io24.outputratio")]
+[PluginActionId("com.oddbear.revelator.io24.keypad.output-level")]
 public class OutputLevelKeypad : KeypadSharedBase<OutputLevelSettings>
 {
     public OutputLevelKeypad(

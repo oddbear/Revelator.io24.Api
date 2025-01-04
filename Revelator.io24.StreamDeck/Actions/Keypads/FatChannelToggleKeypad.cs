@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
-[PluginActionId("com.oddbear.revelator.io24.fatchanneltoggle")]
+[PluginActionId("com.oddbear.revelator.io24.keypad.fatchannel-toggle")]
 public class FatChannelToggleKeypad : KeypadSharedBase<FatChannelToggleSettings>
 {
     public FatChannelToggleKeypad(

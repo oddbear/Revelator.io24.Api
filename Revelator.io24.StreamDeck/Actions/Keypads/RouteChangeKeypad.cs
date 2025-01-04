@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
-[PluginActionId("com.oddbear.revelator.io24.routechange")]
+[PluginActionId("com.oddbear.revelator.io24.keypad.route-change")]
 public class RouteChangeKeypad : KeypadSharedBase<RouteChangeSettings>
 {
     public RouteChangeKeypad(

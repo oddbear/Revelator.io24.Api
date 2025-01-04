@@ -7,7 +7,7 @@ using Revelator.io24.StreamDeck.Actions.Encoders.Settings;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders;
 
-[PluginActionId("com.oddbear.revelator.io24.volumeleveldial")]
+[PluginActionId("com.oddbear.revelator.io24.encoder.volume-level")]
 public class VolumeLevelEncoder : EncoderSharedBase<VolumeLevelEncoderSettings>
 {
     public VolumeLevelEncoder(ISDConnection connection, InitialPayload payload)
