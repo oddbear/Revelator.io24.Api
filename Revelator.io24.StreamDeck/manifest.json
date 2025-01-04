@@ -6,6 +6,23 @@
   "UUID": "com.oddbear.revelator.io24",
   "Actions": [
     {
+      "Name": "Experimental Hardware Mute Left Mic",
+      "UUID": "com.oddbear.revelator.io24.microphone-hardware-mute",
+      "Icon": "Images/Icons/Icon",
+      "States": [
+        {
+          "Image": "Images/Plugin/mic_l_on",
+          "Title": "Unmuted",
+          "TitleAlignment": "bottom"
+        },
+        {
+          "Image": "Images/Plugin/mic_l_off",
+          "Title": "Muted",
+          "TitleAlignment": "bottom"
+        }
+      ]
+    },
+    {
       "Name": "Route Change",
       "UUID": "com.oddbear.revelator.io24.routechange",
       "Icon": "Images/Icons/routing",
