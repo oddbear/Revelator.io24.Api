@@ -2,9 +2,9 @@
 using Newtonsoft.Json.Converters;
 using Revelator.io24.Api.Enums;
 
-namespace Revelator.io24.StreamDeck.Settings;
+namespace Revelator.io24.StreamDeck.Actions.Keypads.Settings;
 
-public class VolumeLevelSettings
+public class RouteChangeSettings
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty(PropertyName = "inputValue")]
@@ -15,16 +15,6 @@ public class VolumeLevelSettings
     public MixOut MixOut { get; set; } = MixOut.Main;
 
     [JsonConverter(typeof(StringEnumConverter))]
-    [JsonProperty(PropertyName = "changeType")]
-    public VolumeType ChangeType { get; set; } = VolumeType.Absolute;
-
-    [JsonProperty(PropertyName = "value")]
-    public int Value { get; set; } = 0;
-}
-
-public enum VolumeType
-{
-    Absolute,
-    Increment,
-    Decrement
+    [JsonProperty(PropertyName = "actionValue")]
+    public Value Action { get; set; } = Value.Toggle;
 }

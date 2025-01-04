@@ -1,13 +1,15 @@
-﻿namespace Revelator.io24.StreamDeck.Encoders;
+﻿namespace Revelator.io24.StreamDeck.Helper;
 
+// TODO: Move to API project when testing is done.
 internal static class LookupTable
 {
     /// <summary>
     /// Since the algorithm is unknown, we have a sample for each db value for a lookup table.
     /// Then we need to figure out the percentage between the two samples, and estimate the correct db value.
     /// It works good enough, but it's not perfect (and diff gets bigger closer to 0dB, as the samples are farther apart per dB gain).
+    /// Algorithm would be some sort of Log function, but it's not a simple one, probably several in ranges.
     /// </summary>
-    public static float OutputFloatToDb(float value)
+    public static float OutputPercentageToDb(float value)
     {
         if (value > 1)
             value = 1;
@@ -45,7 +47,46 @@ internal static class LookupTable
 
         return min.db + diffDb;
     }
-    
+
+
+    public static float OutputDbToPercentage(float valueDb)
+    {
+        if (valueDb > 0)
+            valueDb = 0;
+
+        if (valueDb < -96)
+            valueDb = -96;
+
+        var lastI = _outputSamples.Length - 1;
+        var max = _outputSamples[0];
+        var min = _outputSamples[lastI];
+
+        // Find fist value that is greater or equal to the input value:
+        for (int i = 0; i < _outputSamples.Length; i++)
+        {
+            if (_outputSamples[i].db > valueDb)
+                continue;
+
+            // Spot on:
+            if (Math.Abs(_outputSamples[i].db - valueDb) < 0.001f)
+                return _outputSamples[i].value;
+
+            // Or do an average:
+            min = _outputSamples[i];
+            max = _outputSamples[i - 1]; // Out of range should never happen, as that one is taken by the check above.
+            break;
+        }
+
+        // Must calculate an estimate between min sample and max sample:
+        var diffMaxVal = max.db - valueDb;
+        var diffMaxMin = max.db - min.db;
+        var diffP = 1 - diffMaxVal / diffMaxMin;
+
+        var diffVal = (max.value - min.value) * diffP;
+
+        return min.value + diffVal;
+    }
+
     // Measured on an io44
     private static readonly (int db, float value)[] _outputSamples =
     [

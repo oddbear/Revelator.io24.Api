@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using Revelator.io24.Api.Enums;
 
-namespace Revelator.io24.StreamDeck.Settings;
+namespace Revelator.io24.StreamDeck.Actions.Keypads.Settings;
 
 public class PresetChangeSettings
 {
@@ -11,7 +11,7 @@ public class PresetChangeSettings
     public MicrophoneChannel Channel { get; set; } = MicrophoneChannel.Left;
 
     [JsonProperty(PropertyName = "presetValue")]
-    public int Preset { get; set; } = 0;
+    public int PresetIndex { get; set; } = 0;
 
     [JsonProperty(PropertyName = "presetValues")]
     public SelectData[] Presets { get; set; } =

@@ -10,7 +10,7 @@
       "UUID": "com.oddbear.revelator.io24.routechange",
       "Icon": "Images/Icons/routing",
       "Tooltip": "A route changing action",
-      "PropertyInspectorPath": "PropertyInspector/RouteChangeAction.html",
+      "PropertyInspectorPath": "PropertyInspector/RouteChangeKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/routing_on",
@@ -29,7 +29,7 @@
       "UUID": "com.oddbear.revelator.io24.headphonesource",
       "Icon": "Images/Icons/headphones",
       "Tooltip": "A headphones source set action",
-      "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceAction.html",
+      "PropertyInspectorPath": "PropertyInspector/HeadphonesSourceKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/headphones_on",
@@ -48,7 +48,7 @@
       "UUID": "com.oddbear.revelator.io24.fatchanneltoggle",
       "Icon": "Images/Icons/fat",
       "Tooltip": "A Fat Channel toggle action",
-      "PropertyInspectorPath": "PropertyInspector/FatChannelToggleAction.html",
+      "PropertyInspectorPath": "PropertyInspector/FatChannelToggleKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/fat_on",
@@ -67,7 +67,7 @@
       "UUID": "com.oddbear.revelator.io24.presetchange",
       "Icon": "Images/Icons/presets",
       "Tooltip": "A preset change action",
-      "PropertyInspectorPath": "PropertyInspector/PresetChangeAction.html",
+      "PropertyInspectorPath": "PropertyInspector/PresetChangeKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/preset_on",
@@ -86,11 +86,16 @@
       "UUID": "com.oddbear.revelator.io24.volumelevel",
       "Icon": "Images/Icons/category",
       "Tooltip": "A volume change action",
-      "PropertyInspectorPath": "PropertyInspector/VolumeLevelAction.html",
+      "PropertyInspectorPath": "PropertyInspector/VolumeLevelKeypad.html",
       "States": [
         {
-          "Image": "Images/Icons/Image",
-          "Title": "Volume",
+          "Image": "Images/Plugin/volume_on",
+          "Title": "- dB",
+          "TitleAlignment": "bottom"
+        },
+        {
+          "Image": "Images/Plugin/volume_off",
+          "Title": "- dB",
           "TitleAlignment": "bottom"
         }
       ]
@@ -100,30 +105,16 @@
       "UUID": "com.oddbear.revelator.io24.outputratio",
       "Icon": "Images/Icons/category",
       "Tooltip": "A output volume change action",
-      "PropertyInspectorPath": "PropertyInspector/OutputLevelAction.html",
+      "PropertyInspectorPath": "PropertyInspector/OutputLevelKeypad.html",
       "States": [
         {
           "Image": "Images/Plugin/output_on",
-          "Title": "Output Volume",
-          "TitleAlignment": "bottom"
-        }
-      ]
-    },
-    {
-      "Name": "Toggle monitor",
-      "UUID": "com.oddbear.revelator.io24.togglemonitor",
-      "Icon": "Images/Icons/category",
-      "Tooltip": "A toggle monitor out action",
-      "PropertyInspectorPath": "PropertyInspector/ToggleMonitorAction.html",
-      "States": [
-        {
-          "Image": "Images/Plugin/fat_on",
-          "Title": "Monitor On",
+          "Title": "- dB",
           "TitleAlignment": "bottom"
         },
         {
-          "Image": "Images/Plugin/fat_off",
-          "Title": "Monitor Off",
+          "Image": "Images/Plugin/output_off",
+          "Title": "- dB",
           "TitleAlignment": "bottom"
         }
       ]
@@ -133,14 +124,7 @@
       "UUID": "com.oddbear.revelator.io24.volumeleveldial",
       "Icon": "Images/Icons/category",
       "Tooltip": "A volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/VolumeLevelDial.html",
-      "States": [
-        {
-          "Image": "Images/Icons/Image",
-          "Title": "Volume",
-          "TitleAlignment": "bottom"
-        }
-      ],
+      "PropertyInspectorPath": "PropertyInspector/VolumeLevelEncoder.html",
       "Controllers": [ "Encoder" ],
       "Encoder": {
         "layout": "$B1",
@@ -148,28 +132,31 @@
           "Rotate": "Increase/Decrease",
           "Push": "Toggle mute"
         }
-      }
+      },
+      "States": [
+        {
+          "Image": "Images/Plugin/volume_on"
+        }
+      ]
     },
     {
       "Name": "Output Volume change",
       "UUID": "com.oddbear.revelator.io24.outputratiodial",
       "Icon": "Images/Icons/category",
       "Tooltip": "A output volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/OutputLevelDial.html",
-      "States": [
-        {
-          "Image": "Images/Plugin/output_on",
-          "Title": "Volume",
-          "TitleAlignment": "bottom"
-        }
-      ],
+      "PropertyInspectorPath": "PropertyInspector/OutputLevelEncoder.html",
       "Controllers": [ "Encoder" ],
       "Encoder": {
         "layout": "$B1",
         "TriggerDescription": {
           "Rotate": "Increase/Decrease"
         }
-      }
+      },
+      "States": [
+        {
+          "Image": "Images/Plugin/output_on"
+        }
+      ]
     }
   ],
   "Category": "Revelator io24",
