@@ -7,7 +7,7 @@ namespace Revelator.io24.StreamDeck.Actions;
 /*
     {
      "Name": "Test",
-     "UUID": "com.oddbear.revelator.io24.test",
+     "UUID": "com.oddbear.revelator.io24.keypad.test",
      "Icon": "Images/Icons/Icon",
      "States": [
        {
@@ -16,7 +16,7 @@ namespace Revelator.io24.StreamDeck.Actions;
      ]
    },
  */
-[PluginActionId("com.oddbear.revelator.io24.test")]
+[PluginActionId("com.oddbear.revelator.io24.keypad.test")]
 public class TestKeyPad : KeypadSharedBase<RouteChangeSettings>
 {
     public TestKeyPad(ISDConnection connection, InitialPayload payload)

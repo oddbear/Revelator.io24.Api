@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Test Encoder</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdpi.css">
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdtools.common.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/rangeTooltip.css">
+    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/rangeTooltip.js"></script>
+
+    <script>
+        // Function to handle messages from the plugin
+        function onSendToPropertyInspector(payload) {
+            if (payload.hasOwnProperty('showOtherOptions')) {
+                const showOtherOptions = payload.showOtherOptions;
+                const otherOptionsElement = document.getElementById('otherOptions');
+
+                if (showOtherOptions) {
+                    otherOptionsElement.style.display = 'flex';
+                } else {
+                    otherOptionsElement.style.display = 'none';
+                }
+            }
+        }
+
+        // websocketCreate and settingsUpdated is Easy Pi events.
+
+        // When websocket is created, add listener to it for message events:
+        document.addEventListener('websocketCreate', function () {
+            console.log("Websocket created!");
+
+            // When SendToPropertyInspectorAsync is called FROM the plugin
+            websocket.addEventListener('message', function (event) {
+                // We need the event type and payload, beacuse we don't know if it's an encoder or keypad.
+                // Unless we can get the InitialPayload -> AppearancePayload -> e.Event.Payload (from SDEventReceivedEventArgs<WillAppearEvent> e)
+                const json = JSON.parse(event.data);
+
+                // Requires the csharp code to send the event, Easy Pi only handles 'didReceiveSettings' event.
+                if (json.event === 'sendToPropertyInspector') {
+                    onSendToPropertyInspector(json.payload);
+                }
+            });
+        });
+
+        // propertyInspectorDidAppear
+
+        // When the settings are updated in PropertyInspector and sent TO the plugin:
+        document.addEventListener('settingsUpdated', function () {
+            console.log("Got settingsUpdated event!");
+
+            // This code could inspect and change the UI based on choices without a CSharp roundtrip.
+            const otherOptionsElement = document.getElementById('otherOptions');
+            otherOptionsElement.style.display = 'flex';
+        });
+    </script>
+</head>
+<body>
+    <div id="property-inspector">
+        <form>
+            <div class="sdpi-item" id="select_single">
+                <div class="sdpi-item-label">Value</div>
+                <input class="sdProperty" id="testValue" oninput="setSettings()" value="Test Value" />
+            </div>
+
+            <div id="otherOptions" style="display: none" class="sdpi-item">
+                <div class="sdpi-item-label" data-localize>Other</div>
+                <input class="sdProperty" id="testOther" oninput="setSettings()" value="Test Other" />
+            </div>
+        </form>
+    </div>
+</body>
+</html>

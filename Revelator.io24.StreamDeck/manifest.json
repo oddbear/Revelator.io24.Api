@@ -6,6 +6,25 @@
   "UUID": "com.oddbear.revelator.io24",
   "Actions": [
     {
+      "Name": "Test",
+      "UUID": "com.oddbear.revelator.io24.encoder.test",
+      "PropertyInspectorPath": "PropertyInspector/TestEncoder.html",
+      "Controllers": [ "Encoder", "Keypad" ],
+      "Icon": "Images/Icons/Icon",
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Increase/Decrease",
+          "Push": "Toggle mute"
+        }
+      },
+      "States": [
+        {
+          "Image": "Images/Icons/Image"
+        }
+      ]
+    },
+    {
       "Name": "Experimental Hardware Mute Left Mic",
       "UUID": "com.oddbear.revelator.io24.keypad.microphone-hardware-mute",
       "Icon": "Images/Icons/Icon",
@@ -142,7 +161,7 @@
       "Icon": "Images/Icons/category",
       "Tooltip": "A volume change dial",
       "PropertyInspectorPath": "PropertyInspector/Encoders/VolumeLevelEncoder.html",
-      "Controllers": [ "Encoder" ],
+      "Controllers": [ "Encoder", "Keypad" ],
       "Encoder": {
         "layout": "$B1",
         "TriggerDescription": {
@@ -162,7 +181,7 @@
       "Icon": "Images/Icons/category",
       "Tooltip": "A output volume change dial",
       "PropertyInspectorPath": "PropertyInspector/Encoders/OutputLevelEncoder.html",
-      "Controllers": [ "Encoder" ],
+      "Controllers": [ "Encoder", "Keypad" ],
       "Encoder": {
         "layout": "$B1",
         "TriggerDescription": {
