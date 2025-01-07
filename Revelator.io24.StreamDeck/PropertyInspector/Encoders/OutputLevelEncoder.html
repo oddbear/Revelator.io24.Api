@@ -6,15 +6,32 @@
     <title>Output Level Encoder</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdpi.css">
     <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdtools.common.js"></script>
+    <script src="OutputLevelEncoder.js"></script>
 </head>
 <body>
-    <div class="sdpi-item" id="select_single">
+    <div class="sdpi-item">
         <div class="sdpi-item-label">Output</div>
         <select id="outputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <option value="MainOut">Main Out [io24, io44]</option>
             <option value="Phones">Phones [io24, io44]</option>
             <option value="Blend">Blend [io24, io44]</option>
         </select>
+    </div>
+
+    <!-- Keypad Only: -->
+    <div class="sdpi-item" id="keyPad-item-changeType">
+        <div class="sdpi-item-label">Change type</div>
+        <select id="changeType" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+            <option value="Absolute">Absolute</option>
+            <option value="Increment">Increment</option>
+            <option value="Decrement">Decrement</option>
+        </select>
+    </div>
+
+    <!-- Keypad Only: -->
+    <div class="sdpi-item" id="keyPad-item-value">
+        <div class="sdpi-item-label">Value</div>
+        <input id="value" class="sdProperty" oninput="setSettings()" value="0" />
     </div>
 </body>
 </html>

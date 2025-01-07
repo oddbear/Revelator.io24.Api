@@ -2,13 +2,16 @@
 using BarRaider.SdTools.Payloads;
 using Revelator.io24.Api;
 using System.Globalization;
+using Revelator.io24.StreamDeck.Actions.Enums;
 
 namespace Revelator.io24.StreamDeck.Actions;
 
-public abstract class EncoderSharedBase<TSettings> : EncoderBase
+public abstract class EncoderSharedBase<TSettings> : EncoderBase, IKeypadPlugin
     where TSettings : class, new()
 {
     protected TSettings _settings { get; set; }
+
+    private readonly Controller _controller;
 
     protected readonly RoutingTable _routingTable;
     protected readonly Device _device;
@@ -18,12 +21,16 @@ public abstract class EncoderSharedBase<TSettings> : EncoderBase
         InitialPayload payload)
         : base(connection, payload)
     {
+        _controller = Enum.Parse<Controller>(payload.Controller);
+
         _device = Program.Device;
         _routingTable = Program.RoutingTable;
 
         _settings ??= new TSettings();
     }
-    
+
+    protected abstract Task RefreshState();
+
     public override void DialUp(DialPayload payload)
     {
         // We only react on key press.
@@ -55,6 +62,14 @@ public abstract class EncoderSharedBase<TSettings> : EncoderBase
         };
 
         await Connection.SetFeedbackAsync(dkv);
+    }
+
+    public abstract void KeyPressed(KeyPayload payload);
+
+    public void KeyReleased(KeyPayload payload)
+    {
+        // We only react on key press, but we need to refresh the state because of the automatic UI change by Elgato.
+        RefreshState();
     }
 }
 

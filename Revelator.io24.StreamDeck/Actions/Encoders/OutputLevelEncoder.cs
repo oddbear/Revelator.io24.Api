@@ -26,7 +26,37 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
     {
         _device.Global.PropertyChanged -= PropertyChanged;
     }
-    
+
+    public override void KeyPressed(KeyPayload payload)
+    {
+        // This is a -1 to +1 value:
+        if (_settings.DeviceOut == DeviceOut.Blend)
+        {
+            var value = _settings.ChangeActionType switch
+            {
+                //VolumeType.Increment => GetVolumeOrRatio() + _settings.Value,
+                //VolumeType.Decrement => GetVolumeOrRatio() - _settings.Value,
+                _ => _settings.Value
+            };
+            SetVolumeOrRatio(value);
+        }
+        // Else we should work with dB values.
+        else
+        {
+            var oldValueP = GetVolumeOrRatio();
+            var oldValueDb = LookupTable.OutputPercentageToDb(oldValueP);
+            var valueDb = _settings.ChangeActionType switch
+            {
+                //VolumeType.Increment => oldValueDb + _settings.Value,
+                //VolumeType.Decrement => oldValueDb - _settings.Value,
+                _ => _settings.Value
+            };
+
+            var volumeInPercentage = LookupTable.OutputDbToPercentage(valueDb);
+            SetVolumeOrRatio(volumeInPercentage);
+        }
+    }
+
     public override void DialRotate(DialRotatePayload payload)
     {
         var value = GetVolumeOrRatio();
@@ -37,7 +67,8 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
         if (value is < 0 or > 100)
             return;
 
-        SetVolumeOrRatio(value);
+        // TODO: Find better value:
+        SetVolumeOrRatio(value / 100f);
     }
 
     public override void DialDown(DialPayload payload)
@@ -61,7 +92,7 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
             if (deviceOut == _settings.DeviceOut)
                 return;
 
-            await UpdateFeedback();
+            await RefreshState();
         }
         catch (Exception exception)
         {
@@ -78,7 +109,7 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
                 case nameof(Global.MainOutVolume) when _settings.DeviceOut == DeviceOut.MainOut:
                 case nameof(Global.HeadphonesVolume) when _settings.DeviceOut == DeviceOut.Phones:
                 case nameof(Global.MonitorBlend) when _settings.DeviceOut == DeviceOut.Blend:
-                    await UpdateFeedback();
+                    await RefreshState();
                     return;
             }
         }
@@ -86,17 +117,6 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
         {
             Trace.TraceError(exception.ToString());
         }
-    }
-
-    private async Task UpdateFeedback()
-    {
-        var volumeInPercentage = GetVolumeOrRatio();
-
-        await SetFeedbackAsync(new FeedbackCard
-        {
-            Value = GetValue(volumeInPercentage),
-            Indicator = volumeInPercentage
-        });
     }
 
     private string GetValue(int volumeInPercentage)
@@ -118,7 +138,7 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
         };
     }
 
-    private void SetVolumeOrRatio(int value)
+    private void SetVolumeOrRatio(float value)
     {
         switch (_settings.DeviceOut)
         {
@@ -126,10 +146,37 @@ public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
                 _device.Global.MonitorBlend = value / 100f;
                 break;
             case DeviceOut.Phones:
-                _device.Global.HeadphonesVolume = value;
+                _device.Global.HeadphonesVolume = (int)Math.Round(value * 100f);
                 break;
             case DeviceOut.MainOut:
-                _device.Global.MainOutVolume = value;
+                _device.Global.MainOutVolume = (int)Math.Round(value * 100f);
+                break;
+        }
+    }
+
+    protected override async Task RefreshState()
+    {
+        var volumeInPercentage = GetVolumeOrRatio();
+
+        // Feedback:
+        await SetFeedbackAsync(new FeedbackCard
+        {
+            Value = GetValue(volumeInPercentage),
+            Indicator = volumeInPercentage
+        });
+
+        // KeyPad:
+        var titleValue = GetValue(volumeInPercentage);
+        await Connection.SetTitleAsync(titleValue);
+
+        switch (_settings.DeviceOut)
+        {
+            // If Monitor is selected, and the button has disabled it.
+            case DeviceOut.MainOut:
+                await Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
+                break;
+            default:
+                await Connection.SetStateAsync(0u);
                 break;
         }
     }
