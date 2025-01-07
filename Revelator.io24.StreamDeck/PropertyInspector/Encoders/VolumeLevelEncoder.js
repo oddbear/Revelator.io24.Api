@@ -1,86 +1,84 @@
-﻿// Options:
-
-// Item: Wrapper for layout for one single form element + label etc.
+﻿// Item: Wrapper for layout for one single form element + label etc.
 // Control: The actual input element
+
+// Warning Box:
 const warningItem = document.getElementById("warning-item");
 
-// Keypad only:
+// Action:
 const actionItem = document.getElementById("action-item");
-const volumeItem = document.getElementById("volume-item");
+const actionControl = document.getElementById("actionValue");
 
-// Both:
-const volumeStepItem = document.getElementById("volume-step-item");
+// Volume Range:
+const valueRangeItem = document.getElementById("value-range-item");
 
-const minControl = document.getElementById("min");
-const volumeStepControl = document.getElementById("volume-step");
-const maxControl = document.getElementById("max");
+const valueMinControl = document.getElementById("minValue");
+const valueRangeControl = document.getElementById("rangeValue");
+const valueMaxControl = document.getElementById("maxValue");
 
+// Settings from plugin, set on connection:
 let isEncoder;
+let volumeStep;
+let volume;
 
-// TODO: Add some Warning if visibility is not set at all (default shown, but hidden on load)
+function showRangeItem(min, max, value) {
+    valueRangeItem.style.display = 'flex';
+
+    valueMinControl.textContent = min;
+
+    valueRangeControl.min = min;
+    valueRangeControl.value = value;
+    valueRangeControl.max = max;
+
+    valueMaxControl.textContent = max;
+}
+
 function setVisibility() {
-    warningItem.style.display = 'none';
-
     if (isEncoder) {
-        // Set the volume control range:
-        minControl.textContent = "-1";
+        actionItem.style.display = 'none';
+        actionControl.value = 'Adjust';
 
-        volumeStepControl.min = 1;
-        volumeStepControl.value = payload.volumeStep || 2;
-        volumeStepControl.max = 5;
+        showRangeItem(1, 5, volumeStep);
+    } else {
+        actionItem.style.display = 'flex';
 
-        maxControl.textContent = "+5";
-    }
-    else {
-        // Either volume (absolute) or volume step (relative):
-        if (actionItem.value === 'Set') {
-            volumeItem.style.display = 'flex';
-            volumeStepItem.style.display = 'none';
-        }
-        else if (actionItem.value === 'Adjust') {
-            volumeItem.style.display = 'none';
-            volumeStepItem.style.display = 'flex';
-
-            // Set the volume control range:
-            minControl.textContent = "-25";
-
-            volumeStepControl.min = -25;
-            volumeStepControl.value = payload.volumeStep || 2; // TODO: What's a good number? 3?
-            volumeStepControl.max = 25;
-
-            maxControl.textContent = "+25";
-        }
-        else { // muteControl.isChecked
-            volumeItem.style.display = 'none';
-            volumeStepItem.style.display = 'none';
+        switch (actionControl.value) {
+            case 'Set':
+                showRangeItem(-96, +10, volume);
+                break;
+            case 'Adjust':
+                showRangeItem(-25, +25, volumeStep);
+                break;
+            case 'Mute':
+            default:
+                valueRangeItem.style.display = 'none';
         }
     }
 }
 
 function onSendToPropertyInspector(payload) {
     if (payload.hasOwnProperty('isEncoder')) {
+        // Remove warning message:
+        warningItem.style.display = 'none';
+
         // This is only what happens on appear:
         isEncoder = payload.isEncoder;
 
-        const keypadControls = document.querySelectorAll('.keypad');
-        const encoderControls = document.querySelectorAll('.encoder');
-
-        // Set all to flex, but have none as default (or you can get flickering on load))
-        if (isEncoder) {
-            encoderControls.forEach((control) => {
-                control.style.display = 'flex';
-            });
-        } else {
-            keypadControls.forEach((control) => {
-                control.style.display = 'flex';
-            });
+        // Loaded from saved settings:
+        if (payload.action === 'Set') {
+            volume = payload.value;
+            volumeStep = 2;
+        }
+        else {
+            volume = 0;
+            volumeStep = payload.value;
         }
 
         setVisibility();
     }
 }
 
-actionItem.addEventListener('change', setVisibility);
+// Add event when changing Action betwen Set, Adjust and Mute:
+actionControl.addEventListener('change', setVisibility);
 
 // When websocket is created, add listener to it for message events:
 document.addEventListener('websocketCreate', function () {
