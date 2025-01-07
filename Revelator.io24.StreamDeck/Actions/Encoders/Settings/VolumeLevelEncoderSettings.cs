@@ -15,14 +15,10 @@ public class VolumeLevelEncoderSettings
     [JsonProperty(PropertyName = "outputValue")]
     public MixOut MixOut { get; set; } = MixOut.Main;
 
-    // TODO: Nullable?
     [JsonConverter(typeof(StringEnumConverter))]
-    [JsonProperty(PropertyName = "action")]
+    [JsonProperty(PropertyName = "actionValue")]
     public VolumeActionType Action { get; set; } = VolumeActionType.Set;
 
-    [JsonProperty(PropertyName = "volume")]
-    public int Volume { get; set; } = 0;
-
-    [JsonProperty(PropertyName = "volume-step")]
-    public int VolumeStep { get; set; } = 0;
+    [JsonProperty(PropertyName = "rangeValue")]
+    public int Value { get; set; } = 0;
 }

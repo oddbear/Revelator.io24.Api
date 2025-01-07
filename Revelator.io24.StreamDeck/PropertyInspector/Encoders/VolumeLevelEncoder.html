@@ -13,7 +13,8 @@
 </head>
 <body>
     <div id="warning-item" class="sdpi-item">
-        Warning
+        <div class="sdpi-item-label"></div>
+        <span style="color:red;" class="sdpi-item-value">Warning: Plugin did not communicate</span>
     </div>
 
     <div class="sdpi-item">
@@ -40,43 +41,25 @@
         </select>
     </div>
 
-    <!-- Keypad Only: -->
-    <div style="display: none;" class="sdpi-item keypad">
+    <!-- Visible on Dial, hidden on Encoder (with fixed value Adjust) -->
+    <div id="action-item" style="display: none" class="sdpi-item">
         <div class="sdpi-item-label">Action</div>
-        <select id="action-item" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+        <select id="actionValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
             <!-- Set Fixed Volume -96 dB to +10 dB -->
             <option value="Set">Set Input Volume (dB)</option>
-            <!-- Adjust Volume Up or Down -25 dB to +25 dB -->
+            <!-- Adjust Volume Up or Down -25 dB to +25 dB (keypad) or +1 dB to +5 dB (dial) -->
             <option value="Adjust">Adjust Input Volume (dB)</option>
             <!-- If mute, no slider should be shown -->
             <option value="Mute">Mute Input Volume</option>
         </select>
     </div>
 
-    <!-- Encoder Only: -->
-    <div style="display: none;" class="sdpi-item encoder">
-        <div class="sdpi-item-label">Action</div>
-        <!-- There is only one option, and that is to dial in the volume -->
-        <span style="font-weight: bold; color: white; margin-left: 10px; margin-top: 5px">Adjust Output Volume</span>
-    </div>
-
-    <!-- Keypad Only (Dynamic): -->
-    <div id="volume-item" style="display: none" type="range" class="sdpi-item sdShowTooltip">
-        <div class="sdpi-item-label">Volume</div>
-        <div class="sdpi-item-value">
-            <span value="-96">-96</span>
-            <input id="volume" type="range" min="-96" max="10" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
-            <span value="10" class="clickable">+10</span>
-        </div>
-    </div>
-
-    <!-- Keypad (Dynamic) and Encoder (Always): -->
-    <div id="volume-step-item" style="display: none" type="range" class="sdpi-item sdShowTooltip encoder">
+    <div id="value-range-item" style="display: none" type="range" class="sdpi-item sdShowTooltip">
         <div class="sdpi-item-label">Step Size</div>
         <div class="sdpi-item-value">
-            <span id="min" value="-25">-25</span>
-            <input id="volume-step" type="range" min="-25" max="25" value="5" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
-            <span id="max" class="clickable" value="25">+25</span>
+            <span id="minValue">-25</span>
+            <input id="rangeValue" type="range" min="-25" max="25" value="5" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
+            <span id="maxValue" class="clickable">+25</span>
         </div>
     </div>
 

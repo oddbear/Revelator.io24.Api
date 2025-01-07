@@ -41,11 +41,11 @@ public class VolumeLevelEncoder : EncoderSharedBase<VolumeLevelEncoderSettings>
         switch (_settings.Action)
         {
             case VolumeActionType.Set:
-                value = _settings.Volume;
+                value = _settings.Value;
                 _routingTable.SetVolumeInDb(_settings.Input, _settings.MixOut, value);
                 break;
             case VolumeActionType.Adjust:
-                value += (int)_settings.VolumeStep;
+                value += (int)_settings.Value;
                 _routingTable.SetVolumeInDb(_settings.Input, _settings.MixOut, value);
                 break;
             case VolumeActionType.Mute:
@@ -117,10 +117,8 @@ public class VolumeLevelEncoder : EncoderSharedBase<VolumeLevelEncoderSettings>
             {
                 // Will never change, as it will involve delete and create:
                 isEncoder = _controller == Controller.Encoder,
-
-                // Since the one over will never change, we can use the same values:
-                volumeStep = _settings.VolumeStep,
-                volume = _settings.Volume
+                action = _settings.Action.ToString(),
+                value = _settings.Value
             });
 
             // Need some JS hacking, but seems to work, not sure why I need to send a message back though.
