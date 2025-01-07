@@ -17,19 +17,18 @@ const valueMaxControl = document.getElementById("maxValue");
 
 // Settings from plugin, set on connection:
 let isEncoder;
-let volumeStep;
 let volume;
+let volumeStep;
 
 function showRangeItem(min, max, value) {
     valueRangeItem.style.display = 'flex';
 
     valueMinControl.textContent = min;
+    valueMaxControl.textContent = max;
 
     valueRangeControl.min = min;
-    valueRangeControl.value = value;
     valueRangeControl.max = max;
-
-    valueMaxControl.textContent = max;
+    valueRangeControl.value = value;
 }
 
 function setVisibility() {
