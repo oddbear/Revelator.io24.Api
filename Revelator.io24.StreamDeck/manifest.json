@@ -100,10 +100,18 @@
     },
     {
       "Name": "Input Volume Level",
-      "UUID": "com.oddbear.revelator.io24.keypad.volume-level",
+      "UUID": "com.oddbear.revelator.io24.encoder.volume-level",
       "Icon": "Images/Icons/category",
-      "Tooltip": "A volume change action",
-      "PropertyInspectorPath": "PropertyInspector/Keypads/VolumeLevelKeypad.html",
+      "Tooltip": "A volume change dial",
+      "PropertyInspectorPath": "PropertyInspector/Encoders/VolumeLevelEncoder.html",
+      "Controllers": [ "Encoder", "Keypad" ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Increase/Decrease",
+          "Push": "Toggle mute"
+        }
+      },
       "States": [
         {
           "Image": "Images/Plugin/volume_on",
@@ -119,10 +127,17 @@
     },
     {
       "Name": "Output Volume Level",
-      "UUID": "com.oddbear.revelator.io24.keypad.output-level",
+      "UUID": "com.oddbear.revelator.io24.encoder.output-level",
       "Icon": "Images/Icons/category",
-      "Tooltip": "A output volume change action",
-      "PropertyInspectorPath": "PropertyInspector/Keypads/OutputLevelKeypad.html",
+      "Tooltip": "A output volume change dial",
+      "PropertyInspectorPath": "PropertyInspector/Encoders/OutputLevelEncoder.html",
+      "Controllers": [ "Encoder", "Keypad" ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Increase/Decrease"
+        }
+      },
       "States": [
         {
           "Image": "Images/Plugin/output_on",
@@ -133,45 +148,6 @@
           "Image": "Images/Plugin/output_off",
           "Title": "- dB",
           "TitleAlignment": "bottom"
-        }
-      ]
-    },
-    {
-      "Name": "Input Volume Level",
-      "UUID": "com.oddbear.revelator.io24.encoder.volume-level",
-      "Icon": "Images/Icons/category",
-      "Tooltip": "A volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/Encoders/VolumeLevelEncoder.html",
-      "Controllers": [ "Encoder" ],
-      "Encoder": {
-        "layout": "$B1",
-        "TriggerDescription": {
-          "Rotate": "Increase/Decrease",
-          "Push": "Toggle mute"
-        }
-      },
-      "States": [
-        {
-          "Image": "Images/Plugin/volume_on"
-        }
-      ]
-    },
-    {
-      "Name": "Output Volume Level",
-      "UUID": "com.oddbear.revelator.io24.encoder.output-level",
-      "Icon": "Images/Icons/category",
-      "Tooltip": "A output volume change dial",
-      "PropertyInspectorPath": "PropertyInspector/Encoders/OutputLevelEncoder.html",
-      "Controllers": [ "Encoder" ],
-      "Encoder": {
-        "layout": "$B1",
-        "TriggerDescription": {
-          "Rotate": "Increase/Decrease"
-        }
-      },
-      "States": [
-        {
-          "Image": "Images/Plugin/output_on"
         }
       ]
     }
