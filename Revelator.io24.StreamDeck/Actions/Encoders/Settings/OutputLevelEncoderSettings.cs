@@ -11,11 +11,10 @@ public class OutputLevelEncoderSettings
     [JsonProperty(PropertyName = "outputValue")]
     public DeviceOut DeviceOut { get; set; } = DeviceOut.MainOut;
 
-    // TODO: Nullable?
     [JsonConverter(typeof(StringEnumConverter))]
-    [JsonProperty(PropertyName = "changeType")]
-    public VolumeActionType ChangeActionType { get; set; } = VolumeActionType.Set;
+    [JsonProperty(PropertyName = "actionValue")]
+    public VolumeActionType Action { get; set; } = VolumeActionType.Set;
 
-    [JsonProperty(PropertyName = "value")]
-    public int Value { get; set; } = 0;
+    [JsonProperty(PropertyName = "rangeValue")]
+    public float Value { get; set; } = 0;
 }
