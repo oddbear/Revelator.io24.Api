@@ -105,6 +105,9 @@ function setVisibility() {
     } else {
         setKeypadVisibility();
     }
+
+    // Update settings:
+    setSettings();
 }
 
 // Function to handle messages from the plugin
