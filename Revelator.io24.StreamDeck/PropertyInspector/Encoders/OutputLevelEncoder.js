@@ -1,153 +1,157 @@
 ﻿// Warning Box:
-const warningItem = document.getElementById("warning-item");
+const warningDiv = document.getElementById("warning");
 
-// Output:
-const outputControl = document.getElementById("outputValue");
+// Action Value:
+const actionValueSelect = document.getElementById("actionValue");
 
-// Action:
-const actionItem = document.getElementById("action-item");
-const actionControl = document.getElementById("actionValue");
-const actionSetControl = document.getElementById("actionOptionSet");
-const actionAdjustControl = document.getElementById("actionOptionAdjust");
+// Set:
+const rangeSetDiv = document.getElementById("rangeSet");
+const rangeSetMinValueSpan = document.getElementById("rangeSetMinValue");
+const rangeSetValueInputRange = document.getElementById("rangeSetValue");
+const rangeSetMaxValueSpan = document.getElementById("rangeSetMaxValue");
 
-// Volume Range:
-const valueMinControl = document.getElementById("minValue");
-const valueRangeControl = document.getElementById("rangeValue");
-const valueMaxControl = document.getElementById("maxValue");
+// Adjust:
+const rangeAdjustDiv = document.getElementById("rangeAdjust");
+const rangeAdjustMinValueSpan = document.getElementById("rangeAdjustMinValue");
+const rangeAdjustValueInputRange = document.getElementById("rangeAdjustValue");
+const rangeAdjustMaxValueSpan = document.getElementById("rangeAdjustMaxValue");
 
-// Settings from plugin, set on connection:
-let isEncoder;
-let valueOutputSet;
-let valueOutputAdjust;
-let valueBlendSet;
-let valueBlendAdjust;
+function formatThenSetSettings() {
+    // 
 
-function showOutputRangeItem(min, max, value) {
-    actionSetControl.text = "Set Output Volume (dB)";
-    actionAdjustControl.text = "Adjust Output Volume (dB)";
-
-    valueMinControl.textContent = min;
-    valueMaxControl.textContent = max;
-
-    valueRangeControl.dataset.suffix = ' dB';
-    valueRangeControl.step = 1;
-    valueRangeControl.min = min;
-    valueRangeControl.max = max;
-    valueRangeControl.value = value;
+    //setSettings();
 }
 
-function showBlendRangeItem(min, max, value) {
-    actionSetControl.text = "Set Value";
-    actionAdjustControl.text = "Adjust Value";
+function formatAction() {
+    // Need to know prevous option:
+    const outputValue = document.getElementById("outputValue");
+    const selectedOption = outputValue.options[selectElement.selectedIndex];
+    if (!selectedOption) {
+        return;
+    }
 
-    valueMinControl.textContent = min;
-    valueMaxControl.textContent = max;
+    const actionValue = document.getElementById("actionValue");
+    switch (selectedOption.value) {
+        case "Set":
+            actionValue.querySelector(`option[value="Set"]`).text = "Set Output Volume (dB)";
+            actionValue.querySelector(`option[value="Adjust"]`).text = "Adjust Output Volume (dB)";
+            break;
+        case "Adjust":
+        default:
+            actionValue.querySelector(`option[value="Set"]`).text = "Set Value";
+            actionValue.querySelector(`option[value="Adjust"]`).text = "Adjust Value";
+            break;
+    }
+}
 
-    valueRangeControl.dataset.suffix = '';
-    valueRangeControl.step = 0.1;
-    valueRangeControl.min = min;
-    valueRangeControl.max = max;
-    valueRangeControl.value = value;
+function formatRange() {
+    // 
 }
 
 function setEncoderVisibility() {
-    actionItem.style.display = 'none';
-    actionControl.value = 'Adjust';
+    //actionItem.style.display = 'none';
 
-    // Encoder:
-    switch (outputControl.value) {
-        case 'MainOut':
-        case 'Phones':
-            showOutputRangeItem(1, 5, valueOutputAdjust);
-            break;
-        case 'Blend':
-        default:
-            showBlendRangeItem(0.1, 0.2, valueBlendAdjust);
-            break;
-    }
+    //actionValueSelect.options
+    //elem.options.length = 0;
+
+    //actionValueSelect.querySelector(`option[value="Set"]`).text = "Set Output Volume (dB)";
+    //actionValueSelect.querySelector(`option[value="Adjust"]`).text = "Adjust Output Volume (dB)";
+
+    //// What about ...
+    //for (var idx = 0; idx < items.length; idx++) {
+    //    var opt = document.createElement('option');
+    //    opt.value = items[idx][valueProperty];
+    //    opt.text = items[idx][textProperty];
+    //    elem.appendChild(opt);
+    //}
+    //elem.value = payload[valueField];
 }
 
 function setKeypadVisibility() {
-    actionItem.style.display = 'flex';
-
-    // Keypad:
-    switch (outputControl.value) {
-        case 'MainOut':
-        case 'Phones':
-            switch (actionControl.value) {
-                case 'Set':
-                    showOutputRangeItem(-96, 0, valueOutputSet);
-                    break;
-                case 'Adjust':
-                default:
-                    showOutputRangeItem(-25, +25, valueOutputAdjust);
-                    break;
-            }
-            break;
-        case 'Blend':
-        default:
-            switch (actionControl.value) {
-                case 'Set':
-                    showBlendRangeItem(-1, +1, valueBlendSet);
-                    break;
-                case 'Adjust':
-                default:
-                    showBlendRangeItem(-0.2, +0.2, valueBlendAdjust);
-                    break;
-            }
-            break;
-    }
+    //actionItem.style.display = 'flex';
 }
 
-function setVisibility() {
+// On change
+// - not setSettings, but formatThenSetSettings!
+// -
+// -
+// -
+function formatAll() {
+
+}
+
+function formatEncoder() {
+
+}
+
+// 1. WebSocket OnConnect -> Plugin
+// Any guarantees that this is the correct order always?
+// 2. Plugin -> RefreshSettings
+// 3. Plugin -> ConnectionOnOnPropertyInspectorDidAppear -> SendToPropertyInspectorAsync
+
+// EasyPi:
+// 1. sendValueToPlugin('propertyInspectorConnected'
+// Any guarantees that this is actually the first message?
+// 2. didReceiveSettings
+
+// Initial load:
+function initialLoad(isEncoder) {
+
+    // Remove warning message:
+    warningItem.style.display = 'none';
+
+    // - set isEncoder ?
+
+    // - set range values based on isEncoder
+
+    // TODO: Is it possible to convert a keypad to encoder, ex. by moving an existing one?
+    // Will it then keep the settings?
+
+    // TODO: Is blend settings already set here?
+
+    // Set:
+    //const rangeSetDiv = document.getElementById("rangeSet");
+    const rangeSetMinValueSpan = document.getElementById("rangeSetMinValue");
+    //const rangeSetValueInputRange = document.getElementById("rangeSetValue");
+    const rangeSetMaxValueSpan = document.getElementById("rangeSetMaxValue");
+
+    // Adjust:
+    //const rangeAdjustDiv = document.getElementById("rangeAdjust");
+    const rangeAdjustMinValueSpan = document.getElementById("rangeAdjustMinValue");
+    //const rangeAdjustValueInputRange = document.getElementById("rangeAdjustValue");
+    const rangeAdjustMaxValueSpan = document.getElementById("rangeAdjustMaxValue");
     if (isEncoder) {
-        setEncoderVisibility();
-    } else {
-        setKeypadVisibility();
+
+        // Can switch between Output and Blend:
+        // 1 dB to 25 dB for Output, and -1 to +1 for Blend
+        rangeSetMinValueSpan.textContent = "1 dB";
+        rangeSetMaxValueSpan.textContent = "25 dB";
+
+        // Can switch between Output and Blend:
+        // 1 dB to 5 dB for Output, and 0.1 to 0.2 for Blend
+        rangeAdjustMinValueSpan.textContent = "1 dB";
+        rangeAdjustMaxValueSpan.textContent = "5 dB";
+
+        // Set all .encoder to display: flex;
+        const encoderElements = document.querySelectorAll('.encoder');
+        encoderElements.forEach(element => {
+            element.style.display = 'flex';
+        });
     }
+    else {
+        rangeSetMinValueSpan.textContent = "-96 dB";
+        rangeSetMaxValueSpan.textContent = "0 dB";
 
-    // Update settings:
-    setSettings();
-}
+        rangeAdjustMinValueSpan.textContent = "-25 dB";
+        rangeAdjustMaxValueSpan.textContent = "25 dB";
 
-// Function to handle messages from the plugin
-function onSendToPropertyInspector(payload) {
-    if (payload.hasOwnProperty('isEncoder')) {
-        // Remove warning message:
-        warningItem.style.display = 'none';
-
-        // This is only what happens on appear:
-        isEncoder = payload.isEncoder;
-
-        // Set default values:
-        valueOutputSet = -20;
-        valueOutputAdjust = isEncoder ? 2 : 0;
-        valueBlendSet = 0;
-        valueBlendAdjust = isEncoder ? 0.1 : 0;
-
-        if (payload.device === 'Blend') {
-            if (payload.action === 'Set') {
-                valueBlendSet = payload.value;
-            } else {
-                valueBlendAdjust = payload.value;
-            }
-        } else {
-            if (payload.action === 'Set') {
-                valueOutputSet = payload.value;
-            } else {
-                valueOutputAdjust = payload.value;
-            }
-        }
-
-        // Loaded from saved settings:
-        value = payload.value;
-
-        setVisibility();
+        // Set all .keypad to display: flex;
+        const encoderElements = document.querySelectorAll('.keypad');
+        encoderElements.forEach(element => {
+            element.style.display = 'flex';
+        });
     }
 }
-
-outputControl.addEventListener('change', setVisibility);
-actionControl.addEventListener('change', setVisibility);
 
 // When websocket is created, add listener to it for message events:
 document.addEventListener('websocketCreate', function () {
@@ -155,13 +159,17 @@ document.addEventListener('websocketCreate', function () {
 
     // When SendToPropertyInspectorAsync is called FROM the plugin
     websocket.addEventListener('message', function (event) {
-        // We need the event type and payload, beacuse we don't know if it's an encoder or keypad.
-        // Unless we can get the InitialPayload -> AppearancePayload -> e.Event.Payload (from SDEventReceivedEventArgs<WillAppearEvent> e)
+        warningDiv.style.display = 'none';
+
         const json = JSON.parse(event.data);
 
-        // Requires the csharp code to send the event, Easy Pi only handles 'didReceiveSettings' event.
         if (json.event === 'sendToPropertyInspector') {
-            onSendToPropertyInspector(json.payload);
+            const payload = json.payload;
+
+            if (payload.hasOwnProperty('isEncoder')) {
+
+                initialLoad(payload.isEncoder);
+            }
         }
     });
 });

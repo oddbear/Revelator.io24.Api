@@ -12,34 +12,54 @@
     <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/rangeTooltip.js"></script>
 </head>
 <body>
-    <div id="warning-item" class="sdpi-item">
+    <div id="warning" class="sdpi-item">
         <div class="sdpi-item-label"></div>
-        <span style="color:red;" class="sdpi-item-value">Warning: Plugin did not communicate</span>
+        <span style="color:yellow;" class="sdpi-item-value">Warning: Plugin did not communicate</span>
     </div>
 
-    <div class="sdpi-item">
+    <div class="sdpi-item keypad encoder">
         <div class="sdpi-item-label">Output</div>
-        <select id="outputValue" class="sdpi-item-value select sdProperty">
+        <select id="outputValue" class="sdpi-item-value select sdProperty" onchange="formatThenSetSettings()">
             <option value="MainOut">Main Out [io24, io44]</option>
             <option value="Phones">Phones [io24, io44]</option>
             <option value="Blend">Blend [io24, io44]</option>
         </select>
     </div>
 
-    <div id="action-item" style="display: none" class="sdpi-item">
+    <!-- Keypad -->
+    <div class="sdpi-item keypad" style="display:none;">
         <div class="sdpi-item-label">Action</div>
-        <select id="actionValue" class="sdpi-item-value select sdProperty">
-            <option id="actionOptionSet" value="Set">Set Output Volume (dB)</option>
-            <option id="actionOptionAdjust" value="Adjust">Adjust Output Volume (dB)</option>
+        <select id="actionValue" class="sdpi-item-value select sdProperty" onchange="formatThenSetSettings()">
+            <option value="Set">Set Output Volume (dB)</option>
+            <option value="Adjust">Adjust Output Volume (dB)</option>
         </select>
     </div>
 
-    <div type="range" class="sdpi-item sdShowTooltip">
+    <!-- Encoder -->
+    <div class="sdpi-item encoder" style="display:none;">
+        <div class="sdpi-item-label">Action</div>
+        <span>Adjust</span>
+    </div>
+
+    <!-- Set -->
+    <div id="rangeSet" class="sdpi-item sdShowTooltip" type="range" style="display:none;">
         <div class="sdpi-item-label">Step Size</div>
         <div class="sdpi-item-value">
-            <span id="minValue">-96</span>
-            <input id="rangeValue" type="range" min="-96" max="0" value="5" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
-            <span id="maxValue">0</span>
+            <span id="rangeSetMinValue">-96</span>
+            <input id="rangeSetValue" type="range" min="-96" max="0" value="5" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
+            <span id="rangeSetMaxValue">0</span>
+            <label class="rangeLabel"></label>
+        </div>
+    </div>
+
+    <!-- Adjust -->
+    <div id="rangeAdjust" class="sdpi-item sdShowTooltip" type="range" style="display:none;">
+        <div class="sdpi-item-label">Step Size</div>
+        <div class="sdpi-item-value">
+            <span id="rangeAdjustMinValue">-96</span>
+            <input id="rangeAdjustValue" type="range" min="-25" max="+25" value="1" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
+            <span id="rangeAdjustMaxValue">0</span>
+            <label class="rangeLabel"></label>
         </div>
     </div>
 
