@@ -8,13 +8,23 @@ namespace Revelator.io24.StreamDeck.Actions.Encoders.Settings;
 public class OutputLevelEncoderSettings
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    [JsonProperty(PropertyName = "outputValue")]
-    public DeviceOut DeviceOut { get; set; } = DeviceOut.MainOut;
+    [JsonProperty(PropertyName = "output")]
+    public DeviceOut Output { get; set; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    [JsonProperty(PropertyName = "actionValue")]
-    public VolumeActionType Action { get; set; } = VolumeActionType.Set;
+    [JsonProperty(PropertyName = "action")]
+    public VolumeActionType Action { get; set; }
 
-    [JsonProperty(PropertyName = "rangeValue")]
-    public float Value { get; set; } = 0;
+    // There are 4 states + output and action:
+    [JsonProperty(PropertyName = "volume-set")]
+    public int SetVolume { get; set; } = -10;
+
+    [JsonProperty(PropertyName = "volume-adjust")]
+    public int AdjustVolume { get; set; } = 0;
+
+    [JsonProperty(PropertyName = "blend-set")]
+    public float SetBlend { get; set; } = 0;
+
+    [JsonProperty(PropertyName = "blend-adjust")]
+    public float AdjustBlend { get; set; } = 0;
 }

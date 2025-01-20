@@ -1,175 +1,75 @@
-﻿// Warning Box:
-const warningDiv = document.getElementById("warning");
+﻿/// <reference path="../SDPIComponentsTypeDef.js" />
 
-// Action Value:
-const actionValueSelect = document.getElementById("actionValue");
+document.addEventListener('DOMContentLoaded', async function () {
+    const { streamDeckClient } = SDPIComponents;
 
-// Set:
-const rangeSetDiv = document.getElementById("rangeSet");
-const rangeSetMinValueSpan = document.getElementById("rangeSetMinValue");
-const rangeSetValueInputRange = document.getElementById("rangeSetValue");
-const rangeSetMaxValueSpan = document.getElementById("rangeSetMaxValue");
+    const infoResult = await streamDeckClient.getConnectionInfo();
+    const controller = infoResult.actionInfo.payload.controller;
+    const isEncoder = controller === "Encoder";
+    const isKeypad = controller === "Keypad";
 
-// Adjust:
-const rangeAdjustDiv = document.getElementById("rangeAdjust");
-const rangeAdjustMinValueSpan = document.getElementById("rangeAdjustMinValue");
-const rangeAdjustValueInputRange = document.getElementById("rangeAdjustValue");
-const rangeAdjustMaxValueSpan = document.getElementById("rangeAdjustMaxValue");
-
-function formatThenSetSettings() {
-    // 
-
-    //setSettings();
-}
-
-function formatAction() {
-    // Need to know prevous option:
-    const outputValue = document.getElementById("outputValue");
-    const selectedOption = outputValue.options[selectElement.selectedIndex];
-    if (!selectedOption) {
-        return;
-    }
-
-    const actionValue = document.getElementById("actionValue");
-    switch (selectedOption.value) {
-        case "Set":
-            actionValue.querySelector(`option[value="Set"]`).text = "Set Output Volume (dB)";
-            actionValue.querySelector(`option[value="Adjust"]`).text = "Adjust Output Volume (dB)";
-            break;
-        case "Adjust":
-        default:
-            actionValue.querySelector(`option[value="Set"]`).text = "Set Value";
-            actionValue.querySelector(`option[value="Adjust"]`).text = "Adjust Value";
-            break;
-    }
-}
-
-function formatRange() {
-    // 
-}
-
-function setEncoderVisibility() {
-    //actionItem.style.display = 'none';
-
-    //actionValueSelect.options
-    //elem.options.length = 0;
-
-    //actionValueSelect.querySelector(`option[value="Set"]`).text = "Set Output Volume (dB)";
-    //actionValueSelect.querySelector(`option[value="Adjust"]`).text = "Adjust Output Volume (dB)";
-
-    //// What about ...
-    //for (var idx = 0; idx < items.length; idx++) {
-    //    var opt = document.createElement('option');
-    //    opt.value = items[idx][valueProperty];
-    //    opt.text = items[idx][textProperty];
-    //    elem.appendChild(opt);
-    //}
-    //elem.value = payload[valueField];
-}
-
-function setKeypadVisibility() {
-    //actionItem.style.display = 'flex';
-}
-
-// On change
-// - not setSettings, but formatThenSetSettings!
-// -
-// -
-// -
-function formatAll() {
-
-}
-
-function formatEncoder() {
-
-}
-
-// 1. WebSocket OnConnect -> Plugin
-// Any guarantees that this is the correct order always?
-// 2. Plugin -> RefreshSettings
-// 3. Plugin -> ConnectionOnOnPropertyInspectorDidAppear -> SendToPropertyInspectorAsync
-
-// EasyPi:
-// 1. sendValueToPlugin('propertyInspectorConnected'
-// Any guarantees that this is actually the first message?
-// 2. didReceiveSettings
-
-// Initial load:
-function initialLoad(isEncoder) {
-
-    // Remove warning message:
-    warningItem.style.display = 'none';
-
-    // - set isEncoder ?
-
-    // - set range values based on isEncoder
-
-    // TODO: Is it possible to convert a keypad to encoder, ex. by moving an existing one?
-    // Will it then keep the settings?
-
-    // TODO: Is blend settings already set here?
-
-    // Set:
-    //const rangeSetDiv = document.getElementById("rangeSet");
-    const rangeSetMinValueSpan = document.getElementById("rangeSetMinValue");
-    //const rangeSetValueInputRange = document.getElementById("rangeSetValue");
-    const rangeSetMaxValueSpan = document.getElementById("rangeSetMaxValue");
-
-    // Adjust:
-    //const rangeAdjustDiv = document.getElementById("rangeAdjust");
-    const rangeAdjustMinValueSpan = document.getElementById("rangeAdjustMinValue");
-    //const rangeAdjustValueInputRange = document.getElementById("rangeAdjustValue");
-    const rangeAdjustMaxValueSpan = document.getElementById("rangeAdjustMaxValue");
+    // Set initial values:
+    // A encoder will never be a keypad, therefor we can do some assumptions:
     if (isEncoder) {
 
-        // Can switch between Output and Blend:
-        // 1 dB to 25 dB for Output, and -1 to +1 for Blend
-        rangeSetMinValueSpan.textContent = "1 dB";
-        rangeSetMaxValueSpan.textContent = "25 dB";
-
-        // Can switch between Output and Blend:
-        // 1 dB to 5 dB for Output, and 0.1 to 0.2 for Blend
-        rangeAdjustMinValueSpan.textContent = "1 dB";
-        rangeAdjustMaxValueSpan.textContent = "5 dB";
-
-        // Set all .encoder to display: flex;
-        const encoderElements = document.querySelectorAll('.encoder');
-        encoderElements.forEach(element => {
-            element.style.display = 'flex';
-        });
+        // Encoder is always adjust (and can be hidden):
+        select_action.value = "adjust";
     }
     else {
-        rangeSetMinValueSpan.textContent = "-96 dB";
-        rangeSetMaxValueSpan.textContent = "0 dB";
+        // SDPI Select Elements:
+        const sdpi_select_output = document.querySelector('sdpi-select[setting="output"]');
+        const sdpi_select_action = document.querySelector('sdpi-select[setting="action"]');
 
-        rangeAdjustMinValueSpan.textContent = "-25 dB";
-        rangeAdjustMaxValueSpan.textContent = "25 dB";
+        // HTML Select Elements:
+        const select_output = sdpi_select_output.shadowRoot.querySelector('select');
+        const select_action = sdpi_select_action.shadowRoot.querySelector('select');
 
-        // Set all .keypad to display: flex;
-        const encoderElements = document.querySelectorAll('.keypad');
-        encoderElements.forEach(element => {
-            element.style.display = 'flex';
-        });
-    }
-}
+        // Adding changed events:
+        select_output.addEventListener('change', changeEvent);
+        select_action.addEventListener('change', changeEvent);
 
-// When websocket is created, add listener to it for message events:
-document.addEventListener('websocketCreate', function () {
-    console.log("Websocket created!");
+        // Keypad can adjust and set:
+        setSdpiVisibility("action", true);
 
-    // When SendToPropertyInspectorAsync is called FROM the plugin
-    websocket.addEventListener('message', function (event) {
-        warningDiv.style.display = 'none';
+        // Trigger initial change event:
+        changeEvent();
 
-        const json = JSON.parse(event.data);
-
-        if (json.event === 'sendToPropertyInspector') {
-            const payload = json.payload;
-
-            if (payload.hasOwnProperty('isEncoder')) {
-
-                initialLoad(payload.isEncoder);
-            }
+        function changeEvent() {
+            setSdpiVisibility("volume-set", isVolumeOutput() && isSetAction());
+            setSdpiVisibility("volume-adjust", isVolumeOutput() && isAdjustAction());
+            setSdpiVisibility("blend-set", isBlendOutput() && isSetAction());
+            setSdpiVisibility("blend-adjust", isBlendOutput() && isAdjustAction());
         }
-    });
+
+        function isVolumeOutput() {
+            return select_output.value === "mainOut"
+                || select_output.value === "phones";
+        }
+
+        function isBlendOutput() {
+            return select_output.value === "blend";
+        }
+
+        function isSetAction() {
+            return isKeypad && select_action.value === "set";
+        }
+
+        function isAdjustAction() {
+            return isEncoder || select_action.value === "adjust";
+        }
+
+        /**
+         * Get all the settings from the Property Inspector, and set the visibility of the settings.
+         * @param {string} setting
+         * @param {bool} isVisible
+         */
+        function setSdpiVisibility(setting, isVisible) {
+            const parentElement = document.querySelector(`[setting="${setting}"]`)?.parentElement;
+            if (!parentElement) {
+                return;
+            }
+
+            parentElement.style.display = isVisible ? "flex" : "none";
+        }
+    }
 });

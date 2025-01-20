@@ -77,20 +77,20 @@ namespace Revelator.io24.Api.Models.Global
         /// -96db - -0db
         /// </summary>
         [RouteValue("mainOutVolume")]
-        public int MainOutVolume
+        public float MainOutVolume
         {
-            get => GetVolume();
-            set => SetVolume(value);
+            get => _rawService.GetValue("global/mainOutVolume");
+            set => _rawService.SetValue("global/mainOutVolume", value);
         }
 
         /// <summary>
         /// -96db - -0db
         /// </summary>
         [RouteValue("phonesVolume")]
-        public int HeadphonesVolume
+        public float HeadphonesVolume
         {
-            get => GetVolume();
-            set => SetVolume(value);
+            get => _rawService.GetValue("global/phonesVolume");
+            set => _rawService.SetValue("global/phonesVolume", value);
         }
 
         /// <summary>
