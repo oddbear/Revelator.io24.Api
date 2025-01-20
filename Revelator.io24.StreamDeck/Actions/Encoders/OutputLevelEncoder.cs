@@ -1,271 +1,306 @@
 ﻿using BarRaider.SdTools;
 using BarRaider.SdTools.Payloads;
-using System.Diagnostics;
 using Revelator.io24.Api.Enums;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
-using Revelator.io24.Api.Models.Global;
+using Revelator.io24.Api;
 using Revelator.io24.StreamDeck.Helper;
 using Revelator.io24.StreamDeck.Actions.Encoders.Settings;
-using BarRaider.SdTools.Events;
-using BarRaider.SdTools.Wrappers;
 using Revelator.io24.StreamDeck.Actions.Enums;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders;
 
 [PluginActionId("com.oddbear.revelator.io24.encoder.output-level")]
-public class OutputLevelEncoder : EncoderSharedBase<OutputLevelEncoderSettings>
+public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
 {
-    private readonly Controller _controller;
+    private readonly OutputLevelCache _outputLevelCache;
+    private readonly Device _device;
+    private readonly bool _isEncoder;
+
+    private OutputLevelEncoderSettings _settings;
 
     public OutputLevelEncoder(ISDConnection connection, InitialPayload payload)
         : base(connection, payload)
     {
-        _controller = Enum.Parse<Controller>(payload.Controller);
+        _isEncoder = payload.Controller == "Encoder";
 
-        // Empty if no settings are changed (default settings not picked up)
-        RefreshSettings(payload.Settings);
+        _outputLevelCache = Program.OutputLevelCache;
+        _device = Program.Device;
 
-        _device.Global.PropertyChanged += PropertyChanged;
-        Connection.OnPropertyInspectorDidAppear += ConnectionOnOnPropertyInspectorDidAppear;
+        if (payload.Settings == null || payload.Settings.Count == 0)
+        {
+            _settings = new OutputLevelEncoderSettings();
+        }
+        else
+        {
+            _settings = payload.Settings.ToObject<OutputLevelEncoderSettings>()!;
+            StatesUpdated();
+        }
+
+        _outputLevelCache.PropertyChanged += VolumeCacheOnPropertyChanged;
+        _device.Main.PropertyChanged += VolumeCacheOnPropertyChanged2;
     }
 
     public override void Dispose()
     {
-        _device.Global.PropertyChanged -= PropertyChanged;
-        Connection.OnPropertyInspectorDidAppear -= ConnectionOnOnPropertyInspectorDidAppear;
+        _outputLevelCache.PropertyChanged -= VolumeCacheOnPropertyChanged;
+        _device.Main.PropertyChanged -= VolumeCacheOnPropertyChanged2;
     }
 
-    public override void KeyPressed(KeyPayload payload)
+    private void VolumeCacheOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (_settings.DeviceOut)
+        // Important use this event instead of calling RefreshState directly when changing state.
+        // If not the state will be updated locally and not globally.
+        StatesUpdated();
+    }
+
+    private void VolumeCacheOnPropertyChanged2(object? sender, PropertyChangedEventArgs e)
+    {
+        RefreshState();
+    }
+
+    public void KeyPressed(KeyPayload payload)
+    {
+        switch (_settings.Action)
         {
-            case DeviceOut.Blend:
-                _device.Global.MonitorBlend = KeyPressedBlend(_device.Global.MonitorBlend);
-                return;
-            case DeviceOut.Phones:
-                _device.Global.HeadphonesVolume = KeyPressedOutput(_device.Global.HeadphonesVolume, _settings.Value);
-                return;
-            case DeviceOut.MainOut:
-                _device.Global.MainOutVolume = KeyPressedOutput(_device.Global.MainOutVolume, _settings.Value);
-                return;
+            case VolumeActionType.Set:
+                KeypadSet();
+                break;
+            case VolumeActionType.Adjust:
+                KeypadAdjust(1);
+                break;
         }
     }
 
-    private int KeyPressedOutput(int oldValueP, float ticks)
+    public void KeyReleased(KeyPayload payload)
     {
-        // oldValueP is 0% - 100%, but we need to work with native percentages 0f - 1f:
-        var oldValuePNative = oldValueP / 100f;
-
-        var oldValueDb = LookupTable.OutputPercentageToDb(oldValuePNative);
-
-        var newValueDb = _settings.Action switch
-        {
-            VolumeActionType.Adjust => oldValueDb + ticks,
-            _ => ticks
-        };
-
-        if (newValueDb is < -96 or > 0)
-            return oldValueP;
-
-        // newValuePis 0f - 1f, but we need to work with 0% - 100%:
-        var newValuePNative = LookupTable.OutputDbToPercentage(newValueDb);
-
-        //-39.84 dB cannot turn up on 1 dB ticks, as both are to close in the dataset:
-        if (Math.Abs(newValuePNative - oldValuePNative) < 0.01f) // Closer than 1%
-            newValuePNative += ticks / 100f;
-
-        var newValueP = (int)Math.Round(newValuePNative * 100f);
-        return newValueP;
+        // Hack because on release StreamDeck sets the state automatically:
+        RefreshState();
     }
 
-    private float KeyPressedBlend(float oldValueP)
+    private void KeypadSet()
     {
-        // Convert 0f - 1f to -1 - +1:
-        var oldValue = oldValueP * 2f - 1f;
-
-        var newValue = _settings.Action switch
+        switch (_settings.Output)
         {
-            VolumeActionType.Adjust => oldValue + _settings.Value,
-            _ => _settings.Value
-        };
+            case DeviceOut.Blend:
+                _outputLevelCache.MonitorBlend = SetBlendCalc(_settings.SetBlend);
+                break;
+            case DeviceOut.Phones:
+                _outputLevelCache.HeadphonesVolume = SetVolumeCalc(_settings.SetVolume);
+                break;
+            case DeviceOut.MainOut:
+                _outputLevelCache.MainOutVolume = SetVolumeCalc(_settings.SetVolume);
+                break;
+        }
+    }
 
-        if (newValue is < -1 or > +1)
-            return oldValueP;
-
-        // Convert -1 - +1 to 0f - 1f:
-        var newValueP = (newValue + 1f) / 2f;
-        return newValueP;
+    private void KeypadAdjust(int ticks)
+    {
+        switch (_settings.Output)
+        {
+            case DeviceOut.Blend:
+                // I get about 30 ticks for the whole dial on the interface from -1 to +1
+                _outputLevelCache.MonitorBlend = AdjustBlendCalc(_outputLevelCache.MonitorBlend, _settings.AdjustBlend, ticks);
+                return;
+            case DeviceOut.Phones:
+                _outputLevelCache.HeadphonesVolume = AdjustVolumeDbCalc(_outputLevelCache.HeadphonesVolume, _settings.AdjustVolume, ticks);
+                return;
+            case DeviceOut.MainOut:
+                // 0 -> -0.06 -> -0.12
+                // -10 -> -9.52 -> -9.07
+                // -96 -> -91.9 -> -87.97 -> -84.21
+                _outputLevelCache.MainOutVolume = AdjustVolumeDbCalc(_outputLevelCache.MainOutVolume, _settings.AdjustVolume, ticks);
+                return;
+        }
     }
 
     public override void DialRotate(DialRotatePayload payload)
     {
-        switch (_settings.DeviceOut)
+        // We use fixed values, as these are the same as the ones in UC.
+        switch (_settings.Output)
         {
             case DeviceOut.Blend:
-                _device.Global.MonitorBlend = DialRotateBlend(_device.Global.MonitorBlend, payload.Ticks);
+                _outputLevelCache.MonitorBlend = AdjustBlendCalc(_outputLevelCache.MonitorBlend, 0.02f, payload.Ticks);
                 return;
             case DeviceOut.Phones:
-                _device.Global.HeadphonesVolume = DialRotateOutput(_device.Global.HeadphonesVolume, payload.Ticks * _settings.Value);
+                _outputLevelCache.HeadphonesVolume = AdjustVolumeRawCalc(_outputLevelCache.HeadphonesVolume, 0.01f, payload.Ticks);
                 return;
             case DeviceOut.MainOut:
-                _device.Global.MainOutVolume = DialRotateOutput(_device.Global.MainOutVolume, payload.Ticks * _settings.Value);
+                _outputLevelCache.MainOutVolume = AdjustVolumeRawCalc(_outputLevelCache.MainOutVolume, 0.01f, payload.Ticks);
                 return;
         }
     }
 
-    private int DialRotateOutput(int oldValueP, float ticks)
+    private static float SetVolumeCalc(float newVolumeDb)
     {
-        // oldValueP is 0% - 100%, but we need to work with native percentages 0f - 1f:
-        var oldValuePNative = oldValueP / 100f;
+        if (newVolumeDb < -96)
+            newVolumeDb = -96;
 
-        var oldValueDb = LookupTable.OutputPercentageToDb(oldValuePNative);
+        if (newVolumeDb > 0)
+            newVolumeDb = 0;
 
-        var newValueDb = oldValueDb + ticks;
-
-        if (newValueDb is < -96 or > 0)
-            return oldValueP;
-
-        // newValuePis 0f - 1f, but we need to work with 0% - 100%:
-        var newValuePNative = LookupTable.OutputDbToPercentage(newValueDb);
-
-        //-39.84 dB cannot turn up on 1 dB ticks, as both are to close in the dataset:
-        if (Math.Abs(newValuePNative - oldValuePNative) < 0.01f) // Closer than 1%
-            newValuePNative += ticks / 100f;
-
-        var newValueP = (int)Math.Round(newValuePNative * 100f);
-        return newValueP;
+        return LookupTable.OutputDbToPercentage(newVolumeDb);
     }
 
-    private float DialRotateBlend(float oldValueP, int ticks)
+    private float AdjustVolumeDbCalc(float valueRaw, float value, int ticks)
     {
-        // oldValueP is 0f - 1f for -1 to +1, we have to calculate the percentage.
-        // Ex. -0.6 = 0.2 = 20%
+        var oldVolumeDb = LookupTable.OutputPercentageToDb(valueRaw);
+        var adjustment = value * ticks;
 
-        // Convert 0f - 1f to -1 - +1:
-        var oldValue = oldValueP * 2f - 1f;
+        var newVolumeDb = oldVolumeDb + adjustment;
 
-        var valueIncrease = ticks * _settings.Value;
+        if (newVolumeDb < -96)
+            newVolumeDb = -96;
 
-        var newValue = oldValue + valueIncrease;
-        if (newValue is < -1 or > +1)
-            return oldValueP;
+        if (newVolumeDb > 0)
+            newVolumeDb = 0;
 
-        // Convert -1 - +1 to 0f - 1f:
-        var newValueP = (newValue + 1f) / 2f;
-        return newValueP;
+        return LookupTable.OutputDbToPercentage(newVolumeDb);
     }
 
+    private float AdjustVolumeRawCalc(float valueRaw, float value, int ticks)
+    {
+        var adjustment = value * ticks;
+
+        var newVolume = valueRaw + adjustment;
+
+        if (newVolume < 0)
+            newVolume = 0;
+
+        if (newVolume > 1)
+            newVolume = 1;
+
+        return newVolume;
+    }
+
+    private static float OutputBlendToRaw(float valueBlend)
+        => (valueBlend + 1) * 0.5f;
+
+    private static float OutputRawToBlend(float valueBlend)
+        => valueBlend / 0.5f - 1;
+
+    private static float SetBlendCalc(float newBlend)
+    {
+        if (newBlend < -1)
+            newBlend = -1;
+
+        if (newBlend > 1)
+            newBlend = 1;
+
+        return OutputBlendToRaw(newBlend);
+    }
+
+    private static float AdjustBlendCalc(float valueRaw, float value, int ticks)
+    {
+        var oldBlend = OutputRawToBlend(valueRaw);
+
+        var adjustment = value * ticks;
+
+        var newBlend = oldBlend + adjustment;
+        return SetBlendCalc(newBlend);
+    }
+
+    public override void ReceivedSettings(ReceivedSettingsPayload payload)
+    {
+        Tools.AutoPopulateSettings(_settings, payload.Settings);
+        StatesUpdated();
+    }
+
+    private void StatesUpdated()
+    {
+        switch (_settings.Output)
+        {
+            case DeviceOut.Blend:
+                RefreshBlend(_outputLevelCache.MonitorBlend);
+                return;
+            case DeviceOut.Phones:
+                RefreshVolume(_outputLevelCache.HeadphonesVolume);
+                return;
+            case DeviceOut.MainOut:
+                RefreshVolume(_outputLevelCache.MainOutVolume);
+                return;
+        }
+    }
+
+    private void RefreshBlend(float valueRaw)
+    {
+        var blend = OutputRawToBlend(valueRaw);
+
+        if (_isEncoder)
+        {
+            var percentage = valueRaw * 100f;
+
+            Connection.SetFeedbackAsync(JObject.FromObject(new
+            {
+                value = $"{blend:0.00}",
+                indicator = percentage
+            }));
+        }
+        else
+        {
+            Connection.SetTitleAsync($"{blend:0.00}");
+        }
+    }
+
+    private void RefreshVolume(float valueRaw)
+    {
+        var volumeDb = LookupTable.OutputPercentageToDb(valueRaw);
+        if (_isEncoder)
+        {
+            var indicatorPercentage = valueRaw * 100f;
+
+            Connection.SetFeedbackAsync(JObject.FromObject(new
+            {
+                value = $"{volumeDb:0.00} dB",
+                indicator = indicatorPercentage
+            }));
+        }
+        else
+        {
+            Connection.SetTitleAsync($"{volumeDb:0.00} dB");
+        }
+    }
+
+    private void RefreshState()
+    {
+        switch (_settings.Output)
+        {
+            case DeviceOut.Blend:
+            case DeviceOut.Phones:
+                Connection.SetStateAsync(0);
+                return;
+            default:
+                Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
+                return;
+        }
+    }
+
+    #region NotUsed
 
     public override void DialDown(DialPayload payload)
     {
         // We don't have an action here.
     }
 
-    public override void ReceivedSettings(ReceivedSettingsPayload payload)
+    public override void DialUp(DialPayload payload)
     {
-        // TODO: On change (ex Output or Action) we get the old value and not the new one.
-        RefreshSettings(payload.Settings);
+        //
     }
 
-    private async void RefreshSettings(JObject settings)
+    public override void TouchPress(TouchpadPressPayload payload)
     {
-        try
-        {
-            _settings = settings.ToObject<OutputLevelEncoderSettings>()!;
-            
-            await RefreshState();
-        }
-        catch (Exception exception)
-        {
-            Trace.TraceError(exception.ToString());
-        }
+        //
     }
 
-    private async void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
     {
-        try
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(Global.MainOutVolume) when _settings.DeviceOut == DeviceOut.MainOut:
-                case nameof(Global.HeadphonesVolume) when _settings.DeviceOut == DeviceOut.Phones:
-                case nameof(Global.MonitorBlend) when _settings.DeviceOut == DeviceOut.Blend:
-                    await RefreshState();
-                    return;
-            }
-        }
-        catch (Exception exception)
-        {
-            Trace.TraceError(exception.ToString());
-        }
+        //
     }
 
-    private string GetValue(float volumeInPercentage)
+    public override void OnTick()
     {
-        return _settings.DeviceOut switch
-        {
-            DeviceOut.Blend => $"{volumeInPercentage / 50f - 1f:0.00}",
-            _ => $"{LookupTable.OutputPercentageToDb(volumeInPercentage / 100f):0.0} dB"
-        };
+        //
     }
 
-    private float GetVolumeOrRatio()
-    {
-        return _settings.DeviceOut switch
-        {
-            DeviceOut.Blend => (int)Math.Round(_device.Global.MonitorBlend),
-            DeviceOut.Phones => _device.Global.HeadphonesVolume,
-            _ => _device.Global.MainOutVolume
-        };
-    }
-    
-    private async void ConnectionOnOnPropertyInspectorDidAppear(object? sender, SDEventReceivedEventArgs<PropertyInspectorDidAppear> e)
-    {
-        try
-        {
-            var uiProperties = JObject.FromObject(new
-            {
-                // Will never change, as it will involve delete and create:
-                isEncoder = _controller == Controller.Encoder,
-                action = _settings.Action.ToString(),
-                device = _settings.DeviceOut.ToString(),
-                value = _settings.Value
-            });
-
-            // Need some JS hacking, but seems to work, not sure why I need to send a message back though.
-            await Connection.SendToPropertyInspectorAsync(uiProperties);
-        }
-        catch (Exception exception)
-        {
-            Trace.TraceError(exception.ToString());
-        }
-    }
-
-    protected override async Task RefreshState()
-    {
-        var volumeInPercentage = GetVolumeOrRatio();
-
-        // Feedback:
-        await SetFeedbackAsync(new FeedbackCard
-        {
-            Value = GetValue(volumeInPercentage),
-            Indicator = volumeInPercentage
-        });
-
-        // KeyPad:
-        var titleValue = GetValue(volumeInPercentage);
-        await Connection.SetTitleAsync(titleValue);
-
-        switch (_settings.DeviceOut)
-        {
-            // If Monitor is selected, and the button has disabled it.
-            case DeviceOut.MainOut:
-                await Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
-                break;
-            default:
-                await Connection.SetStateAsync(0u);
-                break;
-        }
-    }
+    #endregion
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api;
 using Revelator.io24.Api.Configuration;
 using System.Diagnostics;
+using Revelator.io24.StreamDeck.Actions.Encoders;
 
 namespace Revelator.io24.StreamDeck;
 
@@ -11,6 +12,7 @@ public class Program
     public static RoutingTable RoutingTable;
     public static Device Device;
     public static RawService RawService;
+    internal static OutputLevelCache OutputLevelCache;
 
     static void Main(string[] args)
     {
@@ -61,6 +63,7 @@ public class Program
         RoutingTable = serviceProvider.GetRequiredService<RoutingTable>();
         Device = serviceProvider.GetRequiredService<Device>();
         RawService = serviceProvider.GetRequiredService<RawService>();
+        OutputLevelCache = new OutputLevelCache(Device);
 
         SDWrapper.Run(args);
     }

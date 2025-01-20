@@ -1,0 +1,11 @@
+﻿/* Style for the custom tooltip */
+.tooltip {
+    position: absolute;
+    background-color: #646464;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: none; /* Initially hidden */
+    white-space: nowrap;
+}
