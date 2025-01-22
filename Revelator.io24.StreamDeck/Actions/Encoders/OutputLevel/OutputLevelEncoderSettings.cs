@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Revelator.io24.Api.Enums;
 using Revelator.io24.StreamDeck.Actions.Enums;
 
-namespace Revelator.io24.StreamDeck.Actions.Encoders.Settings;
+namespace Revelator.io24.StreamDeck.Actions.Encoders.OutputLevel;
 
 public class OutputLevelEncoderSettings
 {

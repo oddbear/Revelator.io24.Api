@@ -5,13 +5,12 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using Revelator.io24.Api;
 using Revelator.io24.StreamDeck.Helper;
-using Revelator.io24.StreamDeck.Actions.Encoders.Settings;
 using Revelator.io24.StreamDeck.Actions.Enums;
 
-namespace Revelator.io24.StreamDeck.Actions.Encoders;
+namespace Revelator.io24.StreamDeck.Actions.Encoders.OutputLevel;
 
 [PluginActionId("com.oddbear.revelator.io24.encoder.output-level")]
-public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
+public class OutputLevelEncoder : HybridBase
 {
     private readonly OutputLevelCache _outputLevelCache;
     private readonly Device _device;
@@ -34,7 +33,8 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
         else
         {
             _settings = payload.Settings.ToObject<OutputLevelEncoderSettings>()!;
-            StatesUpdated();
+            _ = StatesUpdated();
+            _ = RefreshState();
         }
 
         _outputLevelCache.PropertyChanged += CachedPropertyChanged;
@@ -51,17 +51,17 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
     {
         // Important use this event instead of calling RefreshState directly when changing state.
         // If not the state will be updated locally and not globally.
-        StatesUpdated();
+        _ = StatesUpdated();
     }
 
     private void SkipCachePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // Skip cache if it's a state change, as this can only be done physically on the device.
         // Only update the state, nothing more.
-        RefreshState();
+        _ = RefreshState();
     }
 
-    public void KeyPressed(KeyPayload payload)
+    public override Task KeyPressedAsync(KeyPayload payload)
     {
         switch (_settings.Action)
         {
@@ -72,12 +72,14 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
                 KeypadAdjust(1);
                 break;
         }
+
+        return Task.CompletedTask;
     }
 
-    public void KeyReleased(KeyPayload payload)
+    public override async Task KeyReleasedAsync(KeyPayload payload)
     {
         // Hack because on release StreamDeck sets the state automatically:
-        RefreshState();
+        await RefreshState();
     }
 
     private void KeypadSet()
@@ -116,21 +118,23 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
         }
     }
 
-    public override void DialRotate(DialRotatePayload payload)
+    public override Task DialRotateAsync(DialRotatePayload payload)
     {
         // We use fixed values, as these are the same as the ones in UC.
         switch (_settings.Output)
         {
             case DeviceOut.Blend:
                 _outputLevelCache.MonitorBlend = AdjustBlendCalc(_outputLevelCache.MonitorBlend, 0.02f, payload.Ticks);
-                return;
+                break;
             case DeviceOut.Phones:
                 _outputLevelCache.HeadphonesVolume = AdjustVolumeRawCalc(_outputLevelCache.HeadphonesVolume, 0.01f, payload.Ticks);
-                return;
+                break;
             case DeviceOut.MainOut:
                 _outputLevelCache.MainOutVolume = AdjustVolumeRawCalc(_outputLevelCache.MainOutVolume, 0.01f, payload.Ticks);
-                return;
+                break;
         }
+
+        return Task.CompletedTask;
     }
 
     private static float SetVolumeCalc(float newVolumeDb)
@@ -202,29 +206,33 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
         return SetBlendCalc(newBlend);
     }
 
-    public override void ReceivedSettings(ReceivedSettingsPayload payload)
+    public override async Task ReceivedSettingsAsync(ReceivedSettingsPayload payload)
     {
         Tools.AutoPopulateSettings(_settings, payload.Settings);
-        StatesUpdated();
+
+        // To update the displays:
+        await StatesUpdated();
+        // If we go from or to main:
+        await RefreshState();
     }
 
-    private void StatesUpdated()
+    private async Task StatesUpdated()
     {
         switch (_settings.Output)
         {
             case DeviceOut.Blend:
-                RefreshBlend(_outputLevelCache.MonitorBlend);
+                await RefreshBlend(_outputLevelCache.MonitorBlend);
                 return;
             case DeviceOut.Phones:
-                RefreshVolume(_outputLevelCache.HeadphonesVolume);
+                await RefreshVolume(_outputLevelCache.HeadphonesVolume);
                 return;
             case DeviceOut.MainOut:
-                RefreshVolume(_outputLevelCache.MainOutVolume);
+                await RefreshVolume(_outputLevelCache.MainOutVolume);
                 return;
         }
     }
 
-    private void RefreshBlend(float valueRaw)
+    private async Task RefreshBlend(float valueRaw)
     {
         var blend = OutputRawToBlend(valueRaw);
 
@@ -232,7 +240,7 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
         {
             var percentage = valueRaw * 100f;
 
-            Connection.SetFeedbackAsync(JObject.FromObject(new
+            await Connection.SetFeedbackAsync(JObject.FromObject(new
             {
                 value = $"{blend:0.00}",
                 indicator = percentage
@@ -240,18 +248,18 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
         }
         else
         {
-            Connection.SetTitleAsync($"{blend:0.00}");
+            await Connection.SetTitleAsync($"{blend:0.00}");
         }
     }
 
-    private void RefreshVolume(float valueRaw)
+    private async Task RefreshVolume(float valueRaw)
     {
         var volumeDb = LookupTable.OutputPercentageToDb(valueRaw);
         if (_isEncoder)
         {
             var indicatorPercentage = valueRaw * 100f;
 
-            Connection.SetFeedbackAsync(JObject.FromObject(new
+            await Connection.SetFeedbackAsync(JObject.FromObject(new
             {
                 value = $"{volumeDb:0.00} dB",
                 indicator = indicatorPercentage
@@ -259,49 +267,30 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
         }
         else
         {
-            Connection.SetTitleAsync($"{volumeDb:0.00} dB");
+            await Connection.SetTitleAsync($"{volumeDb:0.00} dB");
         }
     }
 
-    private void RefreshState()
+    private async Task RefreshState()
     {
         switch (_settings.Output)
         {
             case DeviceOut.Blend:
             case DeviceOut.Phones:
-                Connection.SetStateAsync(0);
+                await Connection.SetStateAsync(0);
                 return;
             default:
-                Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
+                await Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
                 return;
         }
     }
 
     #region NotUsed
 
-    public override void DialDown(DialPayload payload)
+    public override Task DialDownAsync(DialPayload payload)
     {
         // We don't have an action here.
-    }
-
-    public override void DialUp(DialPayload payload)
-    {
-        //
-    }
-
-    public override void TouchPress(TouchpadPressPayload payload)
-    {
-        //
-    }
-
-    public override void ReceivedGlobalSettings(ReceivedGlobalSettingsPayload payload)
-    {
-        //
-    }
-
-    public override void OnTick()
-    {
-        //
+        return Task.CompletedTask;
     }
 
     #endregion

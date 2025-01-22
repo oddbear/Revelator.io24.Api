@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Revelator.io24.Api;
 using Revelator.io24.Api.Configuration;
 using System.Diagnostics;
-using Revelator.io24.StreamDeck.Actions.Encoders;
+using Revelator.io24.StreamDeck.Actions.Encoders.OutputLevel;
+using Revelator.io24.StreamDeck.Actions.Encoders.VolumeLevel;
 
 namespace Revelator.io24.StreamDeck;
 
@@ -13,6 +14,7 @@ public class Program
     public static Device Device;
     public static RawService RawService;
     internal static OutputLevelCache OutputLevelCache;
+    internal static VolumeLevelCache VolumeLevelCache;
 
     static void Main(string[] args)
     {
@@ -64,6 +66,7 @@ public class Program
         Device = serviceProvider.GetRequiredService<Device>();
         RawService = serviceProvider.GetRequiredService<RawService>();
         OutputLevelCache = new OutputLevelCache(Device);
+        VolumeLevelCache = new VolumeLevelCache(RoutingTable);
 
         SDWrapper.Run(args);
     }
