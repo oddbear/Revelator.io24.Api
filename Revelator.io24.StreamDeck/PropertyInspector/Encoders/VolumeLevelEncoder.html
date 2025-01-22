@@ -3,23 +3,24 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title>Volume Level Encoder</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdpi.css">
-    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdtools.common.js"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/rangeTooltip.css">
-    <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/rangeTooltip.js"></script>
+    <link rel="stylesheet" href="../Tooltip.css">
+    <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
 </head>
 <body>
-    <div id="warning-item" class="sdpi-item">
-        <div class="sdpi-item-label"></div>
-        <span style="color:red;" class="sdpi-item-value">Warning: Plugin did not communicate</span>
-    </div>
 
-    <div class="sdpi-item">
-        <div class="sdpi-item-label">Input</div>
-        <select id="inputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+    <sdpi-item label="Mix">
+        <sdpi-select setting="mixOut"
+                     placeholder="Please choose an Output">
+            <option value="Main">Main [io24, io44]</option>
+            <option value="Mix_A">Stream Mix A [io24, io44]</option>
+            <option value="Mix_B">Stream Mix B [io24, io44]</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Input">
+        <sdpi-select setting="input"
+                     placeholder="Please choose an Input">
             <option value="Mic_L">Mic L [io24, io44]</option>
             <option value="Mic_R">Mic R [io24]</option>
             <option value="Headset_Mic">Headset Mic [io44]</option>
@@ -29,41 +30,54 @@
             <option value="Virtual_B">Virtual B [io24, io44]</option>
             <option value="Reverb">Reverb [io24, io44]</option>
             <option value="Mix">Mix [io24, io44]</option>
-        </select>
-    </div>
+        </sdpi-select>
+    </sdpi-item>
 
-    <div class="sdpi-item">
-        <div class="sdpi-item-label">Output</div>
-        <select id="outputValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
-            <option value="Main">Main [io24, io44]</option>
-            <option value="Mix_A">Stream Mix A [io24, io44]</option>
-            <option value="Mix_B">Stream Mix B [io24, io44]</option>
-        </select>
-    </div>
+    <sdpi-item label="Action" style="display:none;">
+        <sdpi-select setting="action"
+                     placeholder="Please choose an Action">
+            <option value="set">Set Value</option>
+            <option value="adjust">Adjust Value</option>
+            <option value="mute">Route Table</option>
+        </sdpi-select>
+    </sdpi-item>
 
-    <!-- Visible on Dial, hidden on Encoder (with fixed value Adjust) -->
-    <div id="action-item" style="display: none" class="sdpi-item">
-        <div class="sdpi-item-label">Action</div>
-        <select id="actionValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
-            <!-- Set Fixed Volume -96 dB to +10 dB -->
-            <option value="Set">Set Input Volume (dB)</option>
-            <!-- Adjust Volume Up or Down -25 dB to +25 dB (keypad) or +1 dB to +5 dB (dial) -->
-            <option value="Adjust">Adjust Input Volume (dB)</option>
-            <!-- If mute, no slider should be shown -->
-            <option value="Mute">Mute Input Volume</option>
-        </select>
-    </div>
+    <!-- We use 4 states, as these have different min/max values -->
+    <sdpi-item label="Volume (dB)" style="display:none;">
+        <sdpi-range setting="volume-set"
+                    min="-96"
+                    max="10"
+                    step="1"
+                    default="-10"
+                    showlabels>
+            <span slot="min">-96</span>
+            <span slot="max">10</span>
+        </sdpi-range>
+    </sdpi-item>
 
-    <div id="value-range-item" style="display: none" type="range" class="sdpi-item sdShowTooltip">
-        <div class="sdpi-item-label">Step Size</div>
-        <div class="sdpi-item-value">
-            <span id="minValue">-25</span>
-            <input id="rangeValue" type="range" min="-25" max="25" value="5" data-suffix=" dB" class="sdProperty" oninput="setSettings()" />
-            <span id="maxValue" class="clickable">+25</span>
-        </div>
-    </div>
+    <sdpi-item label="Step Size (dB)" style="display:none;">
+        <sdpi-range setting="volume-adjust"
+                    min="-25"
+                    max="25"
+                    step="1"
+                    default="0"
+                    showlabels>
+            <span slot="min">-25</span>
+            <span slot="max">25</span>
+        </sdpi-range>
+    </sdpi-item>
 
-    <div class="sdpi-info-label hidden" style="top: -1000;" value="">Tooltip</div>
+    <sdpi-item label="Route" style="display:none;">
+        <sdpi-radio setting="route-value" columns="3" default="toggle">
+            <option value="toggle">Toggle</option>
+            <option value="on">On</option>
+            <option value="off">Off</option>
+        </sdpi-radio>
+    </sdpi-item>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="../Tooltip.js"></script>
     <script src="VolumeLevelEncoder.js"></script>
 </body>
 </html>

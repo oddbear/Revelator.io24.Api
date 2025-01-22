@@ -1,5 +1,7 @@
 ﻿using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models;
+
 namespace Revelator.io24.Wpf.Models
 {
     public class VolumeMapper
@@ -138,9 +140,9 @@ namespace Revelator.io24.Wpf.Models
         }
 
         private float GetValue(Input input, MixOut mixOut)
-            => _routingTable.GetVolume(input, mixOut);
+            => _routingTable.GetVolume(input, mixOut).ValueRaw;
 
         private void SetValue(Input input, MixOut mixOut, float value)
-            => _routingTable.SetVolume(input, mixOut, value);
+            => _routingTable.SetVolume(input, mixOut, new VolumeValue { ValueRaw = value });
     }
 }

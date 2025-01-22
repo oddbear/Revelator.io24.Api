@@ -8,14 +8,15 @@ namespace Revelator.io24.StreamDeck.Actions.Encoders;
 /// If we turn a dial, we want to store a cached value while turning.
 /// If we stop turning, we want to set the real value to the display.
 /// </summary>
-internal class CacheTimer : IDisposable
+internal class CacheTimer<TKey> : IDisposable
+    where TKey : notnull
 {
-    private readonly Dictionary<string, float> _cache = new();
+    private readonly Dictionary<TKey, float> _cache = new();
 
-    public float GetValueOr(float value, [CallerMemberName] string propertyName = "")
+    public float GetValueOr(TKey key, float value)
     {
         // Cache does not know about this value:
-        if (_cache.ContainsKey(propertyName) is false)
+        if (_cache.ContainsKey(key) is false)
             return value;
 
         // No value is cached, return the real value:
@@ -23,15 +24,15 @@ internal class CacheTimer : IDisposable
             return value;
 
         // Return the cached value:
-        return _cache[propertyName];
+        return _cache[key];
     }
 
-    public void SetValue(float value, [CallerMemberName] string propertyName = "")
+    public void SetValue(TKey key, float value)
     {
         // Reset the timer:
         _timer.Stop();
         _timer.Start();
-        _cache[propertyName] = value;
+        _cache[key] = value;
 
         // Call this when set new value, or cache time has elapsed:
         _elapsedDelegate();

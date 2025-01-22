@@ -10,12 +10,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Set initial values:
     // A encoder will never be a keypad, therefor we can do some assumptions:
-    if (isEncoder) {
-
-        // Encoder is always adjust (and can be hidden):
-        select_action.value = "adjust";
-    }
-    else {
+    if (isKeypad) {
         // SDPI Select Elements:
         const sdpi_select_output = document.querySelector('sdpi-select[setting="output"]');
         const sdpi_select_action = document.querySelector('sdpi-select[setting="action"]');
@@ -51,11 +46,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         function isSetAction() {
-            return isKeypad && select_action.value === "set";
+            return select_action.value === "set";
         }
 
         function isAdjustAction() {
-            return isEncoder || select_action.value === "adjust";
+            return select_action.value === "adjust";
         }
 
         /**

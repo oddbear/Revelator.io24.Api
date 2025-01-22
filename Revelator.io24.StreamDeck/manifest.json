@@ -109,7 +109,7 @@
         "layout": "$B1",
         "TriggerDescription": {
           "Rotate": "Increase/Decrease",
-          "Push": "Toggle mute"
+          "Push": "Toggle route"
         }
       },
       "States": [
