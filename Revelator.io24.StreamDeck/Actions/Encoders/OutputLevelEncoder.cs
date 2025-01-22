@@ -37,25 +37,27 @@ public class OutputLevelEncoder : EncoderBase, IKeypadPlugin
             StatesUpdated();
         }
 
-        _outputLevelCache.PropertyChanged += VolumeCacheOnPropertyChanged;
-        _device.Main.PropertyChanged += VolumeCacheOnPropertyChanged2;
+        _outputLevelCache.PropertyChanged += CachedPropertyChanged;
+        _device.Main.PropertyChanged += SkipCachePropertyChanged;
     }
 
     public override void Dispose()
     {
-        _outputLevelCache.PropertyChanged -= VolumeCacheOnPropertyChanged;
-        _device.Main.PropertyChanged -= VolumeCacheOnPropertyChanged2;
+        _outputLevelCache.PropertyChanged -= CachedPropertyChanged;
+        _device.Main.PropertyChanged -= SkipCachePropertyChanged;
     }
 
-    private void VolumeCacheOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void CachedPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         // Important use this event instead of calling RefreshState directly when changing state.
         // If not the state will be updated locally and not globally.
         StatesUpdated();
     }
 
-    private void VolumeCacheOnPropertyChanged2(object? sender, PropertyChangedEventArgs e)
+    private void SkipCachePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        // Skip cache if it's a state change, as this can only be done physically on the device.
+        // Only update the state, nothing more.
         RefreshState();
     }
 
