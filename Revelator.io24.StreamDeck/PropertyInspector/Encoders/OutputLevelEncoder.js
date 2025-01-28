@@ -1,10 +1,13 @@
 ﻿/// <reference path="../SDPIComponentsTypeDef.js" />
 
-document.addEventListener('DOMContentLoaded', async function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    // eslint-disable-next-line no-undef
     const { streamDeckClient } = SDPIComponents;
 
     const infoResult = await streamDeckClient.getConnectionInfo();
     const controller = infoResult.actionInfo.payload.controller;
+    
+    // eslint-disable-next-line no-unused-vars
     const isEncoder = controller === "Encoder";
     const isKeypad = controller === "Keypad";
 
@@ -12,16 +15,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     // A encoder will never be a keypad, therefor we can do some assumptions:
     if (isKeypad) {
         // SDPI Select Elements:
-        const sdpi_select_output = document.querySelector('sdpi-select[setting="output"]');
-        const sdpi_select_action = document.querySelector('sdpi-select[setting="action"]');
+        const sdpi_select_output = document.querySelector("sdpi-select[setting='output']");
+        const sdpi_select_action = document.querySelector("sdpi-select[setting='action']");
 
         // HTML Select Elements:
-        const select_output = sdpi_select_output.shadowRoot.querySelector('select');
-        const select_action = sdpi_select_action.shadowRoot.querySelector('select');
+        const select_output = sdpi_select_output.shadowRoot.querySelector("select");
+        const select_action = sdpi_select_action.shadowRoot.querySelector("select");
 
         // Adding changed events:
-        select_output.addEventListener('change', changeEvent);
-        select_action.addEventListener('change', changeEvent);
+        select_output.addEventListener("change", changeEvent);
+        select_action.addEventListener("change", changeEvent);
 
         // Keypad can adjust and set:
         setSdpiVisibility("action", true);
