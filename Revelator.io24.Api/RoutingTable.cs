@@ -1,7 +1,7 @@
 ﻿using Revelator.io24.Api.Enums;
-using Revelator.io24.Api.Models;
 using System;
 using System.Collections.Generic;
+using Revelator.io24.Api.Models.ValueConverters;
 
 namespace Revelator.io24.Api
 {
@@ -62,40 +62,24 @@ namespace Revelator.io24.Api
             }
         }
 
-        /// <summary>
-        /// Get volume in range of 0% - 100%
-        /// </summary>
         public VolumeValue GetVolume(Input input, MixOut mixOut)
         {
             if (!_routes.TryGetValue((input, mixOut), out var routes))
-                return new VolumeValue { ValueRaw = 0 };
+                return new VolumeValue { Raw = 0 };
 
-            var value = _rawService.GetValue(routes.volume);
-
-            var volume = new VolumeValue { ValueRaw = value };
-
-            return EnsureVolumeRange(volume);
+            return _rawService.GetValue(routes.volume);
         }
 
-        /// <summary>
-        /// Set volume in range of 0% - 100%
-        /// </summary>
         public void SetVolume(Input input, MixOut mixOut, VolumeValue value)
         {
             if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
 
-            var volume = EnsureVolumeRange(value);
-
-            _rawService.SetValue(routes.volume, volume.ValueRaw);
-        }
-        
-        private VolumeValue EnsureVolumeRange(VolumeValue volume)
-        {
-            if (volume.ValueRaw < 0) volume.ValueRaw = 0;
-            if (volume.ValueRaw > 100) volume.ValueRaw = 100;
-
-            return volume;
+            // TODO: There is a bug in UC 4.5.0.102825,
+            // If we change between set a value in the API, adjust in UC, set value back in API etc. UC will sometimes not update the value.
+            // This seems like PreSonus has the exact same caching issues I had in the API, but it seems that the API is correct now.
+            // It's funny to see if we do this slowly, we would not have any issues, but if we do it fast enough, UC will not get a race condition.
+            _rawService.SetValue(routes.volume, value);
         }
 
         private bool IsRouted(string route, float value)

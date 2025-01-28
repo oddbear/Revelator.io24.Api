@@ -1,5 +1,6 @@
 ﻿using Revelator.io24.Api.Attributes;
 using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models.ValueConverters;
 using System.ComponentModel;
 
 namespace Revelator.io24.Api.Models.Global
@@ -77,7 +78,7 @@ namespace Revelator.io24.Api.Models.Global
         /// -96db - -0db
         /// </summary>
         [RouteValue("mainOutVolume")]
-        public float MainOutVolume
+        public OutputValue MainOutVolume
         {
             get => _rawService.GetValue("global/mainOutVolume");
             set => _rawService.SetValue("global/mainOutVolume", value);
@@ -87,7 +88,7 @@ namespace Revelator.io24.Api.Models.Global
         /// -96db - -0db
         /// </summary>
         [RouteValue("phonesVolume")]
-        public float HeadphonesVolume
+        public OutputValue HeadphonesVolume
         {
             get => _rawService.GetValue("global/phonesVolume");
             set => _rawService.SetValue("global/phonesVolume", value);
@@ -98,7 +99,7 @@ namespace Revelator.io24.Api.Models.Global
         /// Uses raw value for now.
         /// </summary>
         [RouteValue("monitorBlend")]
-        public float MonitorBlend
+        public BlendValue MonitorBlend
         {
             get => _rawService.GetValue("global/monitorBlend");
             set => _rawService.SetValue("global/monitorBlend", value);

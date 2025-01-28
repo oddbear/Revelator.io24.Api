@@ -103,9 +103,9 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             var (input, output) = GetRoutingActionParameter(actionParameter);
             var volume = _plugin.RoutingTable.GetVolume(input, output);
 
-            volume.ValueDb += diff;
+            volume.Db += diff;
 
-            if (volume.ValueDb is < -96 or > +10)
+            if (volume.Db is < -96 or > +10)
                 return;
 
             _plugin.RoutingTable.SetVolume(input, output, volume);
@@ -121,7 +121,7 @@ namespace Loupedeck.RevelatorIo24Plugin.Adjustments
             var (input, output) = GetRoutingActionParameter(actionParameter);
             var volume = _plugin.RoutingTable.GetVolume(input, output);
 
-            return $"{volume.ValueDb}dB";
+            return $"{volume.Db}dB";
         }
 
         protected override BitmapImage GetCommandImage(string actionParameter, PluginImageSize imageSize)

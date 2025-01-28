@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Timers;
+﻿using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders;

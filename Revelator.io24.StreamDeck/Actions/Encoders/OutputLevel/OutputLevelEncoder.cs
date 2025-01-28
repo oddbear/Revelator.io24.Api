@@ -4,8 +4,8 @@ using Revelator.io24.Api.Enums;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using Revelator.io24.Api;
-using Revelator.io24.StreamDeck.Helper;
 using Revelator.io24.StreamDeck.Actions.Enums;
+using Revelator.io24.Api.Models.ValueConverters;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders.OutputLevel;
 
@@ -63,13 +63,16 @@ public class OutputLevelEncoder : HybridBase
 
     public override Task KeyPressedAsync(KeyPayload payload)
     {
-        switch (_settings.Action)
+        if (!ValidKeyPad(out var output, out var action))
+            return Task.CompletedTask;
+
+        switch (action)
         {
             case VolumeActionType.Set:
-                KeypadSet();
+                KeypadSet(output);
                 break;
             case VolumeActionType.Adjust:
-                KeypadAdjust(1);
+                KeypadAdjust(output);
                 break;
         }
 
@@ -82,128 +85,62 @@ public class OutputLevelEncoder : HybridBase
         await RefreshState();
     }
 
-    private void KeypadSet()
+    private void KeypadSet(DeviceOut output)
     {
-        switch (_settings.Output)
+        switch (output)
         {
             case DeviceOut.Blend:
-                _outputLevelCache.MonitorBlend = SetBlendCalc(_settings.SetBlend);
+                _outputLevelCache.MonitorBlend = new BlendValue { Blend = _settings.SetBlend };
                 break;
             case DeviceOut.Phones:
-                _outputLevelCache.HeadphonesVolume = SetVolumeCalc(_settings.SetVolume);
+                _outputLevelCache.HeadphonesVolume = new OutputValue { Db = _settings.SetVolume };
                 break;
             case DeviceOut.MainOut:
-                _outputLevelCache.MainOutVolume = SetVolumeCalc(_settings.SetVolume);
+                _outputLevelCache.MainOutVolume = new OutputValue { Db = _settings.SetVolume };
                 break;
         }
     }
 
-    private void KeypadAdjust(int ticks)
+    private void KeypadAdjust(DeviceOut output, int ticks = 1)
     {
-        switch (_settings.Output)
+        switch (output)
         {
             case DeviceOut.Blend:
                 // I get about 30 ticks for the whole dial on the interface from -1 to +1
-                _outputLevelCache.MonitorBlend = AdjustBlendCalc(_outputLevelCache.MonitorBlend, _settings.AdjustBlend, ticks);
+                _outputLevelCache.MonitorBlend = new BlendValue { Blend = _outputLevelCache.MonitorBlend.Blend + _settings.AdjustBlend };
                 return;
             case DeviceOut.Phones:
-                _outputLevelCache.HeadphonesVolume = AdjustVolumeDbCalc(_outputLevelCache.HeadphonesVolume, _settings.AdjustVolume, ticks);
+                _outputLevelCache.HeadphonesVolume = new OutputValue { Db = _outputLevelCache.HeadphonesVolume.Db + _settings.AdjustVolume };
                 return;
             case DeviceOut.MainOut:
                 // 0 -> -0.06 -> -0.12
                 // -10 -> -9.52 -> -9.07
                 // -96 -> -91.9 -> -87.97 -> -84.21
-                _outputLevelCache.MainOutVolume = AdjustVolumeDbCalc(_outputLevelCache.MainOutVolume, _settings.AdjustVolume, ticks);
+                _outputLevelCache.MainOutVolume = new OutputValue { Db = _outputLevelCache.MainOutVolume.Db + _settings.AdjustVolume };
                 return;
         }
     }
 
     public override Task DialRotateAsync(DialRotatePayload payload)
     {
+        if (!ValidEncoder(out var output))
+            return Task.CompletedTask;
+
         // We use fixed values, as these are the same as the ones in UC.
-        switch (_settings.Output)
+        switch (output)
         {
             case DeviceOut.Blend:
-                _outputLevelCache.MonitorBlend = AdjustBlendCalc(_outputLevelCache.MonitorBlend, 0.02f, payload.Ticks);
+                _outputLevelCache.MonitorBlend = new BlendValue { Percent = _outputLevelCache.MonitorBlend.Percent + payload.Ticks };
                 break;
             case DeviceOut.Phones:
-                _outputLevelCache.HeadphonesVolume = AdjustVolumeRawCalc(_outputLevelCache.HeadphonesVolume, 0.01f, payload.Ticks);
+                _outputLevelCache.HeadphonesVolume = new OutputValue { Percent = _outputLevelCache.HeadphonesVolume.Percent + payload.Ticks };
                 break;
             case DeviceOut.MainOut:
-                _outputLevelCache.MainOutVolume = AdjustVolumeRawCalc(_outputLevelCache.MainOutVolume, 0.01f, payload.Ticks);
+                _outputLevelCache.MainOutVolume = new OutputValue { Percent = _outputLevelCache.MainOutVolume.Percent + payload.Ticks };
                 break;
         }
 
         return Task.CompletedTask;
-    }
-
-    private static float SetVolumeCalc(float newVolumeDb)
-    {
-        if (newVolumeDb < -96)
-            newVolumeDb = -96;
-
-        if (newVolumeDb > 0)
-            newVolumeDb = 0;
-
-        return LookupTable.OutputDbToPercentage(newVolumeDb);
-    }
-
-    private float AdjustVolumeDbCalc(float valueRaw, float value, int ticks)
-    {
-        var oldVolumeDb = LookupTable.OutputPercentageToDb(valueRaw);
-        var adjustment = value * ticks;
-
-        var newVolumeDb = oldVolumeDb + adjustment;
-
-        if (newVolumeDb < -96)
-            newVolumeDb = -96;
-
-        if (newVolumeDb > 0)
-            newVolumeDb = 0;
-
-        return LookupTable.OutputDbToPercentage(newVolumeDb);
-    }
-
-    private float AdjustVolumeRawCalc(float valueRaw, float value, int ticks)
-    {
-        var adjustment = value * ticks;
-
-        var newVolume = valueRaw + adjustment;
-
-        if (newVolume < 0)
-            newVolume = 0;
-
-        if (newVolume > 1)
-            newVolume = 1;
-
-        return newVolume;
-    }
-
-    private static float OutputBlendToRaw(float valueBlend)
-        => (valueBlend + 1) * 0.5f;
-
-    private static float OutputRawToBlend(float valueBlend)
-        => valueBlend / 0.5f - 1;
-
-    private static float SetBlendCalc(float newBlend)
-    {
-        if (newBlend < -1)
-            newBlend = -1;
-
-        if (newBlend > 1)
-            newBlend = 1;
-
-        return OutputBlendToRaw(newBlend);
-    }
-
-    private static float AdjustBlendCalc(float valueRaw, float value, int ticks)
-    {
-        var oldBlend = OutputRawToBlend(valueRaw);
-
-        var adjustment = value * ticks;
-
-        var newBlend = oldBlend + adjustment;
-        return SetBlendCalc(newBlend);
     }
 
     public override async Task ReceivedSettingsAsync(ReceivedSettingsPayload payload)
@@ -218,7 +155,11 @@ public class OutputLevelEncoder : HybridBase
 
     private async Task StatesUpdated()
     {
-        switch (_settings.Output)
+        // We don't need action here:
+        if (!ValidEncoder(out var output))
+            return;
+
+        switch (output)
         {
             case DeviceOut.Blend:
                 await RefreshBlend(_outputLevelCache.MonitorBlend);
@@ -232,48 +173,45 @@ public class OutputLevelEncoder : HybridBase
         }
     }
 
-    private async Task RefreshBlend(float valueRaw)
+    private async Task RefreshBlend(BlendValue blendValue)
     {
-        var blend = OutputRawToBlend(valueRaw);
-
         if (_isEncoder)
         {
-            var percentage = valueRaw * 100f;
-
             await Connection.SetFeedbackAsync(JObject.FromObject(new
             {
-                value = $"{blend:0.00}",
-                indicator = percentage
+                value = $"{blendValue.Blend:0.00}",
+                indicator = blendValue.Percent
             }));
         }
         else
         {
-            await Connection.SetTitleAsync($"{blend:0.00}");
+            await Connection.SetTitleAsync($"{blendValue.Blend:0.00}");
         }
     }
 
-    private async Task RefreshVolume(float valueRaw)
+    private async Task RefreshVolume(OutputValue outputValue)
     {
-        var volumeDb = LookupTable.OutputPercentageToDb(valueRaw);
         if (_isEncoder)
         {
-            var indicatorPercentage = valueRaw * 100f;
-
             await Connection.SetFeedbackAsync(JObject.FromObject(new
             {
-                value = $"{volumeDb:0.00} dB",
-                indicator = indicatorPercentage
+                value = $"{outputValue.Db:0.00} dB",
+                indicator = outputValue.Percent
             }));
         }
         else
         {
-            await Connection.SetTitleAsync($"{volumeDb:0.00} dB");
+            await Connection.SetTitleAsync($"{outputValue.Db:0.00} dB");
         }
     }
 
     private async Task RefreshState()
     {
-        switch (_settings.Output)
+        // We don't need action here:
+        if (!ValidEncoder(out var output))
+            return;
+
+        switch (output)
         {
             case DeviceOut.Blend:
             case DeviceOut.Phones:
@@ -283,6 +221,25 @@ public class OutputLevelEncoder : HybridBase
                 await Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
                 return;
         }
+    }
+
+    private bool ValidKeyPad(out DeviceOut output, out VolumeActionType action)
+    {
+        output = _settings.Output ?? default;
+        action = _settings.Action ?? default;
+
+        return _settings is
+        {
+            Output: not null,
+            Action: not null
+        };
+    }
+
+    private bool ValidEncoder(out DeviceOut output)
+    {
+        output = _settings.Output ?? default;
+
+        return _settings.Output is not null;
     }
 
     #region NotUsed
