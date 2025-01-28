@@ -1,4 +1,5 @@
 ﻿using Revelator.io24.Api;
+using Revelator.io24.Api.Models.ValueConverters;
 using System.ComponentModel;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders.OutputLevel;
@@ -36,21 +37,33 @@ internal class OutputLevelCache : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
     }
 
-    public float MainOutVolume
+    public OutputValue MainOutVolume
     {
         get => _cacheTimer.GetValueOr(nameof(MainOutVolume), _device.Global.MainOutVolume);
-        set => _cacheTimer.SetValue(nameof(MainOutVolume), _device.Global.MainOutVolume = value);
+        set
+        {
+            _cacheTimer.SetValue(nameof(MainOutVolume), value);
+            _device.Global.MainOutVolume = value;
+        }
     }
 
-    public float HeadphonesVolume
+    public OutputValue HeadphonesVolume
     {
         get => _cacheTimer.GetValueOr(nameof(HeadphonesVolume), _device.Global.HeadphonesVolume);
-        set => _cacheTimer.SetValue(nameof(HeadphonesVolume), _device.Global.HeadphonesVolume = value);
+        set
+        {
+            _cacheTimer.SetValue(nameof(HeadphonesVolume), value);
+            _device.Global.HeadphonesVolume = value;
+        }
     }
 
-    public float MonitorBlend
+    public BlendValue MonitorBlend
     {
         get => _cacheTimer.GetValueOr(nameof(MonitorBlend), _device.Global.MonitorBlend);
-        set => _cacheTimer.SetValue(nameof(MonitorBlend), _device.Global.MonitorBlend = value);
+        set
+        {
+            _cacheTimer.SetValue(nameof(MonitorBlend), value);
+            _device.Global.MonitorBlend = value;
+        }
     }
 }

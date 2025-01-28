@@ -1,25 +1,44 @@
-﻿using Revelator.io24.Api.Enums;
-using System;
+﻿using System;
 
-namespace Revelator.io24.Api.Models;
+namespace Revelator.io24.Api.Models.ValueConverters;
 
-public class VolumeValue
+public struct VolumeValue
 {
-    public float ValueRaw { get; set; }
+    private float _value;
 
-    public float ValueDb
+    public static implicit operator float(VolumeValue value) => value._value;
+    public static implicit operator VolumeValue(float value) => new VolumeValue { _value = value };
+
+    public float Raw
     {
-        get => ConvertToDb(ValueRaw);
-        set => ValueRaw = ConvertFromDb(value);
+        get => _value switch
+        {
+            < 0 => 0,
+            > 1 => 1,
+            _ => _value
+        };
+        set => _value = value switch
+        {
+            < 0 => 0,
+            > 1 => 1,
+            _ => value
+        };
     }
 
-    public float ValuePercent
+    public float Db
     {
-        get => ValueRaw * 100;
-        set => ValueRaw = value * 100;
+        // TODO: Recalculate these values, seems to be a little bit off.
+        get => ConvertToDb(Raw);
+        set => Raw = ConvertFromDb(value);
     }
 
-    float ConvertFromDb(float dbValue)
+    public float Percent
+    {
+        get => Raw * 100;
+        set => Raw = value / 100;
+    }
+
+    private float ConvertFromDb(float dbValue)
     {
         var a = 0.47f;
         var b = 0.09f;
@@ -29,7 +48,7 @@ public class VolumeValue
         {
             var x = (dbValue + 10) / 20f;
             var y = x * (1 - a);
-            var floatValue = (y + a);
+            var floatValue = y + a;
 
             return floatValue;
         }
@@ -56,7 +75,7 @@ public class VolumeValue
         }
     }
 
-    float ConvertToDb(float value)
+    private float ConvertToDb(float value)
     {
         //We round to skip decimals (the UI is to tight):
         var a = 0.47f;

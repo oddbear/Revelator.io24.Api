@@ -9,11 +9,11 @@ public class OutputLevelEncoderSettings
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty(PropertyName = "output")]
-    public DeviceOut Output { get; set; }
+    public DeviceOut? Output { get; set; }
 
     [JsonConverter(typeof(StringEnumConverter))]
     [JsonProperty(PropertyName = "action")]
-    public VolumeActionType Action { get; set; }
+    public VolumeActionType? Action { get; set; }
 
     // There are 4 states + output and action:
     [JsonProperty(PropertyName = "volume-set")]
