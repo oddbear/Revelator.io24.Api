@@ -1,25 +1,25 @@
 ﻿// Must add: <div id="tooltip" class="tooltip"></div> and Tooltip.css
 
-document.addEventListener('DOMContentLoaded', function () {
-    const div_tooltip = document.getElementById('tooltip');
-    const sdpi_ranges = document.querySelectorAll('sdpi-range');
+document.addEventListener("DOMContentLoaded", function () {
+    const div_tooltip = document.getElementById("tooltip");
+    const sdpi_ranges = document.querySelectorAll("sdpi-range");
 
     sdpi_ranges.forEach(sdpi_range => {
-        const input_range = sdpi_range.shadowRoot.querySelector('input[type="range"]');
+        const input_range = sdpi_range.shadowRoot.querySelector("input[type='range']");
 
         // Show the tooltip on mouseover
-        input_range.addEventListener('mouseover', function () {
-            div_tooltip.style.display = 'block';
+        input_range.addEventListener("mouseover", function () {
+            div_tooltip.style.display = "block";
             updateTooltip();
         });
 
         // Hide the tooltip on mouseout
-        input_range.addEventListener('mouseout', function () {
-            div_tooltip.style.display = 'none';
+        input_range.addEventListener("mouseout", function () {
+            div_tooltip.style.display = "none";
         });
 
         // Update the tooltip on input change
-        input_range.addEventListener('input', updateTooltip);
+        input_range.addEventListener("input", updateTooltip);
 
         // Function to update the tooltip position and content
         function updateTooltip() {
@@ -54,15 +54,15 @@ document.addEventListener('DOMContentLoaded', function () {
         // All in all, the MutationObserver seems to be the best way.
         const observer = new MutationObserver(mutations => {
             mutations
-                .filter(mutation => mutation.attributeName === 'title')
+                .filter(mutation => mutation.attributeName === "title")
                 // Does not trigger another mutation when removed, just when it's added back again.
-                .forEach(mutation => mutation.target.removeAttribute('title'));
+                .forEach(mutation => mutation.target.removeAttribute("title"));
         });
 
         // Start observing the input element for attribute changes
         observer.observe(input_range, { attributeFilter: ["title"] });
 
         // Remove the attribute, for the observation to trigger when it's added back again.
-        input_range.removeAttribute('title');
+        input_range.removeAttribute("title");
     });
 });

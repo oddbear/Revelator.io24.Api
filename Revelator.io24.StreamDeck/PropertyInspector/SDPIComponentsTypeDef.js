@@ -1,6 +1,8 @@
 ﻿// This file is for VisualStudio intellisense only!
 // Include with: /// <reference path="SDPIComponentsTypeDef.js" />
 
+/* eslint-disable */
+
 const SDPIComponents = {
     /** @type {StreamDeckClient} */
     streamDeckClient,
@@ -249,16 +251,16 @@ const SDPIComponents = {
  * @enum {number}
  */
 const DeviceTypeEnum = {
-    StreamDeck = 0,
-    StreamDeckMini = 1,
-    StreamDeckXL = 2,
-    StreamDeckMobile = 3,
-    CorsairGKeys = 4,
-    StreamDeckPedal = 5,
-    CorsairVoyager = 6,
-    StreamDeckPlus = 7,
-    SCUFController = 8,
-    StreamDeckNeo = 9
+    StreamDeck: 0,
+    StreamDeckMini: 1,
+    StreamDeckXL: 2,
+    StreamDeckMobile: 3,
+    CorsairGKeys: 4,
+    StreamDeckPedal: 5,
+    CorsairVoyager: 6,
+    StreamDeckPlus: 7,
+    SCUFController: 8,
+    StreamDeckNeo: 9
 };
 
 /**
