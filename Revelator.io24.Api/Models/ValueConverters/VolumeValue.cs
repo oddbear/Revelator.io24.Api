@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Revelator.io24.Api.Models.ValueConverters;
+﻿namespace Revelator.io24.Api.Models.ValueConverters;
 
 public struct VolumeValue
 {
@@ -27,7 +25,6 @@ public struct VolumeValue
 
     public float Db
     {
-        // TODO: Recalculate these values, seems to be a little bit off.
         get => ConvertToDb(Raw);
         set => Raw = ConvertFromDb(value);
     }
@@ -38,71 +35,82 @@ public struct VolumeValue
         set => Raw = value / 100;
     }
 
-    private float ConvertFromDb(float dbValue)
-    {
-        var a = 0.47f;
-        var b = 0.09f;
-        var c = 0.004f;
-
-        if (dbValue >= -10)
-        {
-            var x = (dbValue + 10) / 20f;
-            var y = x * (1 - a);
-            var floatValue = y + a;
-
-            return floatValue;
-        }
-        else if (dbValue >= -40)
-        {
-            var x = (dbValue + 47) / 30f;
-            var floatValue = x * (a - b);
-
-            return floatValue;
-        }
-        else if (dbValue >= -60)
-        {
-            var x = (dbValue + 61) / 20f;
-            var floatValue = x * (b - c);
-
-            return floatValue;
-        }
-        else
-        {
-            var x = (dbValue + 96) / 35f;
-            var floatValue = x * (c - 0.0001111f);
-
-            return floatValue;
-        }
-    }
-
     private float ConvertToDb(float value)
     {
-        //We round to skip decimals (the UI is to tight):
-        var a = 0.47f;
-        var b = 0.09f;
-        var c = 0.004f;
-
-        if (value >= a)
-        {
-            var y = (value - a) / (1 - a);
-            return (float)Math.Round(y * 20) - 10;
-        }
+        var a = 1f;     // +10 dB
+        var b = 0.47f;  // -10 dB
+        var c = 0.09f;  // -40 dB
+        var d = 0.004f; // -60 dB
+        var e = 0.0f;   // -96 dB
 
         if (value >= b)
         {
-            var y = value / (a - b);
-            return (float)Math.Round(y * 30) - 47;
+            var size = 20f; // -10 dB to +10 dB = 20 dB diff
+            var normalizedValue = (value - b) / (a - b);
+            var scaledValue = normalizedValue  * size;
+            return scaledValue - 10; // - 10 dB
         }
-
+        
         if (value >= c)
         {
-            var y = value / (b - c);
-            return (float)Math.Round(y * 20) - 61;
+            var size = 30f; // -40 dB to -10 dB = 30 dB diff
+            var normalizedValue = (value - c) / (b - c);
+            var scaledValue = normalizedValue * size;
+            return scaledValue - 40; // - 40 dB
+        }
+        
+        if (value >= d)
+        {
+            var size = 20f; // -60 dB to -40 dB = 20 dB diff
+            var normalizedValue = (value - d) / (c - d);
+            var scaledValue = normalizedValue * size;
+            return scaledValue - 60; // - 60 dB
         }
 
         {
-            var y = value / (c - 0.0001111f);
-            return (float)Math.Round(y * 35) - 96;
+            var size = 36f; // -96 dB to -60 dB = 36 dB diff
+            var normalizedValue = (value - e) / (d - e);
+            var scaledValue = normalizedValue * size;
+            return scaledValue - 96f; // - 96 dB
         }
     }
+
+    private float ConvertFromDb(float dbValue)
+    {
+        var a = 1f;     // +10 dB
+        var b = 0.47f;  // -10 dB
+        var c = 0.09f;  // -40 dB
+        var d = 0.004f; // -60 dB
+        var e = 0.0f;   // -96 dB
+
+        if (dbValue >= -10)
+        {
+            var size = 20f; // -10 dB to +10 dB = 20 dB diff
+            var normalizedValue = (dbValue + 10f) / size; // - 10 dB
+            var scaledValue = normalizedValue * (a - b);
+            return scaledValue + b;
+        }
+        else if (dbValue >= -40)
+        {
+            var size = 30f; // -40 dB to -10 dB = 30 dB diff
+            var normalizedValue = (dbValue + 40f) / size; // - 40 dB
+            var scaledValue = normalizedValue * (b - c);
+            return scaledValue + c;
+        }
+        else if (dbValue >= -60)
+        {
+            var size = 20f; // -60 dB to -40 dB = 20 dB diff
+            var normalizedValue = (dbValue + 60f) / size; // - 60 dB
+            var scaledValue = normalizedValue * (c - d);
+            return scaledValue + d;
+        }
+        else
+        {
+            var size = 36f; // -96 dB to -60 dB = 36 dB diff
+            var normalizedValue = (dbValue + 96f) / size; // - 96 dB
+            var scaledValue = normalizedValue * (d - e);
+            return scaledValue + e;
+        }
+    }
+
 }
