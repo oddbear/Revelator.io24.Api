@@ -24,7 +24,7 @@ namespace Revelator.io24.Api
             SetupRoutes();
         }
 
-        private readonly Dictionary<(Input input, MixOut output), (string route, string volume, string? solo)> _routes = new();
+        private readonly Dictionary<(Input input, MixOut output), (string route, string volume, string soloMono)> _routes = new();
         private readonly Dictionary<string, (Input input, MixOut output)> _routeToKey = new();
 
         public bool GetRouting(Input input, MixOut mixOut)
@@ -59,16 +59,16 @@ namespace Revelator.io24.Api
             }
         }
 
-        public bool GetSolo(Input input, MixOut mixOut)
+        public bool GetSoloMono(Input input, MixOut mixOut)
         {
             if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return false;
 
-            var value = _rawService.GetValue(routes.solo);
+            var value = _rawService.GetValue(routes.soloMono);
             return value > 0.5f;
         }
 
-        public void SetSolo(Input input, MixOut mixOut, Value value)
+        public void SetSoloMono(Input input, MixOut mixOut, Value value)
         {
             if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
@@ -79,14 +79,14 @@ namespace Revelator.io24.Api
             switch (value)
             {
                 case Value.On:
-                    _rawService.SetValue(routes.solo, on);
+                    _rawService.SetValue(routes.soloMono, on);
                     break;
                 case Value.Off:
-                    _rawService.SetValue(routes.solo, off);
+                    _rawService.SetValue(routes.soloMono, off);
                     break;
                 default:
-                    var floatValue = _rawService.GetValue(routes.solo);
-                    _rawService.SetValue(routes.solo, Toggle(floatValue));
+                    var floatValue = _rawService.GetValue(routes.soloMono);
+                    _rawService.SetValue(routes.soloMono, Toggle(floatValue));
                     break;
             }
         }
@@ -262,25 +262,25 @@ namespace Revelator.io24.Api
             SetupRouting((Input.Mix, MixOut.Main),
                 "main/ch1/mute",
                 "main/ch1/volume",
-                null);
+                "main/ch1/mono");
             SetupRouting((Input.Mix, MixOut.Mix_A),
                 "aux/ch1/mute",
                 "aux/ch1/volume",
-                null);
+                "aux/ch1/mono");
             SetupRouting((Input.Mix, MixOut.Mix_B),
                 "aux/ch2/mute",
                 "aux/ch2/volume",
-                null);
+                "aux/ch2/mono");
 
             _rawService.Syncronized += Synchronized;
             _rawService.ValueStateUpdated += ValueStateUpdated;
         }
 
-        private void SetupRouting((Input input, MixOut output) key, string routeAssign, string routeVolume, string? routeSolo)
+        private void SetupRouting((Input input, MixOut output) key, string routeAssign, string routeVolume, string routeSoloMono)
         {
             _routeToKey[routeAssign] = key;
             _routeToKey[routeVolume] = key;
-            _routes[key] = (routeAssign, routeVolume, routeSolo);
+            _routes[key] = (routeAssign, routeVolume, routeSoloMono);
         }
     }
 }

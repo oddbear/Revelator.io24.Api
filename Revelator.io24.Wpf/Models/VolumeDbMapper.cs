@@ -1,5 +1,6 @@
 ﻿using Revelator.io24.Api;
 using Revelator.io24.Api.Enums;
+using Revelator.io24.Api.Models.ValueConverters;
 
 namespace Revelator.io24.Wpf.Models
 {
@@ -142,6 +143,6 @@ namespace Revelator.io24.Wpf.Models
             => _routingTable.GetVolume(input, mixOut).Db;
 
         private void SetValue(Input input, MixOut mixOut, float value)
-            => _routingTable.SetVolume(input, mixOut, new VolumeValue { ValueDb = value });
+            => _routingTable.SetVolume(input, mixOut, new VolumeValue { Db = value });
     }
 }

@@ -71,7 +71,7 @@ public class VolumeLevelEncoder : HybridBase
                 _routingTable.SetRouting(input, mixOut, _settings.RouteValue);
                 break;
             case VolumeActionType.Solo:
-                _routingTable.SetSolo(input, mixOut, _settings.RouteValue);
+                _routingTable.SetSoloMono(input, mixOut, _settings.RouteValue);
                 break;
             case VolumeActionType.Set:
                 _volumeLevelCache.SetVolume(input, mixOut, new VolumeValue { Db = _settings.SetVolume });
@@ -155,7 +155,7 @@ public class VolumeLevelEncoder : HybridBase
                 await Connection.SetStateAsync(routing ? 0u : 1u);
                 return;
             case VolumeActionType.Solo:
-                var solo = _routingTable.GetSolo(input, mixOut);
+                var solo = _routingTable.GetSoloMono(input, mixOut);
                 await Connection.SetStateAsync(solo ? 0u : 1u);
                 return;
         }
