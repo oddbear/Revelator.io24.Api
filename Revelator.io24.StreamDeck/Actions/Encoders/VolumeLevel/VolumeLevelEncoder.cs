@@ -70,6 +70,9 @@ public class VolumeLevelEncoder : HybridBase
             case VolumeActionType.Mute:
                 _routingTable.SetRouting(input, mixOut, _settings.RouteValue);
                 break;
+            case VolumeActionType.Solo:
+                _routingTable.SetSolo(input, mixOut, _settings.RouteValue);
+                break;
             case VolumeActionType.Set:
                 _volumeLevelCache.SetVolume(input, mixOut, new VolumeValue { Db = _settings.SetVolume });
                 break;
@@ -145,8 +148,18 @@ public class VolumeLevelEncoder : HybridBase
         if (!ValidEncoder(out var input, out var mixOut) || _isEncoder)
             return;
 
-        var routing = _routingTable.GetRouting(input, mixOut);
-        await Connection.SetStateAsync(routing ? 0u : 1u);
+        switch (_settings.Action)
+        {
+            case VolumeActionType.Mute:
+                var routing = _routingTable.GetRouting(input, mixOut);
+                await Connection.SetStateAsync(routing ? 0u : 1u);
+                return;
+            case VolumeActionType.Solo:
+                var solo = _routingTable.GetSolo(input, mixOut);
+                await Connection.SetStateAsync(solo ? 0u : 1u);
+                return;
+        }
+        
     }
 
     private bool ValidKeyPad(out Input input, out MixOut mixOut, out VolumeActionType action)

@@ -5,7 +5,7 @@ public struct BlendValue
     private float _value;
 
     public static implicit operator float(BlendValue value) => value._value;
-    public static implicit operator BlendValue(float value) => new BlendValue { _value = value };
+    public static implicit operator BlendValue(float value) => new() { _value = value };
 
     public float Raw
     {
