@@ -9,5 +9,7 @@ public enum VolumeActionType
     [EnumMember(Value = "adjust")]
     Adjust,
     [EnumMember(Value = "mute")]
-    Mute
+    Mute,
+    [EnumMember(Value = "solo")]
+    Solo
 }

@@ -5,7 +5,7 @@ public struct VolumeValue
     private float _value;
 
     public static implicit operator float(VolumeValue value) => value._value;
-    public static implicit operator VolumeValue(float value) => new VolumeValue { _value = value };
+    public static implicit operator VolumeValue(float value) => new() { _value = value };
 
     public float Raw
     {

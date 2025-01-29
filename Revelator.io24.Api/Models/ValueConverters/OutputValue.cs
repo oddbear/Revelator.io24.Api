@@ -7,7 +7,7 @@ public struct OutputValue
     private float _value;
 
     public static implicit operator float(OutputValue value) => value._value;
-    public static implicit operator OutputValue(float value) => new OutputValue { _value = value };
+    public static implicit operator OutputValue(float value) => new() { _value = value };
 
     public float Raw
     {

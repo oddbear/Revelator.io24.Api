@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         function changeEvent() {
             setSdpiVisibility("volume-set", isSetAction());
             setSdpiVisibility("volume-adjust", isAdjustAction());
-            setSdpiVisibility("route-value", isMuteAction());
+            setSdpiVisibility("route-value", isMuteAction() || isSoloAction());
         }
 
         function isSetAction() {
@@ -51,6 +51,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         function isMuteAction() {
             return select_action.value === "mute";
+        }
+
+        function isSoloAction() {
+            return select_action.value === "solo";
         }
 
         /**
