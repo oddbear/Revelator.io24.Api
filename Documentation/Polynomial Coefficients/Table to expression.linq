@@ -106,28 +106,28 @@ var dataPoints = new (double dB, double amplitude)[]
 			( -96, 0f )
 };
 
-        // Extract dB and amplitude values
-        var dBValues = new double[dataPoints.Length];
-        var amplitudeValues = new double[dataPoints.Length];
+// Extract dB and amplitude values
+var dBValues = new double[dataPoints.Length];
+var amplitudeValues = new double[dataPoints.Length];
 
-        for (int i = 0; i < dataPoints.Length; i++)
-        {
-            dBValues[i] = dataPoints[i].dB;
-            amplitudeValues[i] = dataPoints[i].amplitude;
-        }
+for (int i = 0; i < dataPoints.Length; i++)
+{
+    dBValues[i] = dataPoints[i].dB;
+    amplitudeValues[i] = dataPoints[i].amplitude;
+}
 
-        // Fit a polynomial to the data
-        // You can adjust the degree of the polynomial to improve the fit
-        int degree = 20; // Example degree, 5
-        var coefficients = Fit.Polynomial(dBValues, amplitudeValues, degree);
+// Fit a polynomial to the data
+// You can adjust the degree of the polynomial to improve the fit
+int degree = 20; // Example degree, 5
+var coefficients = Fit.Polynomial(dBValues, amplitudeValues, degree);
 
-        // Display the polynomial coefficients
-        Console.WriteLine("Polynomial Coefficients:");
-        for (int i = 0; i < coefficients.Length; i++)
-        {
-			//var c{i} = 
-            Console.WriteLine($"{coefficients[i]}".Replace(",", ".") + ",");
-        }
+// Display the polynomial coefficients
+Console.WriteLine("Polynomial Coefficients:");
+for (int i = 0; i < coefficients.Length; i++)
+{
+	//var c{i} = 
+    Console.WriteLine($"{coefficients[i]}".Replace(",", ".") + ",");
+}
 
 // Example: Calculate amplitude for a given dB value using the polynomial
 double exampleDb = -10;
