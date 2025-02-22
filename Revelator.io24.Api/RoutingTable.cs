@@ -33,8 +33,13 @@ namespace Revelator.io24.Api
                 return false;
 
             var value = _rawService.GetValue(routes.route);
-            return value < 0.5f;
+            return IsRouted(routes.route, value);
         }
+
+        private bool IsRouted(string route, float value)
+            => route.EndsWith("mute")
+                ? (value < 0.5f)
+                : (value > 0.5f);
 
         public void SetRouting(Input input, MixOut mixOut, Value value)
         {

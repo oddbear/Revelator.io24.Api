@@ -6,6 +6,8 @@ using Newtonsoft.Json.Linq;
 using Revelator.io24.Api;
 using Revelator.io24.Api.Models.ValueConverters;
 using Revelator.io24.StreamDeck.Actions.Enums;
+using System.Data;
+using System.Transactions;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders.VolumeLevel;
 
@@ -55,6 +57,17 @@ public class VolumeLevelEncoder : HybridBase
     private void SkipCacheRouteUpdated(object? sender, (Input, MixOut) e)
     {
         _ = RefreshState();
+    }
+
+    public override void TouchPress(TouchpadPressPayload payload)
+    {
+        if (!ValidEncoder(out var input, out var mixOut))
+        {
+            Connection.ShowAlert();
+            return;
+        }
+
+        _routingTable.SetRouting(input, mixOut, Value.Toggle);
     }
 
     public override async Task KeyPressedAsync(KeyPayload payload)
@@ -133,7 +146,8 @@ public class VolumeLevelEncoder : HybridBase
             await Connection.SetFeedbackAsync(JObject.FromObject(new
             {
                 value = $"{value.Db:0.00} dB",
-                indicator = value.Percent
+                indicator = value.Percent,
+                title = input.ToString().Replace("_"," ")
             }));
         }
         else
@@ -145,13 +159,20 @@ public class VolumeLevelEncoder : HybridBase
     private async Task RefreshState()
     {
         // We don't need action here:
-        if (!ValidEncoder(out var input, out var mixOut) || _isEncoder)
+        if (!ValidEncoder(out var input, out var mixOut))
             return;
+
+        bool routing = _routingTable.GetRouting(input, mixOut);
+        if (_isEncoder)
+        {
+            var iconImage = routing ? "Images/Plugin/volume_on" : "Images/Plugin/volume_off";
+            await Connection.SetFeedbackAsync("icon", iconImage);
+            return;
+        }
 
         switch (_settings.Action)
         {
             case VolumeActionType.Mute:
-                var routing = _routingTable.GetRouting(input, mixOut);
                 await Connection.SetStateAsync(routing ? 0u : 1u);
                 return;
             case VolumeActionType.Solo:
@@ -159,7 +180,7 @@ public class VolumeLevelEncoder : HybridBase
                 await Connection.SetStateAsync(solo ? 0u : 1u);
                 return;
         }
-        
+
     }
 
     private bool ValidKeyPad(out Input input, out MixOut mixOut, out VolumeActionType action)
