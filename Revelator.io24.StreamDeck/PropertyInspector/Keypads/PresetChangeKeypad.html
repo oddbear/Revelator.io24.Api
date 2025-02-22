@@ -8,23 +8,28 @@
     <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdtools.common.js"></script>
 </head>
 <body>
-    <div class="sdpi-item" id="selectMicrophone">
-        <div class="sdpi-item-label">Microphone</div>
-        <select id="routeValue"
-                class="sdpi-item-value sdProperty"
-                onchange="setSettings()">
-            <option value="Left">Mic L [io24, io44]</option>
-            <option value="Right">Mic R / Headset Mic [io24, io44]</option>
-        </select>
-    </div>
-    <div class="sdpi-item" id="selectPresets">
-        <div class="sdpi-item-label">Preset</div>
-        <select id="presetValues"
-                sdValueField="presetValue"
-                sdListTextProperty="name"
-                sdListValueProperty="index"
-                class="sdpi-item-value sdProperty sdList"
-                onchange="setSettings()">
-        </select>
-    </div>
+<!-- Add a global Microphone thingy? Gain, Reverb, Trim, Left Right Balance, 48V -->
+
+<div class="sdpi-item" id="selectMicrophone">
+    <div class="sdpi-item-label">Microphone</div>
+    <select id="routeValue"
+            class="sdpi-item-value sdProperty"
+            onchange="setSettings()">
+        <option value="Left">Mic L [io24, io44]</option>
+        <option value="Right">Mic R / Headset Mic [io24, io44]</option>
+    </select>
+</div>
+
+<!-- Add support for Bank A and Bank B (C and D also on USB), what about slap echo? -->
+
+<div class="sdpi-item" id="selectPresets">
+    <div class="sdpi-item-label">Preset</div>
+    <select id="presetValues"
+            sdValueField="presetValue"
+            sdListTextProperty="name"
+            sdListValueProperty="index"
+            class="sdpi-item-value sdProperty sdList"
+            onchange="setSettings()">
+    </select>
+</div>
 </body>

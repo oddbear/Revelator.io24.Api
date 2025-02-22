@@ -12,7 +12,7 @@
 void Main()
 {
 	#region datapoints
-	var dataPoints = new (double dB, double amplitude)[]
+	var dataPoints = new (double dB, double raw)[]
 	{           
 		( 0, 1f ),
 		( -1, 0.86863947f ),
@@ -149,14 +149,14 @@ void Main()
 	//
 	//	Console.WriteLine("\r\n----------------------------------------\r\n");
 
-	// Fit Curve is very interesting, it's so close when -10 to -96
-	Console.WriteLine("\r\n0 to -10 Fit Curve r2db\r\n");
+	// Fit Curve is very interesting, it's so close when -10 to -96	
+	Console.WriteLine("\r\n0 to -96 Fit Curve r2db\r\n");
 	FitCurve3All_raw_to_db(dataPoints);
 
-	Console.WriteLine("\r\n0 to -10 Fit Curve inverse db2r\r\n");
+	Console.WriteLine("\r\n0 to -96 Fit Curve inverse db2r\r\n");
 	FitCurve3All_db_to_raw_Working(dataPoints);
 
-	var xData = dataPoints.Select(item => item.amplitude).ToArray();
+	var xData = dataPoints.Select(item => item.raw).ToArray();
 	var yData = dataPoints.Select(item => item.dB).ToArray();
 
 	void Tests(int from, int to, double test, double expected)
@@ -197,9 +197,11 @@ void Main()
 	Tests(10, 97, 0, -96);
 }
 
-void FitCurve3All_db_to_raw_Working((double dB, double amplitude)[] dataPoints, double tolerance = 0.000001)
+void FitCurve3All_db_to_raw_Working((double dB, double raw)[] dataPoints, double tolerance = 0.000001)
 {
-	// WHOHOOO... This works perfect!
+	// Pick the numbers from FitCurve3All_raw_to_db, and inverse the expression.
+	// For some reason Curve fitting in this direction works pretty bad, however.
+	// Reversing the expression works better than the original.
 	var a = -97.31579042850653f;
 	var b = -4.303524249502191f;
 	var c = 1.3157911281416852f;
@@ -219,14 +221,19 @@ void FitCurve3All_db_to_raw_Working((double dB, double amplitude)[] dataPoints, 
 	}
 }
 
-void FitCurve3All_raw_to_db((double dB, double amplitude)[] dataPoints, double tolerance = 0.0001)
+void FitCurve3All_raw_to_db((double dB, double raw)[] dataPoints, double tolerance = 0.0000182)
 {
 	// WHOHOOO... This works perfect!
-	var xData = dataPoints.Select(item => item.amplitude).ToArray();
+	var xData = dataPoints.Select(item => item.raw).ToArray();
 	var yData = dataPoints.Select(item => item.dB).ToArray();
 
-	Func<double, double, double, double, double> model = (a, b, c, x) => a * Math.Exp(b * x) + c;
-	var (a, b, c) = Fit.Curve(xData, yData, model, 1, 5, 1);
+	// Curve Fitting with Nonlinear Regression, seems to work best.
+	// Math.Exp(...) is not needed, we could use Math.Pow(num, b * x), where num != 1, but it's shorther to just use Math.E.
+	// https://statisticsbyjim.com/regression/curve-fitting-linear-nonlinear-regression/
+	//
+	// Some of theese the Curve Fit woun't play nice with, and get max itterations or bad results:
+	Func<double, double, double, double, double> model = (a, b, c, x) => a * Math.Exp(b * x) - c;
+	var (a, b, c) = Fit.Curve(xData, yData, model, 1, 1, 1);
 
 	// [-97,32, -4,30, 1,32]
 	// [-97,31579042850653, -4,303524249502191, 1,3157911281416852]
@@ -245,9 +252,9 @@ void FitCurve3All_raw_to_db((double dB, double amplitude)[] dataPoints, double t
 	}
 }
 
-void FitCurve2All((double dB, double amplitude)[] dataPoints, double tolerance = 0.001)
+void FitCurve2All((double dB, double raw)[] dataPoints, double tolerance = 0.001)
 {
-	var xData = dataPoints.Select(item => item.amplitude).ToArray();
+	var xData = dataPoints.Select(item => item.raw).ToArray();
 	var yData = dataPoints.Select(item => item.dB).ToArray();
 
 	Func<double, double, double, double> model = (a, b, x) => a * Math.Exp(b * x);
@@ -266,10 +273,10 @@ void FitCurve2All((double dB, double amplitude)[] dataPoints, double tolerance =
 	}
 }
 
-void PolynomialWeightedAll_db_to_raw((double dB, double amplitude)[] dataPoints, int order, double tolerance = 0.001)
+void PolynomialWeightedAll_db_to_raw((double dB, double raw)[] dataPoints, int order, double tolerance = 0.001)
 {
 	var xData = dataPoints.Select(item => item.dB).ToArray();
-	var yData = dataPoints.Select(item => item.amplitude).ToArray();
+	var yData = dataPoints.Select(item => item.raw).ToArray();
 
 	var weight = Enumerable.Repeat(0.1d, xData.Length).ToArray();
 	weight[0] = 1d;
@@ -294,9 +301,9 @@ void PolynomialWeightedAll_db_to_raw((double dB, double amplitude)[] dataPoints,
 	}
 }
 
-void PolynomialWeightedAll_raw_to_db((double dB, double amplitude)[] dataPoints, int order, double tolerance = 0.001)
+void PolynomialWeightedAll_raw_to_db((double dB, double raw)[] dataPoints, int order, double tolerance = 0.001)
 {
-	var xData = dataPoints.Select(item => item.amplitude).ToArray();
+	var xData = dataPoints.Select(item => item.raw).ToArray();
 	var yData = dataPoints.Select(item => item.dB).ToArray();
 
 	var weight = Enumerable.Repeat(1d, xData.Length).ToArray();
@@ -320,10 +327,10 @@ void PolynomialWeightedAll_raw_to_db((double dB, double amplitude)[] dataPoints,
 	}
 }
 
-void PolynomialFitAll_db_to_raw((double dB, double amplitude)[] dataPoints, int order, double tolerance = 0.001)
+void PolynomialFitAll_db_to_raw((double dB, double raw)[] dataPoints, int order, double tolerance = 0.001)
 {
 	var xData = dataPoints.Select(item => item.dB).ToArray();
-	var yData = dataPoints.Select(item => item.amplitude).ToArray();
+	var yData = dataPoints.Select(item => item.raw).ToArray();
 
 	var coefficients = Fit.Polynomial(xData, yData, order);
 
@@ -344,9 +351,9 @@ void PolynomialFitAll_db_to_raw((double dB, double amplitude)[] dataPoints, int 
 }
 
 
-void PolynomialFitAll_raw_to_db((double dB, double amplitude)[] dataPoints, int order, double tolerance = 0.001)
+void PolynomialFitAll_raw_to_db((double dB, double raw)[] dataPoints, int order, double tolerance = 0.001)
 {
-	var xData = dataPoints.Select(item => item.amplitude).ToArray();
+	var xData = dataPoints.Select(item => item.raw).ToArray();
 	var yData = dataPoints.Select(item => item.dB).ToArray();
 
 	var coefficients = Fit.Polynomial(xData, yData, order);

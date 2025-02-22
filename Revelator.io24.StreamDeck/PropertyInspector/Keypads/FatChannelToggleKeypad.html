@@ -8,15 +8,26 @@
     <script src="https://cdn.jsdelivr.net/gh/barraider/streamdeck-easypi-v2@latest/src/sdtools.common.js"></script>
 </head>
 <body>
-    <div class="sdpi-item" id="select_single">
-        <div class="sdpi-item-label">Microphone</div>
-        <select id="routeValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
-            <option value="Left">Mic L [io24, io44]</option>
-            <option value="Right">Mic R [io24]</option>
-            <option value="Right">Headset Mic [io44]</option>
-            <option value="Channel3">Line In [io44]</option>
-        </select>
-    </div>
+<div class="sdpi-item" id="select_single">
+    <div class="sdpi-item-label">Microphone</div>
+    <select id="routeValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
+        <option value="Left">Mic L [io24, io44]</option>
+        <option value="Right">Mic R [io24]</option>
+        <option value="Right">Headset Mic [io44]</option>
+        <option value="Channel3">Line In [io44]</option>
+    </select>
+</div>
+
+    <!--
+    Fat Channel:
+    - HPF
+    - Gate
+    - Comp
+    - EQ
+    - Limiter
+    - Voice
+    -->
+
     <div class="sdpi-item" id="select_single">
         <div class="sdpi-item-label">State</div>
         <select id="actionValue" class="sdpi-item-value select sdProperty" onchange="setSettings()">
@@ -25,5 +36,7 @@
             <option value="Off">Off</option>
         </select>
     </div>
+
+    <!--  -->
 </body>
 </html>
