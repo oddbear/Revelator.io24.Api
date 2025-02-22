@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
 
     <link rel="stylesheet" href="../Tooltip.css">
-    <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
+    <script src="../sdpi-components.js"></script>
 </head>
 <body>
-
+    <!-- Rename to Mix Config? and add Routing icon instead. -->
     <sdpi-item label="Mix">
         <sdpi-select setting="mixOut"
                      placeholder="Please choose an Output">
@@ -28,10 +28,15 @@
             <option value="Playback">Playback [io24, io44]</option>
             <option value="Virtual_A">Virtual A [io24, io44]</option>
             <option value="Virtual_B">Virtual B [io24, io44]</option>
+            <!-- Reverb optgroup? -->
             <option value="Reverb">Reverb [io24, io44]</option>
-            <option value="Mix">Mix [io24, io44]</option>
+            <!-- Move to Output Setup? -->
+            <option value="Mix">Output Mix [io24, io44]</option>
         </sdpi-select>
     </sdpi-item>
+
+    <!-- Set Headphone source here? -->
+    <!-- What about reverb, add more there? HPF (Hz), Size %, Pre Del (ms) -->
 
     <sdpi-item label="Action" style="display:none;">
         <sdpi-select setting="action"

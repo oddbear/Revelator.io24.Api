@@ -36,18 +36,13 @@ namespace Revelator.io24.Api
             return IsRouted(routes.route, value);
         }
 
-        private bool IsRouted(string route, float value)
-            => route.EndsWith("mute")
-                ? (value < 0.5f)
-                : (value > 0.5f);
-
         public void SetRouting(Input input, MixOut mixOut, Value value)
         {
             if (!_routes.TryGetValue((input, mixOut), out var routes))
                 return;
 
-            var on = 1.0f;
-            var off = 0.0f;
+            var on = GetOnState(routes.route);
+            var off = GetOffState(routes.route);
 
             switch (value)
             {
@@ -63,6 +58,26 @@ namespace Revelator.io24.Api
                     break;
             }
         }
+
+        // Routes can either be off type assign_ or mute,
+        // ex. "return/ch1/assign_aux1" vs "return/ch1/mute"
+        private bool IsRouted(string route, float value)
+            => route.EndsWith("mute")
+                // If mute type 0 if unmuted (green), and 1 is muted (red).
+                // So to get this converted to assigned, we need to invert it.
+                ? value < 0.5f
+                // If assign type 1 is assigned (green) and 0 is unassigned (red).
+                : value > 0.5f;
+
+        private float GetOnState(string route)
+            => route.EndsWith("mute")
+                ? 0.0f // unmuted
+                : 1.0f; // assigned
+
+        private float GetOffState(string route)
+            => route.EndsWith("mute")
+                ? 1.0f // muted
+                : 0.0f; // unassigned
 
         public bool GetSoloMono(Input input, MixOut mixOut)
         {
