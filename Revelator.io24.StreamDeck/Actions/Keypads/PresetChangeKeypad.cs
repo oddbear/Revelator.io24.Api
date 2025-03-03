@@ -9,7 +9,7 @@ using System.Diagnostics;
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
 [PluginActionId("com.oddbear.revelator.io24.keypad.preset-change")]
-public class PresetChangeKeypad : KeypadSharedBase<PresetChangeSettings>
+public class PresetChangeKeypad : KeypadSharedBaseOld<PresetChangeSettings>
 {
     public PresetChangeKeypad(
         ISDConnection connection,
@@ -45,7 +45,7 @@ public class PresetChangeKeypad : KeypadSharedBase<PresetChangeSettings>
         try
         {
             // Channel3 does not have presets:
-            if (sender is Channel3)
+            if (sender is LineIn)
                 return;
 
             switch (e.PropertyName)

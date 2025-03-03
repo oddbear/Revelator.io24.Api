@@ -23,77 +23,13 @@
       ]
     },
     {
-      "Name": "Route Change",
-      "UUID": "com.oddbear.revelator.io24.keypad.route-change",
-      "Icon": "Images/Icons/routing",
-      "Tooltip": "A route changing action",
-      "PropertyInspectorPath": "PropertyInspector/Keypads/RouteChangeKeypad.html",
+      "Name": "Input / Microphone Settings",
+      "UUID": "com.oddbear.revelator.io24.keypad.microphone",
+      "PropertyInspectorPath": "PropertyInspector/Keypads/MicrophoneKeypad.html",
+      "Icon": "Images/Icons/Icon",
       "States": [
         {
-          "Image": "Images/Plugin/routing_on",
-          "Title": "Route On",
-          "TitleAlignment": "bottom"
-        },
-        {
-          "Image": "Images/Plugin/routing_off",
-          "Title": "Route Off",
-          "TitleAlignment": "bottom"
-        }
-      ]
-    },
-    {
-      "Name": "Headphone source",
-      "UUID": "com.oddbear.revelator.io24.keypad.headphone-source",
-      "Icon": "Images/Icons/headphones",
-      "Tooltip": "A headphones source set action",
-      "PropertyInspectorPath": "PropertyInspector/Keypads/HeadphonesSourceKeypad.html",
-      "States": [
-        {
-          "Image": "Images/Plugin/headphones_on",
-          "Title": "Headphones On",
-          "TitleAlignment": "bottom"
-        },
-        {
-          "Image": "Images/Plugin/headphones_off",
-          "Title": "Headphones Off",
-          "TitleAlignment": "bottom"
-        }
-      ]
-    },
-    {
-      "Name": "Fat Channel Toggle",
-      "UUID": "com.oddbear.revelator.io24.keypad.fatchannel-toggle",
-      "Icon": "Images/Icons/fat",
-      "Tooltip": "A Fat Channel toggle action",
-      "PropertyInspectorPath": "PropertyInspector/Keypads/FatChannelToggleKeypad.html",
-      "States": [
-        {
-          "Image": "Images/Plugin/fat_on",
-          "Title": "Fat On",
-          "TitleAlignment": "bottom"
-        },
-        {
-          "Image": "Images/Plugin/fat_off",
-          "Title": "Fat Off",
-          "TitleAlignment": "bottom"
-        }
-      ]
-    },
-    {
-      "Name": "Preset change",
-      "UUID": "com.oddbear.revelator.io24.keypad.preset-change",
-      "Icon": "Images/Icons/presets",
-      "Tooltip": "A preset change action",
-      "PropertyInspectorPath": "PropertyInspector/Keypads/PresetChangeKeypad.html",
-      "States": [
-        {
-          "Image": "Images/Plugin/preset_on",
-          "Title": "Preset On",
-          "TitleAlignment": "bottom"
-        },
-        {
-          "Image": "Images/Plugin/preset_off",
-          "Title": "Preset Off",
+          "Image": "Images/Plugin/mic_l_on",
           "TitleAlignment": "bottom"
         }
       ]

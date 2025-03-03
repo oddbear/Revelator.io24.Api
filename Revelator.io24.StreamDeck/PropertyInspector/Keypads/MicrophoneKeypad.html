@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" href="../Tooltip.css">
+    <script src="../sdpi-components.js"></script>
+</head>
+<body>
+
+    <sdpi-item label="Input">
+        <sdpi-select setting="input"
+                     placeholder="Please choose microphone or an input">
+            <option value="microphone">Microphone [usb]</option>
+            <option value="left">Mic L [io24, io44]</option>
+            <option value="right">Mic R [io24]</option>
+            <option value="headsetMic">Headset Mic [io44]</option>
+            <option value="channel3">Line In [io44]</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <sdpi-item label="Action" style="display:none;">
+        <sdpi-select setting="action"
+                     placeholder="Please choose an Action">
+            <option value="fatChannel">Toggle Fat Channel [io24, io44, usb]</option>
+            <option value="hotkey">Toggle Hot Key [io24, io44, usb]</option>
+            <option value="preset1">Select Preset 1 [io24, io44]</option>
+            <option value="preset2">Select Preset 2 [io24, io44]</option>
+            <option value="preset3">Select Preset 3 [usb]</option>
+            <option value="preset4">Select Preset 4 [usb]</option>
+            <option value="profileHotKey">Set Hoy Key [io24, io44, usb]</option>
+            <option value="profilePreset1">Set Preset1 [io24, io44, usb]</option>
+            <option value="profilePreset2">Set Preset2 [io24, io44, usb]</option>
+            <option value="profilePreset3">Set Preset3 [usb]</option>
+            <option value="profilePreset4">Set Preset4 [usb]</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <!-- can be 8 + 6 (io44) or 8 + 8 (usb), also it is possible to set on HOT KEY -->
+    <sdpi-item label="Profile" style="display:none;">
+        <sdpi-select setting="profile"
+                     placeholder="Please choose an Profile">
+            <option value="broadcast">Broadcast</option>
+            <option value="vocal">Vocal</option>
+            <option value="acousticGuitar">Acoustic Guitar</option>
+            <option value="electricGuitar">Electric Guitar</option>
+            <option value="vintageChannel">Vintage Channel</option>
+            <option value="slapEcho">Slap Echo</option>
+            <option value="detunedVocal">Detuned Vocal</option>
+            <option value="robot">Robot</option>
+            <option value="custom1">Custom 1</option>
+            <option value="custom2">Custom 2</option>
+            <option value="custom3">Custom 3</option>
+            <option value="custom4">Custom 4</option>
+            <option value="custom5">Custom 5</option>
+            <option value="custom6">Custom 6</option>
+            <option value="custom7">Custom 7</option>
+            <option value="custom8">Custom 8</option>
+        </sdpi-select>
+    </sdpi-item>
+
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="../Tooltip.js"></script>
+    <script src="MicrophoneKeypad.js"></script>
+</body>
+</html>

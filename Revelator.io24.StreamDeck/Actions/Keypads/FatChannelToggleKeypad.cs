@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
 [PluginActionId("com.oddbear.revelator.io24.keypad.fatchannel-toggle")]
-public class FatChannelToggleKeypad : KeypadSharedBase<FatChannelToggleSettings>
+public class FatChannelToggleKeypad : KeypadSharedBaseOld<FatChannelToggleSettings>
 {
     public FatChannelToggleKeypad(
         ISDConnection connection,
@@ -53,7 +53,7 @@ public class FatChannelToggleKeypad : KeypadSharedBase<FatChannelToggleSettings>
             {
                 case MicrohoneLeft when _settings.Channel == MicrophoneChannel.Left:
                 case MicrohoneRight when _settings.Channel == MicrophoneChannel.Right:
-                case Channel3 when _settings.Channel == MicrophoneChannel.Channel3:
+                case LineIn when _settings.Channel == MicrophoneChannel.Channel3:
                     await RefreshState();
                     return;
             }
@@ -80,6 +80,6 @@ public class FatChannelToggleKeypad : KeypadSharedBase<FatChannelToggleSettings>
         {
             MicrophoneChannel.Left => _device.MicrohoneLeft,
             MicrophoneChannel.Right => _device.MicrohoneRight,
-            _ => _device.Channel3
+            _ => _device.LineIn
         };
 }

@@ -50,20 +50,7 @@ public abstract class EncoderSharedBase<TSettings> : EncoderBase, IKeypadPlugin
     {
         // We don't have global settings.
     }
-
-    protected async Task SetFeedbackAsync(FeedbackCard feedbackCard)
-    {
-        var dkv = new Dictionary<string, string>
-        {
-            // Volume Title in percentage:
-            ["value"] = feedbackCard.Value,
-            // Volume bar in percentage 0-100:
-            ["indicator"] = feedbackCard.Indicator.ToString(CultureInfo.InvariantCulture)
-        };
-
-        await Connection.SetFeedbackAsync(dkv);
-    }
-
+    
     public abstract void KeyPressed(KeyPayload payload);
 
     public void KeyReleased(KeyPayload payload)
@@ -71,10 +58,4 @@ public abstract class EncoderSharedBase<TSettings> : EncoderBase, IKeypadPlugin
         // We only react on key press, but we need to refresh the state because of the automatic UI change by Elgato.
         RefreshState();
     }
-}
-
-public class FeedbackCard
-{
-    public required string Value { get; init; }
-    public required float Indicator { get; init; }
 }

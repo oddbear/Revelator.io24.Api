@@ -13,6 +13,7 @@ export default {
 		}
 	},
 	files: ["**/*.js"],
+	ignores: ["sdpi-components.js"],
 	rules: {
 		semi: "error",
 		"prefer-const": "error",
