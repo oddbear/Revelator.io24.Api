@@ -148,6 +148,24 @@ namespace Revelator.io24.Api.Models
             _rawService.SetValue(route, floatValue);
         }
 
+        protected int GetInteger([CallerMemberName] string propertyName = "")
+        {
+            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+                return default;
+
+            var value = _rawService.GetValue(route);
+            return (int)value;
+        }
+
+        protected void SetInteger(int value, [CallerMemberName] string propertyName = "")
+        {
+            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+                return;
+
+            var floatValue = (float)value;
+            _rawService.SetValue(route, floatValue);
+        }
+
         protected bool GetBoolean([CallerMemberName] string propertyName = "")
         {
             if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))

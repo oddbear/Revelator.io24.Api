@@ -4,9 +4,9 @@ namespace Revelator.io24.Api.Models.Inputs
 {
     // TODO: Need to restructure this to be better with io44
     [RoutePrefix("line/ch3")]
-    public class Channel3 : LineChannel
+    public class LineIn : LineChannel
     {
-        public Channel3(RawService rawService)
+        public LineIn(RawService rawService)
             : base(rawService)
         {
             //

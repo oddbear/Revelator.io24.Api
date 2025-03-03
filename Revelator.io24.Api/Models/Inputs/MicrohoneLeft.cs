@@ -18,5 +18,19 @@ namespace Revelator.io24.Api.Models.Inputs
             get => GetBoolean();
             set => SetBoolean(value);
         }
+
+        [RouteValue("presetHotKey")]
+        public bool HotKey
+        {
+            get => GetBoolean();
+            set => SetBoolean(value);
+        }
+
+        [RouteValue("activePresetSlotIndex")]
+        public int ActivePreset
+        {
+            get => GetInteger();
+            set => SetInteger(value);
+        }
     }
 }

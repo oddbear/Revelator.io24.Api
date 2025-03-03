@@ -6,7 +6,7 @@ using System.Diagnostics;
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
 [PluginActionId("com.oddbear.revelator.io24.keypad.microphone-hardware-mute")]
-public class MicrophoneHardwareMuteKeypad : KeypadSharedBase<object>
+public class MicrophoneHardwareMuteKeypad : KeypadSharedBaseOld<object>
 {
     public MicrophoneHardwareMuteKeypad(
         ISDConnection connection,

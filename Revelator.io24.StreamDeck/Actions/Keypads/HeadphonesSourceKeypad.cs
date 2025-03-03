@@ -7,7 +7,7 @@ using System.Diagnostics;
 namespace Revelator.io24.StreamDeck.Actions.Keypads;
 
 [PluginActionId("com.oddbear.revelator.io24.keypad.headphone-source")]
-public class HeadphonesSourceKeypad : KeypadSharedBase<HeadphonesSourceSettings>
+public class HeadphonesSourceKeypad : KeypadSharedBaseOld<HeadphonesSourceSettings>
 {
     public HeadphonesSourceKeypad(
         ISDConnection connection,

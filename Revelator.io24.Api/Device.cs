@@ -10,11 +10,19 @@ namespace Revelator.io24.Api
 
         public Global Global { get; }
 
+        // [usb]
+        //public MicrohoneUsb MicrohoneUsb { get; }
+
+        // [io24, io44]
         public MicrohoneLeft MicrohoneLeft { get; }
+
+        // [io24]
         public MicrohoneRight MicrohoneRight { get; }
 
-        // TODO: Need to find a better way to structure this for io44 (Line In):
-        public Channel3 Channel3 { get; }
+        // TODO: Headsetmic [io44]
+
+        // [io44]
+        public LineIn LineIn { get; }
 
         public Playback Playback { get; }
         public VirtualA VirtualA { get; }
@@ -34,7 +42,7 @@ namespace Revelator.io24.Api
 
             MicrohoneLeft = new MicrohoneLeft(rawService);
             MicrohoneRight = new MicrohoneRight(rawService);
-            Channel3 = new Channel3(rawService);
+            LineIn = new LineIn(rawService);
 
             Playback = new Playback(rawService);
             VirtualA = new VirtualA(rawService);
