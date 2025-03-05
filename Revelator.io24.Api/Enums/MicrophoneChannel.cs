@@ -1,9 +1,8 @@
-﻿namespace Revelator.io24.Api.Enums
+﻿namespace Revelator.io24.Api.Enums;
+
+public enum MicrophoneChannel
 {
-    public enum MicrophoneChannel
-    {
-        Left,
-        Right,
-        Channel3
-    }
+    Left,
+    Right,
+    Channel3
 }

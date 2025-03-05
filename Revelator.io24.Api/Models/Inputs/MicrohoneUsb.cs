@@ -6,14 +6,17 @@ namespace Revelator.io24.Api.Models.Inputs;
 // Phantom Power
 // Preset 1
 // Preset 2
+// Preset 3
+// Preset 4
 // Gain
 // Reverb
+// 8 custom profiles
 [RoutePrefix("line/ch1")]
-public class MicrohoneLeft : MicrophoneChannel
+public class MicrohoneUsb : MicrophoneChannel
 {
-    protected override float GetPresetLength() => 14;
+    protected override float GetPresetLength() => 16;
 
-    public MicrohoneLeft(RawService rawService)
+    public MicrohoneUsb(RawService rawService)
         : base(rawService)
     {
         //
@@ -34,10 +37,18 @@ public class MicrohoneLeft : MicrophoneChannel
         set => SetBoolean(value);
     }
 
-    [RouteValue("48v")]
-    public bool PhantomPower
+    // TODO: Is this range of 0, 1, 2, 3 or 0, 0.25, 0.5, 0.75, 1?
+    [RouteValue("activePresetSlotIndex")]
+    public bool SelectPreset3
     {
-        get => GetBoolean();
-        set => SetBoolean(value);
+        get => GetInteger() == 2;
+        set => SelectPreset(value, 2);
+    }
+
+    [RouteValue("activePresetSlotIndex")]
+    public bool SelectPreset4
+    {
+        get => GetInteger() == 3;
+        set => SelectPreset(value, 3);
     }
 }

@@ -3,38 +3,37 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Revelator.io24.Wpf
+namespace Revelator.io24.Wpf;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public MainWindow(MainViewModel viewModel)
     {
-        public MainWindow(MainViewModel viewModel)
-        {
-            DataContext = viewModel;
+        DataContext = viewModel;
 
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
 
-            Application.Current.Shutdown();
+        Application.Current.Shutdown();
 #if DEBUG
-            Environment.Exit(0);
+        Environment.Exit(0);
 #endif
-        }
+    }
 
-        private void TextBox_KeyUp(object sender, KeyEventArgs e)
+    private void TextBox_KeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && sender is TextBox textBox)
         {
-            if (e.Key == Key.Enter && sender is TextBox textBox)
-            {
-                textBox
-                    .GetBindingExpression(TextBox.TextProperty)
-                    .UpdateSource();
-            }
+            textBox
+                .GetBindingExpression(TextBox.TextProperty)
+                .UpdateSource();
         }
     }
 }

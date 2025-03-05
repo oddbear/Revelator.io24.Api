@@ -18,12 +18,7 @@ public enum ActionType
     SelectPreset4,
     [EnumMember(Value = "profileHotKey")]
     ProfileHotKey,
-    [EnumMember(Value = "profilePreset1")]
-    ProfilePreset1,
-    [EnumMember(Value = "profilePreset2")]
-    ProfilePreset2,
-    [EnumMember(Value = "profilePreset3")]
-    ProfilePreset3,
-    [EnumMember(Value = "profilePreset4")]
-    ProfilePreset4
+    /// <summary>It is only possible to set the profile on the selected/active preset</summary>
+    [EnumMember(Value = "profilePreset")]
+    ProfilePreset
 }

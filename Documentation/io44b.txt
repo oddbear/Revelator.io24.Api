@@ -1,0 +1,77 @@
+-		_string	Count = 75	System.Collections.Generic.Dictionary<string, string>
++		[0]	{[line/ch1/chnum, Mic]}	System.Collections.Generic.KeyValuePair<string, string>
++		[1]	{[line/ch1/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[2]	{[line/ch1/username, Mic/inst In]}	System.Collections.Generic.KeyValuePair<string, string>
++		[3]	{[line/ch1/preset_name, Ethos]}	System.Collections.Generic.KeyValuePair<string, string>
++		[4]	{[line/ch1/presetHotKeyTitle, Slap Echo]}	System.Collections.Generic.KeyValuePair<string, string>
++		[5]	{[line/ch1/presetSlotTitle1, Ethos]}	System.Collections.Generic.KeyValuePair<string, string>
++		[6]	{[line/ch1/presetSlotTitle2, Vocal]}	System.Collections.Generic.KeyValuePair<string, string>
++		[7]	{[line/ch1/presetSlotTitle3, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[8]	{[line/ch1/presetSlotTitle4, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[9]	{[line/ch1/preampgain/units, gain.0]}	System.Collections.Generic.KeyValuePair<string, string>
++		[10]	{[line/ch1/preampgain/curve, linear]}	System.Collections.Generic.KeyValuePair<string, string>
++		[11]	{[line/ch1/comp/classId, {870D04F7-212E-4F9C-ADBB-39A97216433F}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[12]	{[line/ch1/eq/classId, {A0A8A068-14F0-4B04-BB6F-AF8329D0E8EE}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[13]	{[line/ch1/voicefx/classId, {98A527BA-2D6E-4B35-BB26-251EC081A067}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[14]	{[line/ch1/cache/cacheTitle1, Ethos]}	System.Collections.Generic.KeyValuePair<string, string>
++		[15]	{[line/ch1/cache/cacheTitle2, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[16]	{[line/ch2/chnum, Mic]}	System.Collections.Generic.KeyValuePair<string, string>
++		[17]	{[line/ch2/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[18]	{[line/ch2/username, Headset Mic]}	System.Collections.Generic.KeyValuePair<string, string>
++		[19]	{[line/ch2/preset_name, Broadcast HS]}	System.Collections.Generic.KeyValuePair<string, string>
++		[20]	{[line/ch2/presetHotKeyTitle, Slap Echo]}	System.Collections.Generic.KeyValuePair<string, string>
++		[21]	{[line/ch2/presetSlotTitle1, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[22]	{[line/ch2/presetSlotTitle2, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[23]	{[line/ch2/presetSlotTitle3, Broadcast HS]}	System.Collections.Generic.KeyValuePair<string, string>
++		[24]	{[line/ch2/presetSlotTitle4, Vintage Channel]}	System.Collections.Generic.KeyValuePair<string, string>
++		[25]	{[line/ch2/preampgain/units, gain.0]}	System.Collections.Generic.KeyValuePair<string, string>
++		[26]	{[line/ch2/preampgain/curve, linear]}	System.Collections.Generic.KeyValuePair<string, string>
++		[27]	{[line/ch2/comp/classId, {1F831EC1-B8AC-4EE9-AD53-54227AF53D58}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[28]	{[line/ch2/eq/classId, {A0A8A068-14F0-4B04-BB6F-AF8329D0E8EE}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[29]	{[line/ch2/voicefx/classId, {00000000-0000-0000-0000-000000000000}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[30]	{[line/ch2/cache/cacheTitle1, Broadcast HS]}	System.Collections.Generic.KeyValuePair<string, string>
++		[31]	{[line/ch2/cache/cacheTitle2, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[32]	{[line/ch3/chnum, Mic]}	System.Collections.Generic.KeyValuePair<string, string>
++		[33]	{[line/ch3/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[34]	{[line/ch3/username, Line In]}	System.Collections.Generic.KeyValuePair<string, string>
++		[35]	{[line/ch3/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[36]	{[line/ch3/presetHotKeyTitle, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[37]	{[line/ch3/presetSlotTitle1, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[38]	{[line/ch3/presetSlotTitle2, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[39]	{[line/ch3/presetSlotTitle3, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[40]	{[line/ch3/presetSlotTitle4, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[41]	{[line/ch3/preampgain/units, gain.0]}	System.Collections.Generic.KeyValuePair<string, string>
++		[42]	{[line/ch3/preampgain/curve, linear]}	System.Collections.Generic.KeyValuePair<string, string>
++		[43]	{[line/ch3/comp/classId, {870D04F7-212E-4F9C-ADBB-39A97216433F}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[44]	{[line/ch3/eq/classId, {A0A8A068-14F0-4B04-BB6F-AF8329D0E8EE}]}	System.Collections.Generic.KeyValuePair<string, string>
++		[45]	{[line/ch3/cache/cacheTitle1, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[46]	{[line/ch3/cache/cacheTitle2, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[47]	{[return/ch1/chnum, Playback]}	System.Collections.Generic.KeyValuePair<string, string>
++		[48]	{[return/ch1/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[49]	{[return/ch1/username, Playback]}	System.Collections.Generic.KeyValuePair<string, string>
++		[50]	{[return/ch1/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[51]	{[return/ch2/chnum, Virtual A]}	System.Collections.Generic.KeyValuePair<string, string>
++		[52]	{[return/ch2/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[53]	{[return/ch2/username, Virtual A]}	System.Collections.Generic.KeyValuePair<string, string>
++		[54]	{[return/ch2/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[55]	{[return/ch3/chnum, Virtual B]}	System.Collections.Generic.KeyValuePair<string, string>
++		[56]	{[return/ch3/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[57]	{[return/ch3/username, Virtual B]}	System.Collections.Generic.KeyValuePair<string, string>
++		[58]	{[return/ch3/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[59]	{[fxreturn/ch1/chnum, Reverb]}	System.Collections.Generic.KeyValuePair<string, string>
++		[60]	{[fxreturn/ch1/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[61]	{[fxreturn/ch1/username, Reverb]}	System.Collections.Generic.KeyValuePair<string, string>
++		[62]	{[fxreturn/ch1/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[63]	{[aux/ch1/chnum, USB 1/2]}	System.Collections.Generic.KeyValuePair<string, string>
++		[64]	{[aux/ch1/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[65]	{[aux/ch1/username, Stream Mix A]}	System.Collections.Generic.KeyValuePair<string, string>
++		[66]	{[aux/ch1/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[67]	{[aux/ch2/chnum, USB 3/4]}	System.Collections.Generic.KeyValuePair<string, string>
++		[68]	{[aux/ch2/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[69]	{[aux/ch2/username, Stream Mix B]}	System.Collections.Generic.KeyValuePair<string, string>
++		[70]	{[aux/ch2/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		[71]	{[main/ch1/chnum, Main]}	System.Collections.Generic.KeyValuePair<string, string>
++		[72]	{[main/ch1/name, ]}	System.Collections.Generic.KeyValuePair<string, string>
++		[73]	{[main/ch1/username, Main]}	System.Collections.Generic.KeyValuePair<string, string>
++		[74]	{[main/ch1/preset_name, Default]}	System.Collections.Generic.KeyValuePair<string, string>
++		Raw View		

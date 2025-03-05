@@ -1,6 +1,8 @@
 ﻿using BarRaider.SdTools;
 using Revelator.io24.Api;
+using Revelator.io24.Api.Models.Inputs;
 using Revelator.io24.StreamDeck.Actions.Keypads.Microphone.Enums;
+
 namespace Revelator.io24.StreamDeck.Actions.Keypads.Microphone;
 
 [PluginActionId("com.oddbear.revelator.io24.keypad.microphone")]
@@ -32,51 +34,101 @@ public class MicrophoneKeypad : KeypadSharedBase
         if (!ValidKeyPad(out var input, out var action, out var profile))
             return Task.CompletedTask;
 
-        // TODO: ... add all actions:
-        if (action == ActionType.FatChannel)
+        switch (input)
         {
-            switch (input)
-            {
-                case InputType.Microphone:
-                case InputType.Left:
-                    _device.MicrohoneLeft.BypassDSP = !_device.MicrohoneLeft.BypassDSP;
-                    return Task.CompletedTask;
-                case InputType.Right:
-                case InputType.HeadsetMic:
-                    _device.MicrohoneRight.BypassDSP = !_device.MicrohoneRight.BypassDSP;
-                    return Task.CompletedTask;
-                case InputType.Channel3:
-                    _device.LineIn.BypassDSP = !_device.LineIn.BypassDSP;
-                    return Task.CompletedTask;
-            }
+            case InputType.MicrophoneUsb:
+                IsUsbMicrophone(_device.MicrohoneUsb, action, profile);
+                break;
+
+            case InputType.Left:
+                IsMicrophoneLeft(_device.MicrohoneLeft, action, profile);
+                break;
+
+            case InputType.Right:
+                IsMicrophoneRight(_device.MicrohoneRight, action, profile);
+                break;
+
+            case InputType.HeadsetMic:
+                IsMicrophone(_device.HeadsetMic, action, profile);
+                break;
+
+            case InputType.LineIn:
+                IsLineIn(_device.LineIn, action);
+                break;
         }
-
-        if (action == ActionType.PressHotkey)
-        {
-            _device.MicrohoneLeft.HotKey = !_device.MicrohoneLeft.HotKey;
-        }
-
-        if (action == ActionType.SelectPreset1)
-        {
-            _device.MicrohoneLeft.ActivePreset = 0;
-        }
-
-        if (action == ActionType.SelectPreset2)
-        {
-            _device.MicrohoneLeft.ActivePreset = 1;
-        }
-
-        //if (action == ActionType.SelectPreset3)
-        //{
-        //    _device.MicrohoneLeft.HotKey = !_device.MicrohoneLeft.HotKey;
-        //}
-
-        //if (action == ActionType.SelectPreset3)
-        //{
-        //    _device.MicrohoneLeft.HotKey = !_device.MicrohoneLeft.HotKey;
-        //}
 
         return Task.CompletedTask;
+    }
+
+    private void IsUsbMicrophone(MicrohoneUsb channel, ActionType action, ProfileType profile)
+    {
+        switch (action)
+        {
+            case ActionType.PressHotkey:
+                channel.HotKey = !channel.HotKey;
+                return;
+            case ActionType.SelectPreset3:
+                channel.SelectPreset3 = true;
+                return;
+            case ActionType.SelectPreset4:
+                channel.SelectPreset4 = true;
+                return;
+            // TODO: Profile 3 + 4
+        }
+        IsMicrophone(channel, action, profile);
+    }
+
+    private void IsMicrophoneLeft(MicrohoneLeft channel, ActionType action, ProfileType profile)
+    {
+        switch (action)
+        {
+            case ActionType.PressHotkey:
+                channel.HotKey = !channel.HotKey;
+                return;
+            // Phantom Power?
+        }
+
+        IsMicrophone(channel, action, profile);
+    }
+
+    private void IsMicrophoneRight(MicrohoneRight channel, ActionType action, ProfileType profile)
+    {
+        // Phantom Power?
+        IsMicrophone(channel, action, profile);
+    }
+
+    private void IsMicrophone(MicrophoneChannel channel, ActionType action, ProfileType profile)
+    {
+        switch (action)
+        {
+            case ActionType.SelectPreset1:
+                channel.SelectPreset1 = true;
+                return;
+            case ActionType.SelectPreset2:
+                channel.SelectPreset2 = true;
+                return;
+            case ActionType.ProfilePreset:
+                channel.SetPresetByIndex((int)profile);
+                return;
+        }
+
+        IsLineChannel(channel, action);
+    }
+
+    private void IsLineIn(LineIn channel, ActionType action)
+    {
+        // Trim?
+        IsLineChannel(channel, action);
+    }
+
+    private void IsLineChannel(LineChannel channel, ActionType action)
+    {
+        switch (action)
+        {
+            case ActionType.FatChannel:
+                channel.BypassDSP = !channel.BypassDSP;
+                return;
+        }
     }
 
     private bool ValidKeyPad(out InputType input, out ActionType action, out ProfileType profile)
@@ -91,7 +143,7 @@ public class MicrophoneKeypad : KeypadSharedBase
         if (_settings.Action is null)
             return false;
 
-        if (_settings.Input is not InputType.Microphone)
+        if (_settings.Input is not InputType.MicrophoneUsb)
         {
             // If it's not a USB Microphone, these values are not allowed:
             // A USB Mic has 8 fixed profiles, and 8 custom ones.
@@ -99,15 +151,14 @@ public class MicrophoneKeypad : KeypadSharedBase
             if (_settings.Action
                 is ActionType.SelectPreset3
                 or ActionType.SelectPreset4
-                or ActionType.ProfilePreset3
-                or ActionType.ProfilePreset4)
+                or ActionType.ProfilePreset)
                 return false;
         }
 
         if (_settings.Input
             is InputType.Right
             or InputType.HeadsetMic
-            or InputType.Channel3)
+            or InputType.LineIn)
         {
             if (_settings.Action is ActionType.PressHotkey)
                 return false;
@@ -115,10 +166,7 @@ public class MicrophoneKeypad : KeypadSharedBase
 
         if (_settings.Action
             is ActionType.ProfileHotKey
-            or ActionType.ProfilePreset1
-            or ActionType.ProfilePreset2
-            or ActionType.ProfilePreset3
-            or ActionType.ProfilePreset4)
+            or ActionType.ProfilePreset)
         {
             if (_settings.Profile is null)
                 return false;

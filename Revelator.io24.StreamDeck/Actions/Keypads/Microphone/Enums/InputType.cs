@@ -5,7 +5,7 @@ namespace Revelator.io24.StreamDeck.Actions.Keypads.Microphone.Enums;
 public enum InputType
 {
     [EnumMember(Value = "microphone")]
-    Microphone,
+    MicrophoneUsb,
     [EnumMember(Value = "left")]
     Left,
     [EnumMember(Value = "right")]
@@ -13,5 +13,5 @@ public enum InputType
     [EnumMember(Value = "headsetMic")]
     HeadsetMic,
     [EnumMember(Value = "channel3")]
-    Channel3,
+    LineIn,
 }

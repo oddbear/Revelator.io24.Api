@@ -1,7 +1,6 @@
 ﻿using BarRaider.SdTools;
 using BarRaider.SdTools.Payloads;
 using Revelator.io24.Api;
-using System.Globalization;
 using Revelator.io24.StreamDeck.Actions.Enums;
 
 namespace Revelator.io24.StreamDeck.Actions;

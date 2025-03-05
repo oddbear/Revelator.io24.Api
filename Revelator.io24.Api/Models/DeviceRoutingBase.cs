@@ -6,191 +6,190 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace Revelator.io24.Api.Models
+namespace Revelator.io24.Api.Models;
+
+public abstract class DeviceRoutingBase
 {
-    public abstract class DeviceRoutingBase
+    private readonly RawService _rawService;
+
+    private readonly Dictionary<string, string> _propertyValueNameRoute = new();
+    private readonly Dictionary<string, string> _propertyStringNameRoute = new();
+    private readonly Dictionary<string, string> _propertyStringsNameRoute = new();
+
+    public DeviceRoutingBase(RawService rawService)
     {
-        private readonly RawService _rawService;
+        _rawService = rawService;
+        _rawService.Syncronized += Syncronized;
+        _rawService.ValueStateUpdated += ValueStateUpdated;
+        _rawService.StringStateUpdated += StringStateUpdated;
+        _rawService.StringsStateUpdated += StringsStateUpdated;
 
-        private readonly Dictionary<string, string> _propertyValueNameRoute = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _propertyStringNameRoute = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _propertyStringsNameRoute = new Dictionary<string, string>();
+        InitMapRoutes();
+    }
 
-        public DeviceRoutingBase(RawService rawService)
+    protected abstract void OnPropertyChanged(PropertyChangedEventArgs eventArgs);
+
+    //TODO: Add GetStringRoute and GetStringsRoute? Could be refactored to be isolated away from each other.
+    public string GetValueRoute(string propertyName)
+        => _propertyValueNameRoute.TryGetValue(propertyName, out var route)
+            ? route
+            : default;
+
+    private void Syncronized()
+    {
+        var type = this.GetType();
+        var properties = type.GetProperties();
+        foreach (var property in properties)
         {
-            _rawService = rawService;
-            _rawService.Syncronized += Syncronized;
-            _rawService.ValueStateUpdated += ValueStateUpdated;
-            _rawService.StringStateUpdated += StringStateUpdated;
-            _rawService.StringsStateUpdated += StringsStateUpdated;
-
-            InitMapRoutes();
+            OnPropertyChanged(new PropertyChangedEventArgs(property.Name));
         }
+    }
 
-        protected abstract void OnPropertyChanged(PropertyChangedEventArgs eventArgs);
+    private void ValueStateUpdated(string route, float value)
+    {
+        var propertyName = _propertyValueNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
+        if (propertyName is null)
+            return;
 
-        //TODO: Add GetStringRoute and GetStringsRoute? Could be refactored to be isolated away from each other.
-        public string GetValueRoute(string propertyName)
-            => _propertyValueNameRoute.TryGetValue(propertyName, out var route)
-                ? route
-                : default;
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+    }
 
-        private void Syncronized()
+    private void StringStateUpdated(string route, string value)
+    {
+        var propertyName = _propertyStringNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
+        if (propertyName is null)
+            return;
+
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void StringsStateUpdated(string route, string[] value)
+    {
+        var propertyName = _propertyStringsNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
+        if (propertyName is null)
+            return;
+
+        OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void InitMapRoutes()
+    {
+        var type = this.GetType();
+        var routePrefix = type.GetCustomAttribute<RoutePrefixAttribute>();
+        if (routePrefix is null)
+            return;
+
+        var properties = type.GetProperties();
+        foreach (var property in properties)
         {
-            var type = this.GetType();
-            var properties = type.GetProperties();
-            foreach (var property in properties)
+            if (property is null)
+                continue;
+
+            var routeValue = property.GetCustomAttribute<RouteValueAttribute>();
+            if (routeValue != null)
             {
-                OnPropertyChanged(new PropertyChangedEventArgs(property.Name));
+                var route = $"{routePrefix.RoutePrefixName}/{routeValue.RouteValueName}";
+                _propertyValueNameRoute[property.Name] = route;
+                continue;
+            }
+
+            var routeString = property.GetCustomAttribute<RouteStringAttribute>();
+            if (routeString != null)
+            {
+                var route = $"{routePrefix.RoutePrefixName}/{routeString.RouteStringName}";
+                _propertyStringNameRoute[property.Name] = route;
+                continue;
+            }
+
+
+            var routeStrings = property.GetCustomAttribute<RouteStringsAttribute>();
+            if (routeStrings != null)
+            {
+                var route = $"{routePrefix.RoutePrefixName}/{routeStrings.RouteStringsName}";
+                _propertyStringsNameRoute[property.Name] = route;
+                continue;
             }
         }
+    }
 
-        private void ValueStateUpdated(string route, float value)
-        {
-            var propertyName = _propertyValueNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
-            if (propertyName is null)
-                return;
+    protected string[] GetStrings([CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyStringsNameRoute.TryGetValue(propertyName, out var route))
+            return Array.Empty<string>();
 
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
+        return _rawService.GetStrings(route);
+    }
 
-        private void StringStateUpdated(string route, string value)
-        {
-            var propertyName = _propertyStringNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
-            if (propertyName is null)
-                return;
+    protected string GetString([CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
+            return default;
 
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
+        return _rawService.GetString(route);
+    }
 
-        private void StringsStateUpdated(string route, string[] value)
-        {
-            var propertyName = _propertyStringsNameRoute.SingleOrDefault(pair => pair.Value == route).Key;
-            if (propertyName is null)
-                return;
+    protected void SetString(string value, [CallerMemberName] string propertyName = "")
+    {
+        if (value is null)
+            return;
 
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
+        if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
+            return;
 
-        private void InitMapRoutes()
-        {
-            var type = this.GetType();
-            var routePrefix = type.GetCustomAttribute<RoutePrefixAttribute>();
-            if (routePrefix is null)
-                return;
+        _rawService.SetString(value, value);
+    }
 
-            var properties = type.GetProperties();
-            foreach (var property in properties)
-            {
-                if (property is null)
-                    continue;
+    protected void SetBoolean(bool value, [CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+            return;
 
-                var routeValue = property.GetCustomAttribute<RouteValueAttribute>();
-                if (routeValue != null)
-                {
-                    var route = $"{routePrefix.RoutePrefixName}/{routeValue.RouteValueName}";
-                    _propertyValueNameRoute[property.Name] = route;
-                    continue;
-                }
+        var floatValue = value ? 1.0f : 0.0f;
+        _rawService.SetValue(route, floatValue);
+    }
 
-                var routeString = property.GetCustomAttribute<RouteStringAttribute>();
-                if (routeString != null)
-                {
-                    var route = $"{routePrefix.RoutePrefixName}/{routeString.RouteStringName}";
-                    _propertyStringNameRoute[property.Name] = route;
-                    continue;
-                }
+    protected int GetInteger([CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+            return default;
 
+        var value = _rawService.GetValue(route);
+        return (int)value;
+    }
 
-                var routeStrings = property.GetCustomAttribute<RouteStringsAttribute>();
-                if (routeStrings != null)
-                {
-                    var route = $"{routePrefix.RoutePrefixName}/{routeStrings.RouteStringsName}";
-                    _propertyStringsNameRoute[property.Name] = route;
-                    continue;
-                }
-            }
-        }
+    protected void SetInteger(int value, [CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+            return;
 
-        protected string[] GetStrings([CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyStringsNameRoute.TryGetValue(propertyName, out var route))
-                return Array.Empty<string>();
+        var floatValue = (float)value;
+        _rawService.SetValue(route, floatValue);
+    }
 
-            return _rawService.GetStrings(route);
-        }
+    protected bool GetBoolean([CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+            return default;
 
-        protected string GetString([CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
-                return default;
+        var value = _rawService.GetValue(route);
+        return value > 0.5f;
+    }
 
-            return _rawService.GetString(route);
-        }
+    protected int GetVolume([CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+            return default;
 
-        protected void SetString(string value, [CallerMemberName] string propertyName = "")
-        {
-            if (value is null)
-                return;
+        var floatValue = _rawService.GetValue(route);
+        return (int)Math.Round(floatValue * 100f);
+    }
 
-            if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
-                return;
+    protected void SetVolume(int value, [CallerMemberName] string propertyName = "")
+    {
+        if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
+            return;
 
-            _rawService.SetString(value, value);
-        }
-
-        protected void SetBoolean(bool value, [CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-                return;
-
-            var floatValue = value ? 1.0f : 0.0f;
-            _rawService.SetValue(route, floatValue);
-        }
-
-        protected int GetInteger([CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-                return default;
-
-            var value = _rawService.GetValue(route);
-            return (int)value;
-        }
-
-        protected void SetInteger(int value, [CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-                return;
-
-            var floatValue = (float)value;
-            _rawService.SetValue(route, floatValue);
-        }
-
-        protected bool GetBoolean([CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-                return default;
-
-            var value = _rawService.GetValue(route);
-            return value > 0.5f;
-        }
-
-        protected int GetVolume([CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-                return default;
-
-            var floatValue = _rawService.GetValue(route);
-            return (int)Math.Round(floatValue * 100f);
-        }
-
-        protected void SetVolume(int value, [CallerMemberName] string propertyName = "")
-        {
-            if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-                return;
-
-            var floatValue = value / 100f;
-            _rawService.SetValue(route, floatValue);
-        }
+        var floatValue = value / 100f;
+        _rawService.SetValue(route, floatValue);
     }
 }

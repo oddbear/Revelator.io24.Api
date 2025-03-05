@@ -1,16 +1,15 @@
-namespace Loupedeck.RevelatorIo24Plugin
+namespace Loupedeck.RevelatorIo24Plugin;
+
+using System;
+
+public class RevelatorIo24Application : ClientApplication
 {
-    using System;
-
-    public class RevelatorIo24Application : ClientApplication
+    public RevelatorIo24Application()
     {
-        public RevelatorIo24Application()
-        {
 
-        }
-
-        protected override String GetProcessName() => "";
-
-        protected override String GetBundleName() => "";
     }
+
+    protected override String GetProcessName() => "";
+
+    protected override String GetBundleName() => "";
 }
