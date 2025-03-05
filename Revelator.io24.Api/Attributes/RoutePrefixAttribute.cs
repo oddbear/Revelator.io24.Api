@@ -1,49 +1,48 @@
 ﻿using System;
 
-namespace Revelator.io24.Api.Attributes
+namespace Revelator.io24.Api.Attributes;
+
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+public class RoutePrefixAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class RoutePrefixAttribute : Attribute
+    public RoutePrefixAttribute(string routePrefix)
     {
-        public RoutePrefixAttribute(string routePrefix)
-        {
-            RoutePrefixName = routePrefix;
-        }
-
-        public string RoutePrefixName { get; }
+        RoutePrefixName = routePrefix;
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public class RouteValueAttribute : Attribute
-    {
-        public RouteValueAttribute(string routeValueName)
-        {
-            RouteValueName = routeValueName;
-        }
+    public string RoutePrefixName { get; }
+}
 
-        public string RouteValueName { get; }
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+public class RouteValueAttribute : Attribute
+{
+    public RouteValueAttribute(string routeValueName)
+    {
+        RouteValueName = routeValueName;
     }
 
+    public string RouteValueName { get; }
+}
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public class RouteStringAttribute : Attribute
+
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+public class RouteStringAttribute : Attribute
+{
+    public RouteStringAttribute(string routeStringName)
     {
-        public RouteStringAttribute(string routeStringName)
-        {
-            RouteStringName = routeStringName;
-        }
-
-        public string RouteStringName { get; }
+        RouteStringName = routeStringName;
     }
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public class RouteStringsAttribute : Attribute
-    {
-        public RouteStringsAttribute(string routeStringsName)
-        {
-            RouteStringsName = routeStringsName;
-        }
+    public string RouteStringName { get; }
+}
 
-        public string RouteStringsName { get; }
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+public class RouteStringsAttribute : Attribute
+{
+    public RouteStringsAttribute(string routeStringsName)
+    {
+        RouteStringsName = routeStringsName;
     }
+
+    public string RouteStringsName { get; }
 }

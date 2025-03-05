@@ -3,131 +3,130 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 
-namespace Revelator.io24.Api.Messages
+namespace Revelator.io24.Api.Messages;
+
+public class TcpMessageWriter
 {
-    public class TcpMessageWriter
+    private readonly ushort _deviceId;
+
+    public TcpMessageWriter(ushort deviceId)
     {
-        private readonly ushort _deviceId;
+        _deviceId = deviceId;
+    }
 
-        public TcpMessageWriter(ushort deviceId)
+    public byte[] CreateClientInfoMessage()
+    {
+        var data = CreateHeader(_deviceId);
+
+        var json = JsonSerializer.Serialize(new
         {
-            _deviceId = deviceId;
-        }
+            id = "Subscribe",
+            clientName = "UC-Surface",
+            clientInternalName = "ucremoteapp",
+            clientType = "CustomAPI",
+            clientDescription = "CustomAPI for Revelator io24",
+            clientIdentifier = "661b1ece-b4d3-44b3-913c-d12964456f0b",
+            clientOptions = "perm users",
+            clientEncoding = 23117
+        });
 
-        public byte[] CreateClientInfoMessage()
-        {
-            var data = CreateHeader(_deviceId);
+        //JsonLength [12..16]:
+        data.AddRange(BitConverter.GetBytes(json.Length));
 
-            var json = JsonSerializer.Serialize(new
-            {
-                id = "Subscribe",
-                clientName = "UC-Surface",
-                clientInternalName = "ucremoteapp",
-                clientType = "CustomAPI",
-                clientDescription = "CustomAPI for Revelator io24",
-                clientIdentifier = "661b1ece-b4d3-44b3-913c-d12964456f0b",
-                clientOptions = "perm users",
-                clientEncoding = 23117
-            });
+        //Json [16..]
+        data.AddRange(Encoding.ASCII.GetBytes(json));
 
-            //JsonLength [12..16]:
-            data.AddRange(BitConverter.GetBytes(json.Length));
+        return Create(data, "JM");
+    }
 
-            //Json [16..]
-            data.AddRange(Encoding.ASCII.GetBytes(json));
+    public byte[] CreateKeepAliveMessage()
+    {
+        var data = CreateHeader(_deviceId);
 
-            return Create(data, "JM");
-        }
+        return Create(data, "KA");
+    }
 
-        public byte[] CreateKeepAliveMessage()
-        {
-            var data = CreateHeader(_deviceId);
+    public byte[] CreateWelcomeMessage(ushort monitorPort)
+    {
+        var data = CreateHeader(_deviceId);
 
-            return Create(data, "KA");
-        }
+        //Port [12..14]:
+        data.AddRange(BitConverter.GetBytes(monitorPort));
 
-        public byte[] CreateWelcomeMessage(ushort monitorPort)
-        {
-            var data = CreateHeader(_deviceId);
+        return Create(data, "UM");
+    }
 
-            //Port [12..14]:
-            data.AddRange(BitConverter.GetBytes(monitorPort));
+    public byte[] CreateRouteStringUpdate(string route, string value)
+    {
+        var data = CreateHeader(_deviceId);
 
-            return Create(data, "UM");
-        }
+        //Text [12..x]:
+        data.AddRange(Encoding.ASCII.GetBytes(route));
 
-        public byte[] CreateRouteStringUpdate(string route, string value)
-        {
-            var data = CreateHeader(_deviceId);
+        //Empty [0..3]:
+        data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
 
-            //Text [12..x]:
-            data.AddRange(Encoding.ASCII.GetBytes(route));
+        //State [x+3..]:
+        data.AddRange(Encoding.ASCII.GetBytes(value + "\0"));
 
-            //Empty [0..3]:
-            data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
+        return Create(data, "PS");
+    }
 
-            //State [x+3..]:
-            data.AddRange(Encoding.ASCII.GetBytes(value + "\0"));
+    public byte[] CreateRouteValueUpdate(string route, float value)
+    {
+        var data = CreateHeader(_deviceId);
 
-            return Create(data, "PS");
-        }
+        //Text [12..x]:
+        data.AddRange(Encoding.ASCII.GetBytes(route));
 
-        public byte[] CreateRouteValueUpdate(string route, float value)
-        {
-            var data = CreateHeader(_deviceId);
+        //Empty [0..3]:
+        data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
 
-            //Text [12..x]:
-            data.AddRange(Encoding.ASCII.GetBytes(route));
+        //State [x+3..x+7]:
+        data.AddRange(BitConverter.GetBytes(value));
 
-            //Empty [0..3]:
-            data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
+        return Create(data, "PV");
+    }
 
-            //State [x+3..x+7]:
-            data.AddRange(BitConverter.GetBytes(value));
+    private static byte[] Create(List<byte> data, string messageType)
+    {
+        //Length [4..6]:
+        var length = (ushort)(data.Count - 6);
+        var lengthBytes = BitConverter.GetBytes(length);
+        data[4] = lengthBytes[0];
+        data[5] = lengthBytes[1];
 
-            return Create(data, "PV");
-        }
+        //MessageType [6..8]:
+        var messageTypeBytes = Encoding.ASCII.GetBytes(messageType);
+        if (messageTypeBytes.Length != 2)
+            throw new InvalidOperationException("Messagetype must be two bytes.");
 
-        private static byte[] Create(List<byte> data, string messageType)
-        {
-            //Length [4..6]:
-            var length = (ushort)(data.Count - 6);
-            var lengthBytes = BitConverter.GetBytes(length);
-            data[4] = lengthBytes[0];
-            data[5] = lengthBytes[1];
+        data[6] = messageTypeBytes[0];
+        data[7] = messageTypeBytes[1];
 
-            //MessageType [6..8]:
-            var messageTypeBytes = Encoding.ASCII.GetBytes(messageType);
-            if (messageTypeBytes.Length != 2)
-                throw new InvalidOperationException("Messagetype must be two bytes.");
+        return data.ToArray();
+    }
 
-            data[6] = messageTypeBytes[0];
-            data[7] = messageTypeBytes[1];
+    private static List<byte> CreateHeader(ushort deviceId)
+    {
+        var data = new List<byte>();
 
-            return data.ToArray();
-        }
+        //Header [0..4]:
+        data.AddRange(Encoding.ASCII.GetBytes("UC"));
+        data.AddRange(BitConverter.GetBytes((ushort)256));
 
-        private static List<byte> CreateHeader(ushort deviceId)
-        {
-            var data = new List<byte>();
+        //Length [4..6] (placeholder):
+        data.AddRange(new byte[] { 0x00, 0x00 });
 
-            //Header [0..4]:
-            data.AddRange(Encoding.ASCII.GetBytes("UC"));
-            data.AddRange(BitConverter.GetBytes((ushort)256));
+        //MessageType [6..8] (placeholder):
+        data.AddRange(new byte[] { 0x00, 0x00 });
 
-            //Length [4..6] (placeholder):
-            data.AddRange(new byte[] { 0x00, 0x00 });
+        //From [8..10]:
+        data.AddRange(BitConverter.GetBytes((ushort)104));
 
-            //MessageType [6..8] (placeholder):
-            data.AddRange(new byte[] { 0x00, 0x00 });
+        //To [10..12]:
+        data.AddRange(BitConverter.GetBytes(deviceId));
 
-            //From [8..10]:
-            data.AddRange(BitConverter.GetBytes((ushort)104));
-
-            //To [10..12]:
-            data.AddRange(BitConverter.GetBytes(deviceId));
-
-            return data;
-        }
+        return data;
     }
 }

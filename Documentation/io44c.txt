@@ -1,0 +1,12 @@
+-		_strings	Count = 10	System.Collections.Generic.Dictionary<string, string[]>
++		[0]	{[line/ch1/opt/eqmodel, {string[3]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[1]	{[line/ch1/opt/compmodel, {string[3]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[2]	{[line/ch1/voicefxopt/fxmodel, {string[6]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[3]	{[line/ch1/presets/preset, {string[14]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[4]	{[line/ch2/opt/eqmodel, {string[3]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[5]	{[line/ch2/opt/compmodel, {string[3]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[6]	{[line/ch2/voicefxopt/fxmodel, {string[6]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[7]	{[line/ch2/presets/preset, {string[14]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[8]	{[line/ch3/opt/eqmodel, {string[3]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		[9]	{[line/ch3/opt/compmodel, {string[3]}]}	System.Collections.Generic.KeyValuePair<string, string[]>
++		Raw View		

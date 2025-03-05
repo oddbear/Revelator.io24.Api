@@ -1,25 +1,24 @@
 ﻿using System;
 
-namespace Revelator.io24.Api.Extensions
+namespace Revelator.io24.Api.Extensions;
+
+internal static class ArrayExtensions
 {
-    internal static class ArrayExtensions
+    public static T[] Range<T>(this T[] data, int startIndex)
     {
-        public static T[] Range<T>(this T[] data, int startIndex)
-        {
-            return Range(data, startIndex, data.Length);
-        }
+        return Range(data, startIndex, data.Length);
+    }
 
-        public static T[] Range<T>(this T[] data, int startIndex, int toIndex)
-        {
-            if (startIndex < 0)
-                startIndex = data.Length + startIndex;
+    public static T[] Range<T>(this T[] data, int startIndex, int toIndex)
+    {
+        if (startIndex < 0)
+            startIndex = data.Length + startIndex;
 
-            if (toIndex < 0)
-                toIndex = data.Length + toIndex;
+        if (toIndex < 0)
+            toIndex = data.Length + toIndex;
 
-            var slice = new T[toIndex - startIndex];
-            Array.Copy(data, startIndex, slice, 0, slice.Length);
-            return slice;
-        }
+        var slice = new T[toIndex - startIndex];
+        Array.Copy(data, startIndex, slice, 0, slice.Length);
+        return slice;
     }
 }

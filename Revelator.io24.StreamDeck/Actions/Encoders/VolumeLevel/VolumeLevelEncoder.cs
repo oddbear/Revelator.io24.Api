@@ -6,8 +6,6 @@ using Newtonsoft.Json.Linq;
 using Revelator.io24.Api;
 using Revelator.io24.Api.Models.ValueConverters;
 using Revelator.io24.StreamDeck.Actions.Enums;
-using System.Data;
-using System.Transactions;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders.VolumeLevel;
 

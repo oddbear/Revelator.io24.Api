@@ -69,6 +69,9 @@ document.addEventListener("DOMContentLoaded", async function () {
      * @param {bool} hasHotKey
      */
     function setOptionsVisibility(isUsbMic, hasHotKey) {
+
+        // TODO: Whould SELECT be better to be under profiles, as an preset action etc.?
+
         // Hotkey can only be selected if USB Microphone or Left Microphone on Interface:
         setOptionVisibility("action", "hotkey", hasHotKey);
         setOptionVisibility("action", "profileHotKey", hasHotKey);
@@ -77,10 +80,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         setOptionVisibility("action", "preset3", isUsbMic);
         setOptionVisibility("action", "preset4", isUsbMic);
         
-        // Custom Profile 7 and 8 cannot be selected to Preset if not USB Microphone:
-        setOptionVisibility("action", "profilePreset3", isUsbMic);
-        setOptionVisibility("action", "profilePreset4", isUsbMic);
-
         // Profile 7 and 8 cannot be updated:
         setOptionVisibility("profile", "custom7", isUsbMic);
         setOptionVisibility("profile", "custom8", isUsbMic);
