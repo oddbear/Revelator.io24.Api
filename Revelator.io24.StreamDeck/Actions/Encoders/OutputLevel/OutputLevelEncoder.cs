@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using Revelator.io24.Api;
 using Revelator.io24.StreamDeck.Actions.Enums;
+using Revelator.io24.StreamDeck.Extensions;
 using Revelator.io24.Api.Models.ValueConverters;
 
 namespace Revelator.io24.StreamDeck.Actions.Encoders.OutputLevel;
@@ -16,7 +17,8 @@ public class OutputLevelEncoder : HybridBase
     private readonly Device _device;
     private readonly bool _isEncoder;
 
-    private OutputLevelEncoderSettings _settings;
+    // Warning, settings is mutable:
+    private readonly OutputLevelEncoderSettings _settings = new ();
 
     public OutputLevelEncoder(ISDConnection connection, InitialPayload payload)
         : base(connection, payload)
@@ -26,11 +28,7 @@ public class OutputLevelEncoder : HybridBase
         _outputLevelCache = Program.OutputLevelCache;
         _device = Program.Device;
 
-        if (payload.Settings == null || payload.Settings.Count == 0)
-        {
-            _settings = new OutputLevelEncoderSettings();
-        }
-        else
+        if (payload.Settings?.Count > 0)
         {
             _settings = payload.Settings.ToObject<OutputLevelEncoderSettings>()!;
             _ = StatesUpdated();
@@ -215,10 +213,10 @@ public class OutputLevelEncoder : HybridBase
         {
             case DeviceOut.Blend:
             case DeviceOut.Phones:
-                await Connection.SetStateAsync(0);
+                await Connection.SetStateAsync(false);
                 return;
             default:
-                await Connection.SetStateAsync(_device.Main.HardwareMute ? 1u : 0u);
+                await Connection.SetStateAsync(_device.Main.HardwareMute);
                 return;
         }
     }
@@ -245,6 +243,12 @@ public class OutputLevelEncoder : HybridBase
     #region NotUsed
 
     public override Task DialDownAsync(DialPayload payload)
+    {
+        // We don't have an action here.
+        return Task.CompletedTask;
+    }
+
+    public override Task TouchPressAsync(TouchpadPressPayload payload)
     {
         // We don't have an action here.
         return Task.CompletedTask;

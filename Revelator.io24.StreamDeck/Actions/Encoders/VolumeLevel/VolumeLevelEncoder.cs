@@ -4,6 +4,7 @@ using BarRaider.SdTools.Payloads;
 using Revelator.io24.Api.Enums;
 using Newtonsoft.Json.Linq;
 using Revelator.io24.Api;
+using Revelator.io24.StreamDeck.Extensions;
 using Revelator.io24.Api.Models.ValueConverters;
 using Revelator.io24.StreamDeck.Actions.Enums;
 
@@ -16,7 +17,8 @@ public class VolumeLevelEncoder : HybridBase
     private readonly RoutingTable _routingTable;
     private readonly bool _isEncoder;
 
-    private VolumeLevelEncoderSettings _settings;
+    // Warning, settings is mutable:
+    private readonly VolumeLevelEncoderSettings _settings = new ();
 
     public VolumeLevelEncoder(ISDConnection connection, InitialPayload payload)
         : base(connection, payload)
@@ -26,11 +28,7 @@ public class VolumeLevelEncoder : HybridBase
         _volumeLevelCache = Program.VolumeLevelCache;
         _routingTable = Program.RoutingTable;
 
-        if (payload.Settings == null || payload.Settings.Count == 0)
-        {
-            _settings = new VolumeLevelEncoderSettings();
-        }
-        else
+        if (payload.Settings?.Count > 0)
         {
             _settings = payload.Settings.ToObject<VolumeLevelEncoderSettings>()!;
             _ = RefreshVolume();
@@ -57,11 +55,11 @@ public class VolumeLevelEncoder : HybridBase
         _ = RefreshState();
     }
 
-    public override void TouchPress(TouchpadPressPayload payload)
+    public override async Task TouchPressAsync(TouchpadPressPayload payload)
     {
         if (!ValidEncoder(out var input, out var mixOut))
         {
-            Connection.ShowAlert();
+            await Connection.ShowAlert();
             return;
         }
 
@@ -171,11 +169,11 @@ public class VolumeLevelEncoder : HybridBase
         switch (_settings.Action)
         {
             case VolumeActionType.Mute:
-                await Connection.SetStateAsync(routing ? 0u : 1u);
+                await Connection.SetStateAsync(!routing);
                 return;
             case VolumeActionType.Solo:
                 var solo = _routingTable.GetSoloMono(input, mixOut);
-                await Connection.SetStateAsync(solo ? 0u : 1u);
+                await Connection.SetStateAsync(!solo);
                 return;
         }
 

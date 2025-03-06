@@ -9,11 +9,11 @@ namespace Revelator.io24.Api.Models.Inputs;
 // Gain
 // Reverb
 [RoutePrefix("line/ch1")]
-public class MicrohoneLeft : MicrophoneChannel
+public class MicrophoneLeft : MicrophoneChannel
 {
     protected override float GetPresetLength() => 14;
 
-    public MicrohoneLeft(RawService rawService)
+    public MicrophoneLeft(RawService rawService)
         : base(rawService)
     {
         //

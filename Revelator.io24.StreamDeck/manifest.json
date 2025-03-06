@@ -29,6 +29,10 @@
       "Icon": "Images/Icons/Icon",
       "States": [
         {
+          "Image": "Images/Plugin/mic_l_off",
+          "TitleAlignment": "bottom"
+        },
+        {
           "Image": "Images/Plugin/mic_l_on",
           "TitleAlignment": "bottom"
         }

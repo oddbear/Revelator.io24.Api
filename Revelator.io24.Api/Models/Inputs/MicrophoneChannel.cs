@@ -86,7 +86,7 @@ public abstract class MicrophoneChannel : LineChannel
         var floatValue = index / presetsIndex;
         _rawService.SetValue(route, floatValue);
     }
-
+    
     /// <summary>Gets name of selected preset</summary>
     [RouteValue("presets/preset")]
     public string Preset
