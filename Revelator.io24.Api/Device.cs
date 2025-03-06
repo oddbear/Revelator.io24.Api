@@ -8,16 +8,20 @@ public class Device
 {
     private readonly RawService _rawService;
 
+    // Global Settings:
+    // --------------------------------------------------
     public Global Global { get; }
 
+    // Physical Inputs:
+    // --------------------------------------------------
     // [usb]
-    public MicrohoneUsb MicrohoneUsb { get; }
+    public MicrophoneUsb MicrophoneUsb { get; }
 
     // [io24, io44]
-    public MicrohoneLeft MicrohoneLeft { get; }
+    public MicrophoneLeft MicrophoneLeft { get; }
 
     // [io24]
-    public MicrohoneRight MicrohoneRight { get; }
+    public MicrophoneRight MicrophoneRight { get; }
 
     // [io44]
     public HeadsetMic HeadsetMic { get; }
@@ -25,12 +29,16 @@ public class Device
     // [io44]
     public LineIn LineIn { get; }
 
+    // Mix Inputs:
+    // --------------------------------------------------
     public Playback Playback { get; }
     public VirtualA VirtualA { get; }
     public VirtualB VirtualB { get; }
 
     public Reverb Reverb { get; }
 
+    // Mix Outputs:
+    // --------------------------------------------------
     public Main Main { get; }
     public StreamMixA StreamMixA { get; }
     public StreamMixB StreamMixB { get; }
@@ -41,8 +49,11 @@ public class Device
 
         Global = new Global(rawService);
 
-        MicrohoneLeft = new MicrohoneLeft(rawService);
-        MicrohoneRight = new MicrohoneRight(rawService);
+        // Various wrappers for what is exposed on each input:
+        MicrophoneUsb = new MicrophoneUsb(rawService);
+        MicrophoneLeft = new MicrophoneLeft(rawService);
+        MicrophoneRight = new MicrophoneRight(rawService);
+        HeadsetMic = new HeadsetMic(rawService);
         LineIn = new LineIn(rawService);
 
         Playback = new Playback(rawService);

@@ -39,7 +39,7 @@ public abstract class HybridBase : EncoderBase, IKeypadPlugin
 
     public abstract Task DialDownAsync(DialPayload payload);
 
-    public async void KeyPressed(KeyPayload payload)
+    public async void KeyPressed(KeyPayload payload) // Interface, so no override
     {
         try
         {
@@ -50,10 +50,10 @@ public abstract class HybridBase : EncoderBase, IKeypadPlugin
             // LOG
         }
     }
-
+    
     public abstract Task KeyPressedAsync(KeyPayload payload);
 
-    public async void KeyReleased(KeyPayload payload)
+    public async void KeyReleased(KeyPayload payload) // Interface, so no override
     {
         try
         {
@@ -91,9 +91,18 @@ public abstract class HybridBase : EncoderBase, IKeypadPlugin
         // Ignore for now
     }
 
-    public override void TouchPress(TouchpadPressPayload payload)
+    public abstract Task TouchPressAsync(TouchpadPressPayload payload);
+
+    public override async void TouchPress(TouchpadPressPayload payload)
     {
-        // Ignore for now
+        try
+        {
+            await TouchPressAsync(payload);
+        }
+        catch (Exception e)
+        {
+            // LOG
+        }
     }
 
     public override void OnTick()

@@ -36,8 +36,8 @@ public class RevelatorIo24Plugin : ITouchPortalEventHandler
         _routingTable.VolumeUpdated += VolumeUpdated;
 
         _device.Global.PropertyChanged += Global_PropertyChanged;
-        _device.MicrohoneLeft.PropertyChanged += Microhone_PropertyChanged;
-        _device.MicrohoneRight.PropertyChanged += Microhone_PropertyChanged;
+        _device.MicrophoneLeft.PropertyChanged += MicrophonePropertyChanged;
+        _device.MicrophoneRight.PropertyChanged += MicrophonePropertyChanged;
     }
 
     private void Global_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -54,12 +54,12 @@ public class RevelatorIo24Plugin : ITouchPortalEventHandler
         }
     }
 
-    private void Microhone_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void MicrophonePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is not LineChannel channel)
             return;
 
-        var endpoint = sender is MicrohoneLeft
+        var endpoint = sender is MicrophoneLeft
             ? MicrophoneChannel.Left
             : MicrophoneChannel.Right;
 
@@ -168,8 +168,8 @@ public class RevelatorIo24Plugin : ITouchPortalEventHandler
         var value = ValueConverter.GetValue(actions);
 
         var lineChannel = channel == MicrophoneChannel.Left
-            ? _device.MicrohoneLeft as LineChannel
-            : _device.MicrohoneRight as LineChannel;
+            ? _device.MicrophoneLeft as LineChannel
+            : _device.MicrophoneRight as LineChannel;
 
         switch (value)
         {
@@ -197,11 +197,11 @@ public class RevelatorIo24Plugin : ITouchPortalEventHandler
         var channel = MicrophoneChannelConverter.GetMicrophoneChannel(microphone);
         if (channel == MicrophoneChannel.Left)
         {
-            _device.MicrohoneLeft.Preset = preset;
+            _device.MicrophoneLeft.Preset = preset;
         }
         else
         {
-            _device.MicrohoneRight.Preset = preset;
+            _device.MicrophoneRight.Preset = preset;
         }
     }
 
@@ -251,8 +251,8 @@ public class RevelatorIo24Plugin : ITouchPortalEventHandler
         {
             var microphone = MicrophoneChannelConverter.GetMicrophoneChannel(message.Value);
             var presets = microphone == MicrophoneChannel.Left
-                ? _device.MicrohoneLeft.Presets
-                : _device.MicrohoneRight.Presets;
+                ? _device.MicrophoneLeft.Presets
+                : _device.MicrophoneRight.Presets;
 
             _client.ChoiceUpdate(PluginId + ".presetchange.action.change.data.preset", presets, message.InstanceId);
         }

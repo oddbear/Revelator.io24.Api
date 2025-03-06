@@ -12,11 +12,11 @@ namespace Revelator.io24.Api.Models.Inputs;
 // Reverb
 // 8 custom profiles
 [RoutePrefix("line/ch1")]
-public class MicrohoneUsb : MicrophoneChannel
+public class MicrophoneUsb : MicrophoneChannel
 {
     protected override float GetPresetLength() => 16;
 
-    public MicrohoneUsb(RawService rawService)
+    public MicrophoneUsb(RawService rawService)
         : base(rawService)
     {
         //

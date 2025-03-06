@@ -13,17 +13,17 @@ public class MicrophoneHardwareMuteKeypad : KeypadSharedBaseOld<object>
         InitialPayload payload)
         : base(connection, payload)
     {
-        _device.MicrohoneLeft.PropertyChanged += PropertyChanged;
+        _device.MicrophoneLeft.PropertyChanged += PropertyChanged;
     }
 
     public override void Dispose()
     {
-        _device.MicrohoneLeft.PropertyChanged -= PropertyChanged;
+        _device.MicrophoneLeft.PropertyChanged -= PropertyChanged;
     }
 
     public override void KeyPressed(KeyPayload payload)
     {
-        _device.MicrohoneLeft.ExperimentalHardwareMute = !_device.MicrohoneLeft.ExperimentalHardwareMute;
+        _device.MicrophoneLeft.ExperimentalHardwareMute = !_device.MicrophoneLeft.ExperimentalHardwareMute;
     }
 
     protected override async Task SettingsUpdated()
@@ -35,10 +35,10 @@ public class MicrophoneHardwareMuteKeypad : KeypadSharedBaseOld<object>
     {
         try
         {
-            if (sender is not MicrohoneLeft)
+            if (sender is not MicrophoneLeft)
                 return;
 
-            if (e.PropertyName != nameof(MicrohoneLeft.ExperimentalHardwareMute))
+            if (e.PropertyName != nameof(MicrophoneLeft.ExperimentalHardwareMute))
                 return;
 
             await RefreshState();
@@ -51,7 +51,7 @@ public class MicrophoneHardwareMuteKeypad : KeypadSharedBaseOld<object>
 
     protected override async Task RefreshState()
     {
-        var state = _device.MicrohoneLeft.ExperimentalHardwareMute ? 1u : 0u;
+        var state = _device.MicrophoneLeft.ExperimentalHardwareMute ? 1u : 0u;
         await Connection.SetStateAsync(state);
     }
 }

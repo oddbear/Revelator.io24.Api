@@ -8,6 +8,8 @@ public enum ActionType
     FatChannel,
     [EnumMember(Value = "hotkey")]
     PressHotkey,
+    [EnumMember(Value = "phantomPower")]
+    PhantomPower,
     [EnumMember(Value = "preset1")]
     SelectPreset1,
     [EnumMember(Value = "preset2")]
@@ -16,9 +18,7 @@ public enum ActionType
     SelectPreset3,
     [EnumMember(Value = "preset4")]
     SelectPreset4,
-    [EnumMember(Value = "profileHotKey")]
-    ProfileHotKey,
-    /// <summary>It is only possible to set the profile on the selected/active preset</summary>
+    /// <summary>It is only possible to set the profile on the selected/active preset, including Hot Key</summary>
     [EnumMember(Value = "profilePreset")]
     ProfilePreset
 }

@@ -1,6 +1,14 @@
 ﻿/// <reference path="../SDPIComponentsTypeDef.js" />
 
 document.addEventListener("DOMContentLoaded", async function () {
+    // eslint-disable-next-line no-undef
+    const { streamDeckClient } = SDPIComponents;
+
+    // Just make sure the PropertyInspector is ready before triggering changeEvent,
+    //  this can also be done with getSettings, if we don't do this,
+    //  then changeEvent will be triggered before the settings are loaded.
+    await streamDeckClient.getConnectionInfo();
+
     // SDPI Select Elements:
     const sdpi_select_input = document.querySelector("sdpi-select[setting='input']");
     const sdpi_select_action = document.querySelector("sdpi-select[setting='action']");
@@ -45,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     function isSetProfileAction() {
-        const validActions = ["profileHotKey", "profilePreset1", "profilePreset2", "profilePreset3", "profilePreset4"];
+        const validActions = ["profilePreset"];
         return validActions.includes(select_action.value);
     }
 
@@ -74,7 +82,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         // Hotkey can only be selected if USB Microphone or Left Microphone on Interface:
         setOptionVisibility("action", "hotkey", hasHotKey);
-        setOptionVisibility("action", "profileHotKey", hasHotKey);
 
         // Preset 3 and 4 can only be selected if USB Microphone:
         setOptionVisibility("action", "preset3", isUsbMic);
