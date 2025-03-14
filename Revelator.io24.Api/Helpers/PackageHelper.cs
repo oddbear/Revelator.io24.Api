@@ -1,5 +1,4 @@
-﻿using Revelator.io24.Api.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +8,7 @@ public static class PackageHelper
 {
     public static byte[] GetHeader()
     {
-        return new byte[] { 0x55, 0x43, 0x00, 0x01 };
+        return [0x55, 0x43, 0x00, 0x01];
     }
 
     public static byte[] GetFromToBytes(ushort deviceId)
@@ -37,7 +36,7 @@ public static class PackageHelper
 
     public static bool IsUcNetPackage(byte[] data, int index = 0)
     {
-        if (data is null || data.Length - index < 4)
+        if (data.Length - index < 4)
             return false;
 
         return data[index] == 0x55 && data[index + 1] == 0x43 && data[index + 2] == 0x00 && data[index + 3] == 0x01;
@@ -45,7 +44,7 @@ public static class PackageHelper
 
     public static string GetMessageType(byte[] data)
     {
-        return Encoding.ASCII.GetString(data.Range(6, 8));
+        return Encoding.ASCII.GetString(data[6..8]);
     }
 
     public static void ApplyBytes(byte[] message, byte[] data, int index, int? length = null)
@@ -57,7 +56,7 @@ public static class PackageHelper
         }
     }
 
-    public static IEnumerable<byte[]> ChuncksByIndicator(byte[] data)
+    public static IEnumerable<byte[]> ChunksByIndicator(byte[] data)
     {
         var indexes = new List<int>();
         for (int i = 0; i < data.Length; i++)
@@ -76,7 +75,7 @@ public static class PackageHelper
             var startI = indexes[i - 1];
             var stopI = indexes[i];
 
-            yield return data.Range(startI, stopI);
+            yield return data[startI .. stopI];
         }
     }
 }

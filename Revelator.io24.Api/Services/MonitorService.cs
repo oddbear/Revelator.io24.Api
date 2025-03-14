@@ -1,5 +1,4 @@
-﻿using Revelator.io24.Api.Extensions;
-using Revelator.io24.Api.Helpers;
+﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Models.Monitor;
 using Serilog;
 using System;
@@ -88,11 +87,11 @@ public class MonitorService : IDisposable
         //TODO: Add back... When the whole range thing is figured out.
         //return;
 
-        var header = Encoding.ASCII.GetString(data.Range(0, 4)); //UC01
-        var unknownValue = BitConverter.ToUInt16(data.Range(4, 6), 0); //always: 0x6C, 0xDB : 108, 219: 56172 (27867 inversed)
-        var type = Encoding.ASCII.GetString(data.Range(6, 8)); //MS: Monitor Status?
-        var from = data.Range(8, 10);
-        var to = data.Range(10, 12);
+        var header = Encoding.ASCII.GetString(data[0..4]); //UC01
+        var unknownValue = BitConverter.ToUInt16(data[4..6], 0); //always: 0x6C, 0xDB : 108, 219: 56172 (27867 inversed)
+        var type = Encoding.ASCII.GetString(data[6..8]); //MS: Monitor Status?
+        var from = data[8..10];
+        var to = data[10..12];
 
         //Good tool for testing, send to source:
         //https://www.szynalski.com/tone-generator/
@@ -106,7 +105,7 @@ public class MonitorService : IDisposable
         //85:  6c:65:76:6c:00:00:14:00
         //                       22
         //101: 72:65:64:75:00:00:16:00
-        var unknownHeader = BitConverter.ToString(data.Range(12, 20)).Replace("-", ":"); //Always the same (but there is tree of them, 81, 85, 101).
+        var unknownHeader = BitConverter.ToString(data[12..20]).Replace("-", ":"); //Always the same (but there is tree of them, 81, 85, 101).
 
         //FatChannel, gain reduction etc.:
         if (data.Length == 101)
@@ -115,27 +114,27 @@ public class MonitorService : IDisposable
             var gateL_A = BitConverter.ToUInt16(data, 20);
             var gateR_A = BitConverter.ToUInt16(data, 22);
 
-            var unknown1 = data.Range(24, 28);
+            var unknown1 = data[24..28];
             var unknown1Val = BitConverter.ToString(unknown1).Replace("-", "");
             if (unknown1Val != "FFFFFFFF")
                 Log.Information("Something 1: {val1}", unknown1Val);
 
             //Compressor VU meter (FF FF is the lowest value)
             //Ex. DeEss is always Standard and not the VU meter.
-            var compressorVuMonitor = data.Range(28, 30);
+            var compressorVuMonitor = data[28..30];
             //TODO: Test on 30..32, I guess there is a left and right here.
 
-            var unknown2 = data.Range(30, 36);
+            var unknown2 = data[30..36];
             var unknown2Val = BitConverter.ToString(unknown2).Replace("-", "");
             if (unknown2Val != "FFFFFFFFFFFF")
                 Log.Information("Something 2: {val1}", unknown2Val);
 
             //Compressor Standard (F9FF: OFF):
             //There might be a bug here. I am not sure where this indicator is suposed to be shown.
-            var compressorStandardMonitor = data.Range(36, 38);
+            var compressorStandardMonitor = data[36..38];
             //TODO: Test on 38..40, I guess there is a left and right here.
 
-            var unknown3 = data.Range(38, 44);
+            var unknown3 = data[38..44];
             var unknown3Val = BitConverter.ToString(unknown3).Replace("-", "");
             if (unknown3Val != "FFFFFFFFFFFF")
                 Log.Information("Something 3: {val1}", unknown3Val);
@@ -145,7 +144,7 @@ public class MonitorService : IDisposable
             _fatChannel.GainReductionMeter_L = BitConverter.ToUInt16(data, 44);
             _fatChannel.GainReductionMeter_R = BitConverter.ToUInt16(data, 46);
 
-            var unknown4 = data.Range(48, 101);
+            var unknown4 = data[48..101];
             var unknown4Val = BitConverter.ToString(unknown4).Replace("-", "");
 
             //What is this, why does it sometimes change, but almost never?
@@ -173,7 +172,7 @@ public class MonitorService : IDisposable
             _values.Microphone_R = BitConverter.ToUInt16(data, 22); //XLR Input Right
 
             //Unknown 1:
-            var unknown1 = data.Range(24, 32);
+            var unknown1 = data[24..32];
             var unknown1Val = BitConverter.ToString(unknown1).Replace("-", "");
             if (unknown1Val != "0000000000000000")
                 Log.Information("Unknown 1: {val1}", unknown1Val);
@@ -205,7 +204,7 @@ public class MonitorService : IDisposable
             _values.Main_R = BitConverter.ToUInt16(data, 54);
 
             //Unknown 2:
-            var unknown2 = data.Range(56);
+            var unknown2 = data[56..];
             var unknown2Val = BitConverter.ToString(unknown2).Replace("-", "");
             if (unknown2Val != "0400000000060001000600060004000C000400070010000200")
                 Log.Information("Unknown 2: {val1}", unknown2Val);
@@ -228,7 +227,7 @@ public class MonitorService : IDisposable
                 Log.Information("Mic R != Something R: {val1} {val2}", _values.Microphone_R, somethingR);
 
             //Unknown 1:
-            var unknown1 = data.Range(32, 36);
+            var unknown1 = data[32..36];
             var unknown1Val = BitConverter.ToString(unknown1).Replace("-", "");
             if (unknown1Val != "00000000")
                 Log.Information("Unknown 1: {val1}", unknown1Val);
@@ -260,7 +259,7 @@ public class MonitorService : IDisposable
             _values.Main_R = BitConverter.ToUInt16(data, 58);
 
             //Unknown 2:
-            var unknown2 = data.Range(60);
+            var unknown2 = data[60..];
             var unknown2Val = BitConverter.ToString(unknown2).Replace("-", "");
             if (unknown2Val != "0400000000080001000800060004000E000400070012000200")
                 Log.Information("Unknown 2: {val1}", unknown2Val);
