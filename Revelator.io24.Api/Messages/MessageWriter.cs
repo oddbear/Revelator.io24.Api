@@ -5,18 +5,34 @@ using System.Text.Json;
 
 namespace Revelator.io24.Api.Messages;
 
-public class TcpMessageWriter
+public static class MessageWriter
 {
-    private readonly ushort _deviceId;
-
-    public TcpMessageWriter(ushort deviceId)
+    public static byte[] CreateWelcomeMessages(ushort deviceId, ushort monitorPort)
     {
-        _deviceId = deviceId;
+        var list = new List<byte>();
+
+        var welcomeMessage = CreateWelcomeMessage(deviceId, monitorPort);
+        list.AddRange(welcomeMessage);
+
+        var clientInfoMessage = CreateClientInfoMessage(deviceId);
+        list.AddRange(clientInfoMessage);
+
+        return list.ToArray();
     }
 
-    public byte[] CreateClientInfoMessage()
+    private static byte[] CreateWelcomeMessage(ushort deviceId, ushort monitorPort)
     {
-        var data = CreateHeader(_deviceId);
+        var data = CreateHeader(deviceId);
+
+        //Port [12..14]:
+        data.AddRange(BitConverter.GetBytes(monitorPort));
+
+        return CreateMessage(data, "UM");
+    }
+
+    private static byte[] CreateClientInfoMessage(ushort deviceId)
+    {
+        var data = CreateHeader(deviceId);
 
         var json = JsonSerializer.Serialize(new
         {
@@ -36,59 +52,49 @@ public class TcpMessageWriter
         //Json [16..]
         data.AddRange(Encoding.ASCII.GetBytes(json));
 
-        return Create(data, "JM");
+        return CreateMessage(data, "JM");
     }
 
-    public byte[] CreateKeepAliveMessage()
+    public static byte[] CreateKeepAliveMessage(ushort deviceId)
     {
-        var data = CreateHeader(_deviceId);
+        var data = CreateHeader(deviceId);
 
-        return Create(data, "KA");
+        return CreateMessage(data, "KA");
     }
 
-    public byte[] CreateWelcomeMessage(ushort monitorPort)
+    public static byte[] CreateRouteStringUpdate(ushort deviceId, string route, string value)
     {
-        var data = CreateHeader(_deviceId);
-
-        //Port [12..14]:
-        data.AddRange(BitConverter.GetBytes(monitorPort));
-
-        return Create(data, "UM");
-    }
-
-    public byte[] CreateRouteStringUpdate(string route, string value)
-    {
-        var data = CreateHeader(_deviceId);
+        var data = CreateHeader(deviceId);
 
         //Text [12..x]:
         data.AddRange(Encoding.ASCII.GetBytes(route));
 
         //Empty [0..3]:
-        data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
+        data.AddRange([0x00, 0x00, 0x00]);
 
         //State [x+3..]:
         data.AddRange(Encoding.ASCII.GetBytes(value + "\0"));
 
-        return Create(data, "PS");
+        return CreateMessage(data, "PS");
     }
 
-    public byte[] CreateRouteValueUpdate(string route, float value)
+    public static byte[] CreateRouteValueUpdate(ushort deviceId, string route, float value)
     {
-        var data = CreateHeader(_deviceId);
+        var data = CreateHeader(deviceId);
 
         //Text [12..x]:
         data.AddRange(Encoding.ASCII.GetBytes(route));
 
         //Empty [0..3]:
-        data.AddRange(new byte[] { 0x00, 0x00, 0x00 });
+        data.AddRange([0x00, 0x00, 0x00]);
 
         //State [x+3..x+7]:
         data.AddRange(BitConverter.GetBytes(value));
 
-        return Create(data, "PV");
+        return CreateMessage(data, "PV");
     }
 
-    private static byte[] Create(List<byte> data, string messageType)
+    private static byte[] CreateMessage(List<byte> data, string messageType)
     {
         //Length [4..6]:
         var length = (ushort)(data.Count - 6);
@@ -116,10 +122,10 @@ public class TcpMessageWriter
         data.AddRange(BitConverter.GetBytes((ushort)256));
 
         //Length [4..6] (placeholder):
-        data.AddRange(new byte[] { 0x00, 0x00 });
+        data.AddRange([0x00, 0x00]);
 
         //MessageType [6..8] (placeholder):
-        data.AddRange(new byte[] { 0x00, 0x00 });
+        data.AddRange([0x00, 0x00]);
 
         //From [8..10]:
         data.AddRange(BitConverter.GetBytes((ushort)104));
