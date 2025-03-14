@@ -3,7 +3,6 @@ using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
 using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -62,26 +61,9 @@ public class CommunicationService : IDisposable
 
     private void RequestCommunicationMessage()
     {
-        var networkStream = GetNetworkStream();
-        if (networkStream is null)
-            return;
+        var welcomeMessage = MessageWriter.CreateWelcomeMessages(_deviceId, _monitorService.Port);
 
-        var welcomeMessage = CreateWelcomeMessage();
-        networkStream.Write(welcomeMessage, 0, welcomeMessage.Length);
-    }
-
-    private byte[] CreateWelcomeMessage()
-    {
-        var list = new List<byte>();
-
-        var tcpMessageWriter = new TcpMessageWriter(_deviceId);
-        var welcomeMessage = tcpMessageWriter.CreateWelcomeMessage(_monitorService.Port);
-        list.AddRange(welcomeMessage);
-
-        var jsonMessage = tcpMessageWriter.CreateClientInfoMessage();
-        list.AddRange(jsonMessage);
-
-        return list.ToArray();
+        SendMessage(welcomeMessage);
     }
 
     private void KeepAlive()
@@ -90,13 +72,9 @@ public class CommunicationService : IDisposable
         {
             try
             {
-                var networkStream = GetNetworkStream();
-                if (networkStream is null)
-                    continue;
+                var keepAliveMessage = MessageWriter.CreateKeepAliveMessage(_deviceId);
 
-                var tcpMessageWriter = new TcpMessageWriter(_deviceId);
-                var keepAliveMessage = tcpMessageWriter.CreateKeepAliveMessage();
-                networkStream.Write(keepAliveMessage, 0, keepAliveMessage.Length);
+                SendMessage(keepAliveMessage);
             }
             catch (Exception exception)
             {
@@ -140,8 +118,8 @@ public class CommunicationService : IDisposable
                         case "PR":
                             //Happens when lining and unlinking mic channels.
                             //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
-                            //Fatchannel is bound to "both"
-                            //Fatchannel is bound to "both", ex. toggle toggles both to same state.
+                            //FatChannel is bound to "both"
+                            //FatChannel is bound to "both", ex. toggle toggles both to same state.
                             break;
                         case "PV":
                             //PV Settings packet
@@ -211,11 +189,11 @@ public class CommunicationService : IDisposable
     /// <param name="data"></param>
     private void SetList(byte[] data)
     {
-        var header = data[0..4];
-        var messageLength = data[4..6];
-        var messageType = data[6..8];
-        var from = data[8..10];
-        var to = data[10..12];
+        //var header = data[..4];
+        //var messageLength = data[4..6];
+        //var messageType = data[6..8];
+        //var from = data[8..10];
+        //var to = data[10..12];
 
         var i = Array.IndexOf<byte>(data, 0x00, 12);
         var route = Encoding.ASCII.GetString(data[12..i]);
@@ -225,7 +203,7 @@ public class CommunicationService : IDisposable
             return;
         }
 
-        var selectedPreset = BitConverter.ToSingle(data[(i + 3) .. (i + 7)], 0);
+        //var selectedPreset = BitConverter.ToSingle(data[(i + 3) .. (i + 7)], 0);
 
         //0x0A (\n): List delimiter
         //Last char is a 0x00 (\0)
@@ -235,21 +213,21 @@ public class CommunicationService : IDisposable
 
     /// <summary>
     /// Updates float value.
-    /// Happens ex. on turning thing on and of, ex. EQ
+    /// Happens ex. on turning thing on and off, ex. EQ
     /// </summary>
     private void SetFloatValue(byte[] data)
     {
-        var header = data[..4];
-        var messageLength = data[4..6];
-        var messageType = data[6..8];
-        var from = data[8..10];
-        var to = data[10..12];
+        //var header = data[..4];
+        //var messageLength = data[4..6];
+        //var messageType = data[6..8];
+        //var from = data[8..10];
+        //var to = data[10..12];
 
         var route = Encoding.ASCII.GetString(data[12..^7]);
-        var emptyBytes = data[^7..^4];
-        var state = BitConverter.ToSingle(data[^4..], 0);
+        //var emptyBytes = data[^7..^4];
+        var value = BitConverter.ToSingle(data[^4..], 0);
 
-        _rawService.UpdateValueState(route, state);
+        _rawService.UpdateValueState(route, value);
     }
 
     /// <summary>
@@ -258,11 +236,11 @@ public class CommunicationService : IDisposable
     /// </summary>
     private void SetStringValue(byte[] data)
     {
-        var header = data[0..4];
-        var messageLength = data[4..6];
-        var messageType = Encoding.ASCII.GetString(data[6..8]);
-        var from = data[8..10];
-        var to = data[10..12];
+        //var header = data[..4];
+        //var messageLength = data[4..6];
+        //var messageType = Encoding.ASCII.GetString(data[6..8]);
+        //var from = data[8..10];
+        //var to = data[10..12];
 
         //Ex. "line/ch1/preset_name\0\0\0Slap Echo\0"
         var str = Encoding.ASCII.GetString(data[12..]);
@@ -275,16 +253,14 @@ public class CommunicationService : IDisposable
 
     public void SetStringValue(string route, string value)
     {
-        var writer = new TcpMessageWriter(_deviceId);
-        var data = writer.CreateRouteStringUpdate(route, value);
+        var data = MessageWriter.CreateRouteStringUpdate(_deviceId, route, value);
 
         SendMessage(data);
     }
 
     public void SetRouteValue(string route, float value)
     {
-        var writer = new TcpMessageWriter(_deviceId);
-        var data = writer.CreateRouteValueUpdate(route, value);
+        var data = MessageWriter.CreateRouteValueUpdate(_deviceId, route, value);
 
         SendMessage(data);
     }
