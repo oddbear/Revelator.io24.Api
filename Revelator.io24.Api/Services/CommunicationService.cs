@@ -1,5 +1,4 @@
-﻿using Revelator.io24.Api.Extensions;
-using Revelator.io24.Api.Helpers;
+﻿using Revelator.io24.Api.Helpers;
 using Revelator.io24.Api.Messages;
 using Revelator.io24.Api.Messages.Readers;
 using Serilog;
@@ -128,7 +127,7 @@ public class CommunicationService : IDisposable
                 var data = receiveBytes[..bytesReceived];
 
                 //Multiple messages can be in one package:
-                var chunks = PackageHelper.ChuncksByIndicator(data).ToArray();
+                var chunks = PackageHelper.ChunksByIndicator(data).ToArray();
                 foreach (var chunk in chunks)
                 {
                     var messageType = PackageHelper.GetMessageType(chunk);
@@ -212,25 +211,25 @@ public class CommunicationService : IDisposable
     /// <param name="data"></param>
     private void SetList(byte[] data)
     {
-        var header = data.Range(0, 4);
-        var messageLength = data.Range(4, 6);
-        var messageType = data.Range(6, 8);
-        var from = data.Range(8, 10);
-        var to = data.Range(10, 12);
+        var header = data[0..4];
+        var messageLength = data[4..6];
+        var messageType = data[6..8];
+        var from = data[8..10];
+        var to = data[10..12];
 
         var i = Array.IndexOf<byte>(data, 0x00, 12);
-        var route = Encoding.ASCII.GetString(data.Range(12, i));
+        var route = Encoding.ASCII.GetString(data[12..i]);
         if (!route.EndsWith("/presets/preset"))
         {
             Log.Warning("[{className}] PL unknown list on route {route}", nameof(CommunicationService), route);
             return;
         }
 
-        var selectedPreset = BitConverter.ToSingle(data.Range((i + 3), (i + 7)), 0);
+        var selectedPreset = BitConverter.ToSingle(data[(i + 3) .. (i + 7)], 0);
 
         //0x0A (\n): List delimiter
         //Last char is a 0x00 (\0)
-        var list = Encoding.ASCII.GetString(data.Range((i + 7), -1)).Split('\n');
+        var list = Encoding.ASCII.GetString(data[(i + 7)..^1]).Split('\n');
         _rawService.UpdateStringsState(route, list);
     }
 
@@ -240,15 +239,15 @@ public class CommunicationService : IDisposable
     /// </summary>
     private void SetFloatValue(byte[] data)
     {
-        var header = data.Range(0, 4);
-        var messageLength = data.Range(4, 6);
-        var messageType = data.Range(6, 8);
-        var from = data.Range(8, 10);
-        var to = data.Range(10, 12);
+        var header = data[..4];
+        var messageLength = data[4..6];
+        var messageType = data[6..8];
+        var from = data[8..10];
+        var to = data[10..12];
 
-        var route = Encoding.ASCII.GetString(data.Range(12, -7));
-        var emptyBytes = data.Range(-7, -4);
-        var state = BitConverter.ToSingle(data.Range(-4), 0);
+        var route = Encoding.ASCII.GetString(data[12..^7]);
+        var emptyBytes = data[^7..^4];
+        var state = BitConverter.ToSingle(data[^4..], 0);
 
         _rawService.UpdateValueState(route, state);
     }
@@ -259,14 +258,14 @@ public class CommunicationService : IDisposable
     /// </summary>
     private void SetStringValue(byte[] data)
     {
-        var header = data.Range(0, 4);
-        var messageLength = data.Range(4, 6);
-        var messageType = Encoding.ASCII.GetString(data.Range(6, 8));
-        var from = data.Range(8, 10);
-        var to = data.Range(10, 12);
+        var header = data[0..4];
+        var messageLength = data[4..6];
+        var messageType = Encoding.ASCII.GetString(data[6..8]);
+        var from = data[8..10];
+        var to = data[10..12];
 
         //Ex. "line/ch1/preset_name\0\0\0Slap Echo\0"
-        var str = Encoding.ASCII.GetString(data.Range(12));
+        var str = Encoding.ASCII.GetString(data[12..]);
         var split = str.Split('\0');
         var route = split[0];
         var value = split[3];

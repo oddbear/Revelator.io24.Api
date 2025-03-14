@@ -27,7 +27,7 @@ public static class EnumExtensions
         var fields = type.GetFields();
         foreach (var field in fields)
         {
-            var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
+            var attribute = field.GetCustomAttribute<DescriptionAttribute>();
             var description = attribute?.Description;
             if (enumDescription == description)
             {

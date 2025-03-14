@@ -1,5 +1,4 @@
-﻿using Revelator.io24.Api.Extensions;
-using Revelator.io24.Api.Helpers;
+﻿using Revelator.io24.Api.Helpers;
 using Serilog;
 using System;
 using System.Net;
@@ -64,7 +63,7 @@ public class BroadcastService : IDisposable
         {
             try
             {
-                IPEndPoint endPoint = null;
+                IPEndPoint? endPoint = null;
                 var data = _udpClient.Receive(ref endPoint);
 
                 var isUcNetPackage = PackageHelper.IsUcNetPackage(data);
@@ -86,7 +85,7 @@ public class BroadcastService : IDisposable
                     continue;
                 }
 
-                var deviceString = Encoding.UTF8.GetString(data.Range(32));
+                var deviceString = Encoding.UTF8.GetString(data[32..]);
                 var segments = deviceString.Split('\0');
 
                 // Format DeviceName/firmwareNumber, ex. Revelator IO 24/123
@@ -120,8 +119,8 @@ public class BroadcastService : IDisposable
 
                 if (!_communicationService.IsConnected)
                 {
-                    var deviceId = BitConverter.ToUInt16(data.Range(8, 10), 0);
-                    var tcpPort = BitConverter.ToUInt16(data.Range(4, 6), 0);
+                    var deviceId = BitConverter.ToUInt16(data[8..10], 0);
+                    var tcpPort = BitConverter.ToUInt16(data[4..6], 0);
                     _communicationService.Connect(deviceId, tcpPort);
                 }
             }
