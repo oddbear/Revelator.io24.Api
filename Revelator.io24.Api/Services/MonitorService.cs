@@ -20,10 +20,8 @@ namespace Revelator.io24.Api.Services;
 public class MonitorService : IDisposable
 {
     private readonly UdpClient _udpClient;
-    private readonly Thread _thread;
     private readonly FatChannelMonitorModel _fatChannel;
     private readonly ValuesMonitorModel _values;
-    private readonly RevelatorApiSettings _settings;
 
     public ushort Port { get; }
 
@@ -36,14 +34,13 @@ public class MonitorService : IDisposable
             return;
 
         _udpClient = new UdpClient(0);
-        var ipEndpoint = _udpClient.Client.LocalEndPoint as IPEndPoint;
-        if (ipEndpoint is null)
+        if (_udpClient.Client.LocalEndPoint is not IPEndPoint ipEndpoint)
             throw new InvalidOperationException("Failed to start UDP server.");
 
         Port = (ushort)ipEndpoint.Port;
 
-        _thread = new Thread(Listener) { IsBackground = true };
-        _thread.Start();
+        var thread = new Thread(Listener) { IsBackground = true };
+        thread.Start();
 
         _fatChannel = fatChannelMonitorModel;
         _values = valuesMonitorModel;
@@ -80,7 +77,7 @@ public class MonitorService : IDisposable
         }
     }
 
-    private Dictionary<string, int> _count = new Dictionary<string, int>();
+    private Dictionary<string, int> _count = new();
 
     /// <summary>
     /// This Package type is used for real time monitoring.

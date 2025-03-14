@@ -16,10 +16,10 @@ public abstract class DeviceRoutingBase
     private readonly Dictionary<string, string> _propertyStringNameRoute = new();
     private readonly Dictionary<string, string> _propertyStringsNameRoute = new();
 
-    public DeviceRoutingBase(RawService rawService)
+    protected DeviceRoutingBase(RawService rawService)
     {
         _rawService = rawService;
-        _rawService.Syncronized += Syncronized;
+        _rawService.Synchronized += Synchronized;
         _rawService.ValueStateUpdated += ValueStateUpdated;
         _rawService.StringStateUpdated += StringStateUpdated;
         _rawService.StringsStateUpdated += StringsStateUpdated;
@@ -30,12 +30,10 @@ public abstract class DeviceRoutingBase
     protected abstract void OnPropertyChanged(PropertyChangedEventArgs eventArgs);
 
     //TODO: Add GetStringRoute and GetStringsRoute? Could be refactored to be isolated away from each other.
-    public string GetValueRoute(string propertyName)
-        => _propertyValueNameRoute.TryGetValue(propertyName, out var route)
-            ? route
-            : default;
+    public string? GetValueRoute(string propertyName)
+        => _propertyValueNameRoute.GetValueOrDefault(propertyName);
 
-    private void Syncronized()
+    private void Synchronized()
     {
         var type = this.GetType();
         var properties = type.GetProperties();
@@ -82,9 +80,6 @@ public abstract class DeviceRoutingBase
         var properties = type.GetProperties();
         foreach (var property in properties)
         {
-            if (property is null)
-                continue;
-
             var routeValue = property.GetCustomAttribute<RouteValueAttribute>();
             if (routeValue != null)
             {
@@ -115,24 +110,21 @@ public abstract class DeviceRoutingBase
     protected string[] GetStrings([CallerMemberName] string propertyName = "")
     {
         if (!_propertyStringsNameRoute.TryGetValue(propertyName, out var route))
-            return Array.Empty<string>();
+            return [];
 
         return _rawService.GetStrings(route);
     }
 
-    protected string GetString([CallerMemberName] string propertyName = "")
+    protected string? GetString([CallerMemberName] string propertyName = "")
     {
         if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
-            return default;
+            return null;
 
         return _rawService.GetString(route);
     }
 
     protected void SetString(string value, [CallerMemberName] string propertyName = "")
     {
-        if (value is null)
-            return;
-
         if (!_propertyStringNameRoute.TryGetValue(propertyName, out var route))
             return;
 
@@ -151,7 +143,7 @@ public abstract class DeviceRoutingBase
     protected int GetInteger([CallerMemberName] string propertyName = "")
     {
         if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-            return default;
+            return 0;
 
         var value = _rawService.GetValue(route);
         return (int)value;
@@ -169,7 +161,7 @@ public abstract class DeviceRoutingBase
     protected bool GetBoolean([CallerMemberName] string propertyName = "")
     {
         if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-            return default;
+            return false;
 
         var value = _rawService.GetValue(route);
         return value > 0.5f;
@@ -178,7 +170,7 @@ public abstract class DeviceRoutingBase
     protected int GetVolume([CallerMemberName] string propertyName = "")
     {
         if (!_propertyValueNameRoute.TryGetValue(propertyName, out var route))
-            return default;
+            return 0;
 
         var floatValue = _rawService.GetValue(route);
         return (int)Math.Round(floatValue * 100f);
