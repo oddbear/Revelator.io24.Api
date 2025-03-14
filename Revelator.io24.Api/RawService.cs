@@ -7,16 +7,16 @@ namespace Revelator.io24.Api;
 
 public class RawService
 {
-    public delegate void SyncronizeEvent();
+    public delegate void SynchronizeEvent();
     public delegate void ValueStateEvent(string route, float value);
     public delegate void StringStateEvent(string route, string value);
     public delegate void StringsStateEvent(string route, string[] value);
 
-    private Dictionary<string, float> _values = new Dictionary<string, float>();
-    private Dictionary<string, string> _string = new Dictionary<string, string>();
-    private Dictionary<string, string[]> _strings = new Dictionary<string, string[]>();
+    private readonly Dictionary<string, float> _values = new();
+    private readonly Dictionary<string, string> _string = new();
+    private readonly Dictionary<string, string[]> _strings = new();
 
-    public event SyncronizeEvent Syncronized;
+    public event SynchronizeEvent Synchronized;
     public event ValueStateEvent ValueStateUpdated;
     public event StringStateEvent StringStateUpdated;
     public event StringsStateEvent StringsStateUpdated;
@@ -26,17 +26,11 @@ public class RawService
 
     public void SetString(string route, string value)
     {
-        if (route is null)
-            return;
-
         SetStringMethod?.Invoke(route, value);
     }
 
     public void SetValue(string route, float value)
     {
-        if (route is null)
-            return;
-
         //Check if value has actually changed:
         //if (_values.TryGetValue(route, out var oldValue) && oldValue == value)
         //    return;
@@ -46,16 +40,14 @@ public class RawService
     }
 
     public float GetValue(string route)
-        => _values.TryGetValue(route, out var value)
-            ? value : default;
+        => _values.GetValueOrDefault(route);
 
-    public string GetString(string route)
-        => _string.TryGetValue(route, out var value)
-            ? value : default;
+    public string? GetString(string route)
+        => _string.GetValueOrDefault(route);
 
     public string[] GetStrings(string route)
         => _strings.TryGetValue(route, out var value)
-            ? value : Array.Empty<string>();
+            ? value : [];
 
     internal void UpdateValueState(string route, float value)
     {
@@ -75,7 +67,7 @@ public class RawService
         StringsStateUpdated?.Invoke(route, values);
     }
 
-    internal void Syncronize(string json)
+    internal void Synchronize(string json)
     {
         var doc = JsonSerializer.Deserialize<JsonDocument>(json);
         if (doc is null)
@@ -94,7 +86,7 @@ public class RawService
 
         Traverse(children, string.Empty);
 
-        Syncronized?.Invoke();
+        Synchronized?.Invoke();
     }
 
 

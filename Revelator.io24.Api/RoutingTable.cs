@@ -292,7 +292,7 @@ public class RoutingTable
             "aux/ch2/volume",
             "aux/ch2/mono");
 
-        _rawService.Syncronized += Synchronized;
+        _rawService.Synchronized += Synchronized;
         _rawService.ValueStateUpdated += ValueStateUpdated;
     }
 

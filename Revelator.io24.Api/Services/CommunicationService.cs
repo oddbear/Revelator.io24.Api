@@ -19,9 +19,7 @@ public class CommunicationService : IDisposable
     private readonly MonitorService _monitorService;
     private readonly RawService _rawService;
 
-    private TcpClient _tcpClient;
-    private Thread _listeningThread;
-    private Thread _writingThread;
+    private TcpClient? _tcpClient;
 
     private ushort _deviceId;
 
@@ -37,11 +35,11 @@ public class CommunicationService : IDisposable
         _rawService.SetValueMethod = SetRouteValue;
         _rawService.SetStringMethod = SetStringValue;
 
-        _listeningThread = new Thread(Listener) { IsBackground = true };
-        _listeningThread.Start();
+        var listeningThread = new Thread(Listener) { IsBackground = true };
+        listeningThread.Start();
 
-        _writingThread = new Thread(KeepAlive) { IsBackground = true };
-        _writingThread.Start();
+        var writingThread = new Thread(KeepAlive) { IsBackground = true };
+        writingThread.Start();
     }
 
     public void Connect(ushort deviceId, int tcpPort)
@@ -56,7 +54,7 @@ public class CommunicationService : IDisposable
         RequestCommunicationMessage();
     }
 
-    public NetworkStream GetNetworkStream()
+    public NetworkStream? GetNetworkStream()
     {
         return _tcpClient?.Connected is true
             ? _tcpClient.GetStream()
@@ -127,18 +125,18 @@ public class CommunicationService : IDisposable
                 }
 
                 var bytesReceived = networkStream.Read(receiveBytes, 0, receiveBytes.Length);
-                var data = receiveBytes.Range(0, bytesReceived);
+                var data = receiveBytes[..bytesReceived];
 
                 //Multiple messages can be in one package:
                 var chunks = PackageHelper.ChuncksByIndicator(data).ToArray();
-                foreach (var chunck in chunks)
+                foreach (var chunk in chunks)
                 {
-                    var messageType = PackageHelper.GetMessageType(chunck);
+                    var messageType = PackageHelper.GetMessageType(chunk);
                     switch (messageType)
                     {
                         case "PL":
                             //PL List:
-                            SetList(chunck);
+                            SetList(chunk);
                             break;
                         case "PR":
                             //Happens when lining and unlinking mic channels.
@@ -148,21 +146,21 @@ public class CommunicationService : IDisposable
                             break;
                         case "PV":
                             //PV Settings packet
-                            SetFloatValue(chunck);
+                            SetFloatValue(chunk);
                             Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                             break;
                         case "JM":
-                            var jm = JM.GetJsonMessage(chunck);
+                            var jm = JM.GetJsonMessage(chunk);
                             SetJsonMessage(jm);
                             Log.Debug("[{className}] {messageType} -> {Json}", nameof(CommunicationService), messageType, jm);
                             break;
                         case "ZM":
-                            var zm = ZM.GetJsonMessage(chunck);
+                            var zm = ZM.GetJsonMessage(chunk);
                             SetJsonMessage(zm);
                             Log.Debug("[{className}] {messageType} -> {Json}", nameof(CommunicationService), messageType, zm);
                             break;
                         case "PS":
-                            SetStringValue(chunck);
+                            SetStringValue(chunk);
                             Log.Debug("[{className}] {messageType}", nameof(CommunicationService), messageType);
                             break;
                         default:
@@ -191,10 +189,10 @@ public class CommunicationService : IDisposable
             case "SynchronizePart":
                 //Happens when lining and unlinking mic channels.
                 //If linked, volume and gain reduction (bug in UC Control?) is bound to Right Channel.
-                //Fatchannel is bound to "both", ex. toggle toggles both to same state.
+                //FatChannel is bound to "both", ex. toggle toggles both to same state.
                 return;
             case "Synchronize":
-                _rawService.Syncronize(json);
+                _rawService.Synchronize(json);
                 return;
             case "SubscriptionReply":
                 //We now have communication.
