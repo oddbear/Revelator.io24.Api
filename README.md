@@ -5,6 +5,10 @@ This way we can have **automations** and **plugins** for Stream Deck, Touch Port
 
 This API might also work for other Revelator models (currently only tested with a io44), but limited.
 
+## Status on project
+
+2025.05.24: After a couple of years **my interface died**. If I am not able to get another one for cheap, this project will see minimal or no maintainance.
+
 ## Progress
 
 - API: Still early, but many features are implemented. Try the Windows App to see what is possible.
